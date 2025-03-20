@@ -1,0 +1,58 @@
+import { hilog } from "@kit.PerformanceAnalysisKit";
+
+export  function  test1()
+{
+  const DOMAIN = 0x0000;
+  let a1=Date.now()
+
+  //hilog.info("", '调试信息: %s',a1.toString());
+
+//  console.info("a1value:"+a1.toString())
+ // hilog.info(DOMAIN,  '%{a1value2}s', a1.toString());
+  let str1= formatTime(a1)
+  hilog.info(0,"str1:%s",str1)
+}
+export function formatTime(time: number) {
+  let dateTimeStamp = new Date(time).getTime()
+
+
+  let minute = 1000 * 60;
+  let hour = minute * 60;
+  let day = hour * 24;
+
+  let month = day * 30;
+  let year = month * 12;
+  let now = new Date().getTime();
+  let diffValue = now - dateTimeStamp;
+  let result = ""
+  if (diffValue < 0) {
+    return;
+  }
+
+
+  let monthC = diffValue / month;
+  let weekC = diffValue / (7 * day);
+  let dayC = diffValue / day;
+  let hourC = diffValue / hour;
+  let minC = diffValue / minute;
+  let yearC = diffValue / year
+  if (yearC >= 1) {
+    return "" + parseInt(yearC.toString()) + "年前";
+  }
+  if (monthC >= 1) {
+    result = "" + parseInt(monthC.toString()) + "月前";
+  } else if (weekC >= 1) {
+    result = "" + parseInt(weekC.toString()) + "周前";
+  } else if (dayC >= 1) {
+    result = "" + parseInt(dayC.toString()) + "天前";
+  } else if (hourC >= 1) {
+    result = "" + parseInt(hourC.toString()) + "小时前";
+  } else if (minC >= 1) {
+    result = "" + parseInt(minC.toString()) + "分钟前";
+  } else {
+    result = "刚刚";
+  }
+
+  return result;
+}
+
