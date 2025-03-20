@@ -1,6 +1,7 @@
 import { router } from '@kit.ArkUI'
-import image from '@ohos.multimedia.image'
+
 import { CategoryItem, DefaultCategoryList } from '../models/CategoryList'
+import { IncomeAndExpenditure } from './EditParts/IncomeAndExpenditure'
 import { RoundImage } from './RoundImage'
 
 @Entry
@@ -10,6 +11,22 @@ struct EditAccount {
   showOutput: boolean = true
   @State
   categoryList: CategoryItem[] = DefaultCategoryList
+
+  @Prop
+  selectedCategoryName: string
+
+  @Prop
+  selectedCategoryImage: string
+
+  updateSelectCategory = (name: string,image:string) => {
+    this.selectedCategoryName=name;
+    this.selectedCategoryImage=image;
+  }
+
+  aboutToAppear(): void {
+    this.selectedCategoryName="其它"
+    this.selectedCategoryImage="app.media.other_houses_48dp_F3F3F3"
+  }
 
   build() {
 
@@ -107,26 +124,11 @@ struct EditAccount {
         Row() {
           Row() {
 
-            // Column() {
-            //
-            //   Image($r("app.media.restaurant_48dp_F3F3F3"))
-            //     .width(24)
-            //     .height(24)
-            //   // .backgroundColor(Color.Grey)
-            //
-            //
-            // }
-            // .justifyContent(FlexAlign.Center)
-            // .width(40)
-            // .height(40)
-            // .backgroundColor($r("app.color.danger"))
-            // //.backgroundColor(Color.Gray)
-            // .borderRadius(20)
-
             RoundImage(
               {
                 contentWidth: 40,
-                imageUrl: $r("app.media.restaurant_48dp_F3F3F3"),
+                imageUrl: $r(this.selectedCategoryImage),
+
                 backColor: $r("app.color.danger")
               }
             ).margin(
@@ -136,7 +138,7 @@ struct EditAccount {
             )
 
 
-            Text("其它")
+            Text( this.selectedCategoryName)
               .fontSize(20)
               .margin(
                 {
@@ -173,79 +175,87 @@ struct EditAccount {
       )
 
       //第三行，类型grid
+      // Column() {
+      //
+      //   Scroll() {
+      //
+      //     GridRow({ columns: 5 }) {
+      //       ForEach(this.categoryList, (item: CategoryItem) => {
+      //         GridCol() {
+      //           Column({ space: 6 }) {
+      //
+      //
+      //             RoundImage(
+      //               {
+      //                 contentWidth: 40,
+      //                 imageUrl: $r(item.category_image),
+      //
+      //                 backColor:
+      //                 this.getCategoryBackColor(item)
+      //
+      //               }
+      //             ).onClick(() => {
+      //
+      //               this.selectedCategoryName = item.category_name
+      //               this.selectedCategoryImage = item.category_image
+      //
+      //             }
+      //             )
+      //
+      //             //.fillColor($r("app.color"))
+      //             Text(item.category_name)
+      //               .fontSize(14)
+      //               .margin(
+      //                 {
+      //                   top: 5
+      //                 }
+      //               )
+      //             //.fontColor($r("app.color.white"))
+      //           }
+      //           .padding(
+      //             {
+      //               top: 10,
+      //               right: 10,
+      //               left: 10,
+      //               bottom: 10
+      //             }
+      //           )
+      //           .height(60)
+      //           .onClick(() => {
+      //             // item.itemClick && item.itemClick()
+      //           })
+      //
+      //         }
+      //         //.border({ width: { right: 1,bottom:1 }, color: '#cccccc' })
+      //
+      //         .padding(
+      //           {
+      //             top: 10,
+      //             right: 10,
+      //             left: 10,
+      //             bottom: 10
+      //           }
+      //         )
+      //       })
+      //     }
+      //
+      //   }.height(175)
+      //   .width('100%')
+      //   //.backgroundColor(Color.Yellow)
+      //   .scrollable(ScrollDirection.Vertical)
+      //
+      // }
+      // .width("100%")
+      // .backgroundColor($r("app.color.white"))
+      //
 
-      Column() {
+      IncomeAndExpenditure(
+        {
+         updateSelectCategory:this.updateSelectCategory
+        }
 
-        // ScrollContainer()
-        //   .width('100%')
-        //   .height('100%')
-        //   .scrollDirection(ScrollDirection.Vertical) // 垂直滚动
-        //   .childrenAlign(VerticalAlign.Start)
-        //   .build() {
-        // }
-        // }
+      )
 
-        Scroll() {
-
-          GridRow({ columns: 5 }) {
-            ForEach(this.categoryList, (item: CategoryItem) => {
-              GridCol() {
-                Column({ space: 6 }) {
-
-
-                  RoundImage(
-                    {
-                      contentWidth: 40,
-                      imageUrl: $r(item.category_image),
-                      backColor: $r("app.color.danger")
-                    }
-                  )
-
-                  //.fillColor($r("app.color"))
-                  Text(item.category_name)
-                    .fontSize(14)
-                    .margin(
-                      {
-                        top:5
-                      }
-                    )
-                  //.fontColor($r("app.color.white"))
-                }
-                .padding(
-                  {
-                    top: 10,
-                    right: 10,
-                    left: 10,
-                    bottom: 10
-                  }
-                )
-                .height(60)
-                .onClick(() => {
-                  // item.itemClick && item.itemClick()
-                })
-
-              }
-              //.border({ width: { right: 1,bottom:1 }, color: '#cccccc' })
-
-              .padding(
-                {
-                  top: 10,
-                  right: 10,
-                  left: 10,
-                  bottom: 10
-                }
-              )
-            })
-          }
-
-        }.height(175)
-        .width('100%')
-        //.backgroundColor(Color.Yellow)
-        .scrollable(ScrollDirection.Vertical)
-
-      }
-      .width("100%")
-      .backgroundColor($r("app.color.white"))
 
       //余下的空间
       Column() {
@@ -257,6 +267,10 @@ struct EditAccount {
     .height("100%")
     .backgroundColor($r("app.color.back_color"))
 
+  }
+
+  private getCategoryBackColor(item: CategoryItem): ResourceColor | undefined {
+    return this.selectedCategoryName === item.category_name ? $r("app.color.danger") : Color.Gray
   }
 }
 

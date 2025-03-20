@@ -84,5 +84,10 @@
       "name": "pay_back",
       "value": "#57ab70"
     }
+    ,
+    {
+      "name": "image_gray",
+      "value":"#F3F3F3"
+    }
   ]
 }
