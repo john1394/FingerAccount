@@ -1,7 +1,10 @@
 import { router } from '@kit.ArkUI'
 
 import { CategoryItem, DefaultIncomeCategoryList, DefaultOutcomeCategoryList } from '../models/CategoryList'
+import { EditMemo } from './EditParts/EditMemo'
+
 import { IncomeAndExpenditure } from './EditParts/IncomeAndExpenditure'
+import { TimeSelector as TimeSelect } from './EditParts/TimeSelect'
 import { RoundImage } from './RoundImage'
 
 @Entry
@@ -11,16 +14,10 @@ struct EditAccount {
   showOutput: boolean = true
   @State
   categoryList: CategoryItem[] = DefaultOutcomeCategoryList
-
   @Provide
   selectedCategoryName: string = "其它"
-
   @Prop
-  selectedImageColor:ResourceColor;
-
-
-
-
+  selectedImageColor: ResourceColor;
   @Prop
   selectedCategoryImage: string
   updateSelectCategory = (name: string, image: string) => {
@@ -32,7 +29,7 @@ struct EditAccount {
   aboutToAppear(): void {
     this.selectedCategoryName = this.categoryList[0].category_name
     this.selectedCategoryImage = this.categoryList[0].category_image
-    this.selectedImageColor=$r("app.color.danger")
+    this.selectedImageColor = $r("app.color.danger")
 
     //"app.media.other_houses_48dp_F3F3F3"
   }
@@ -73,7 +70,7 @@ struct EditAccount {
                   this.categoryList = DefaultOutcomeCategoryList
                   //todo list长度要不为空
                   this.selectedCategoryName = DefaultOutcomeCategoryList[0].category_name
-                  this.selectedImageColor=$r("app.color.danger")
+                  this.selectedImageColor = $r("app.color.danger")
 
                 }
                 )
@@ -107,7 +104,7 @@ struct EditAccount {
                   this.categoryList = DefaultIncomeCategoryList
                   this.selectedCategoryName = DefaultIncomeCategoryList[0].category_name
                   //this.selectedImageColor=$r("app.color.image_green")
-                  this.selectedImageColor=Color.Green
+                  this.selectedImageColor = Color.Green
                 }
 
                 )
@@ -149,7 +146,7 @@ struct EditAccount {
                 contentWidth: 40,
                 imageUrl: $r(this.selectedCategoryImage),
 
-                backColor:this.selectedImageColor
+                backColor: this.selectedImageColor
                 //$r("app.color.danger")
               }
             ).margin(
@@ -201,12 +198,15 @@ struct EditAccount {
         {
           updateSelectCategory: this.updateSelectCategory
         , categoryList: this.categoryList
-          ,selectedImageColor:this.selectedImageColor
+        , selectedImageColor: this.selectedImageColor
         }
 
       )
 
       //第4行，备注
+      EditMemo()
+
+      TimeSelect()
 
 
       //余下的空间
@@ -225,6 +225,8 @@ struct EditAccount {
     return this.selectedCategoryName === item.category_name ? $r("app.color.danger") : Color.Gray
   }
 }
+
+
 
 
 
