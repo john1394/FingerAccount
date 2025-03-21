@@ -8,7 +8,7 @@ export interface CategoryItem {
 
 }
 
-export const DefaultCategoryList: CategoryItem[] = [
+export const DefaultOutcomeCategoryList: CategoryItem[] = [
 
   {
     // 类型图片
@@ -67,3 +67,65 @@ export const DefaultCategoryList: CategoryItem[] = [
     category_name: "学习"
   }
 ]
+
+
+export const DefaultIncomeCategoryList: CategoryItem[] = [
+
+  {
+    // 类型图片
+    category_image: "app.media.other_houses_48dp_F3F3F3",
+    // 类型名称
+    category_name: "其它"
+
+  },
+  {
+    category_image: "app.media.flight_48dp_F3F3F3",
+    category_name: "薪资"
+  }
+  ,
+  {
+    category_image: "app.media.flight_48dp_F3F3F3",
+    category_name: "奖金"
+  }
+  ,
+  {
+    category_image: "app.media.flight_48dp_F3F3F3",
+    category_name: "借入"
+  }
+  ,
+  {
+    category_image: "app.media.flight_48dp_F3F3F3",
+    category_name: "收债"
+  }
+  ,
+  {
+    category_image: "app.media.flight_48dp_F3F3F3",
+    category_name: "利息"
+  }
+  ,
+  {
+    category_image: "app.media.flight_48dp_F3F3F3",
+    category_name: "投资"
+  }
+  ,
+  {
+    category_image: "app.media.flight_48dp_F3F3F3",
+    category_name: "意外"
+  }
+  ,
+  {
+    category_image: "app.media.flight_48dp_F3F3F3",
+    category_name: "兼职"
+  }
+  ,
+  {
+    category_image: "app.media.flight_48dp_F3F3F3",
+    category_name: "礼金"
+  }
+  ,
+  {
+    category_image: "app.media.flight_48dp_F3F3F3",
+    category_name: "股票"
+  }
+]
+

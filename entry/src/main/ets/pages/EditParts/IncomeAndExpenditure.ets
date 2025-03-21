@@ -1,19 +1,27 @@
-import { CategoryItem, DefaultCategoryList } from "../../models/CategoryList"
+import { CategoryItem, DefaultOutcomeCategoryList } from "../../models/CategoryList"
 import { RoundImage } from "../RoundImage"
 
 @Component
 export struct IncomeAndExpenditure {
-  @State
-  categoryList: CategoryItem[] = DefaultCategoryList
-
   @Prop
-  selectedCategoryName: string = "其它"
+  categoryList: CategoryItem[] ;
+
+  @Consume
+  selectedCategoryName: string ;
 
   @Prop
   selectedCategoryImage: string ="";
 
+  @Consume
+  showOutput: boolean ;
+
+  @Prop
+  selectedImageColor:ResourceColor;
+
+
+
   private getCategoryBackColor(item: CategoryItem): ResourceColor | undefined {
-    return this.selectedCategoryName === item.category_name ? $r("app.color.danger") : Color.Gray
+    return this.selectedCategoryName === item.category_name ? this.selectedImageColor : Color.Gray
   }
 
   updateSelectCategory = (name: string,image:string) => {
@@ -47,9 +55,10 @@ export struct IncomeAndExpenditure {
                   }
                 ).onClick(() => {
 
-                  //this.selectedCategoryName = item.category_name
-                  //this.selectedCategoryImage = item.category_image
-                  this.updateSelectCategory(item.category_name,item.category_image);
+
+                  this.updateSelectCategory(item.category_name,item.category_image)
+                  this.selectedCategoryName=item.category_name
+                  this.selectedCategoryImage=item.category_image
 
                 }
                 )
@@ -57,6 +66,11 @@ export struct IncomeAndExpenditure {
                 //.fillColor($r("app.color"))
                 Text(item.category_name)
                   .fontSize(14)
+                  .textAlign(
+                    TextAlign.Center
+                  )
+                  .width(60)
+                 // .backgroundColor(Color.Orange)
                   .margin(
                     {
                       top: 5
@@ -72,13 +86,12 @@ export struct IncomeAndExpenditure {
                   bottom: 10
                 }
               )
-              .height(60)
-              .onClick(() => {
-                // item.itemClick && item.itemClick()
-              })
+              .height(70)
+
 
             }
-            //.border({ width: { right: 1,bottom:1 }, color: '#cccccc' })
+           // .backgroundColor(Color.Pink)
+            .border({ width: { left:1,top:1, right: 1,bottom:1 }, color: '#cccccc' })
 
             .padding(
               {
@@ -91,7 +104,7 @@ export struct IncomeAndExpenditure {
           })
         }
 
-      }.height(175)
+      }.height(186)
       .width('100%')
       //.backgroundColor(Color.Yellow)
       .scrollable(ScrollDirection.Vertical)

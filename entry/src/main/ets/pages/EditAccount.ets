@@ -1,31 +1,40 @@
 import { router } from '@kit.ArkUI'
 
-import { CategoryItem, DefaultCategoryList } from '../models/CategoryList'
+import { CategoryItem, DefaultIncomeCategoryList, DefaultOutcomeCategoryList } from '../models/CategoryList'
 import { IncomeAndExpenditure } from './EditParts/IncomeAndExpenditure'
 import { RoundImage } from './RoundImage'
 
 @Entry
 @Component
 struct EditAccount {
-  @State
+  @Provide
   showOutput: boolean = true
   @State
-  categoryList: CategoryItem[] = DefaultCategoryList
+  categoryList: CategoryItem[] = DefaultOutcomeCategoryList
+
+  @Provide
+  selectedCategoryName: string = "其它"
 
   @Prop
-  selectedCategoryName: string
+  selectedImageColor:ResourceColor;
+
+
+
 
   @Prop
   selectedCategoryImage: string
+  updateSelectCategory = (name: string, image: string) => {
+    this.selectedCategoryName = name;
+    this.selectedCategoryImage = image;
 
-  updateSelectCategory = (name: string,image:string) => {
-    this.selectedCategoryName=name;
-    this.selectedCategoryImage=image;
   }
 
   aboutToAppear(): void {
-    this.selectedCategoryName="其它"
-    this.selectedCategoryImage="app.media.other_houses_48dp_F3F3F3"
+    this.selectedCategoryName = this.categoryList[0].category_name
+    this.selectedCategoryImage = this.categoryList[0].category_image
+    this.selectedImageColor=$r("app.color.danger")
+
+    //"app.media.other_houses_48dp_F3F3F3"
   }
 
   build() {
@@ -58,7 +67,13 @@ struct EditAccount {
 
                   animateTo({ duration: 300 }, () => {
                     this.showOutput = !this.showOutput
+
                   })
+
+                  this.categoryList = DefaultOutcomeCategoryList
+                  //todo list长度要不为空
+                  this.selectedCategoryName = DefaultOutcomeCategoryList[0].category_name
+                  this.selectedImageColor=$r("app.color.danger")
 
                 }
                 )
@@ -86,8 +101,13 @@ struct EditAccount {
 
                   animateTo({ duration: 300 }, () => {
                     this.showOutput = !this.showOutput
+
                   })
 
+                  this.categoryList = DefaultIncomeCategoryList
+                  this.selectedCategoryName = DefaultIncomeCategoryList[0].category_name
+                  //this.selectedImageColor=$r("app.color.image_green")
+                  this.selectedImageColor=Color.Green
                 }
 
                 )
@@ -129,7 +149,8 @@ struct EditAccount {
                 contentWidth: 40,
                 imageUrl: $r(this.selectedCategoryImage),
 
-                backColor: $r("app.color.danger")
+                backColor:this.selectedImageColor
+                //$r("app.color.danger")
               }
             ).margin(
               {
@@ -138,7 +159,7 @@ struct EditAccount {
             )
 
 
-            Text( this.selectedCategoryName)
+            Text(this.selectedCategoryName)
               .fontSize(20)
               .margin(
                 {
@@ -175,86 +196,17 @@ struct EditAccount {
       )
 
       //第三行，类型grid
-      // Column() {
-      //
-      //   Scroll() {
-      //
-      //     GridRow({ columns: 5 }) {
-      //       ForEach(this.categoryList, (item: CategoryItem) => {
-      //         GridCol() {
-      //           Column({ space: 6 }) {
-      //
-      //
-      //             RoundImage(
-      //               {
-      //                 contentWidth: 40,
-      //                 imageUrl: $r(item.category_image),
-      //
-      //                 backColor:
-      //                 this.getCategoryBackColor(item)
-      //
-      //               }
-      //             ).onClick(() => {
-      //
-      //               this.selectedCategoryName = item.category_name
-      //               this.selectedCategoryImage = item.category_image
-      //
-      //             }
-      //             )
-      //
-      //             //.fillColor($r("app.color"))
-      //             Text(item.category_name)
-      //               .fontSize(14)
-      //               .margin(
-      //                 {
-      //                   top: 5
-      //                 }
-      //               )
-      //             //.fontColor($r("app.color.white"))
-      //           }
-      //           .padding(
-      //             {
-      //               top: 10,
-      //               right: 10,
-      //               left: 10,
-      //               bottom: 10
-      //             }
-      //           )
-      //           .height(60)
-      //           .onClick(() => {
-      //             // item.itemClick && item.itemClick()
-      //           })
-      //
-      //         }
-      //         //.border({ width: { right: 1,bottom:1 }, color: '#cccccc' })
-      //
-      //         .padding(
-      //           {
-      //             top: 10,
-      //             right: 10,
-      //             left: 10,
-      //             bottom: 10
-      //           }
-      //         )
-      //       })
-      //     }
-      //
-      //   }.height(175)
-      //   .width('100%')
-      //   //.backgroundColor(Color.Yellow)
-      //   .scrollable(ScrollDirection.Vertical)
-      //
-      // }
-      // .width("100%")
-      // .backgroundColor($r("app.color.white"))
-      //
 
       IncomeAndExpenditure(
         {
-         updateSelectCategory:this.updateSelectCategory
+          updateSelectCategory: this.updateSelectCategory
+        , categoryList: this.categoryList
+          ,selectedImageColor:this.selectedImageColor
         }
 
       )
+
+      //第4行，备注
 
 
       //余下的空间

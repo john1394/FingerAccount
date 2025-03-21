@@ -88,6 +88,11 @@
     {
       "name": "image_gray",
       "value":"#F3F3F3"
+    },
+    {
+      "name": "image_green",
+      "value":"#75FB4C"
     }
+
   ]
 }
