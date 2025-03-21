@@ -18,6 +18,10 @@ export struct IncomeAndExpenditure {
   @Prop
   selectedImageColor:ResourceColor;
 
+  @State
+  blockHeight:number=210
+    //186;
+
 
 
   private getCategoryBackColor(item: CategoryItem): ResourceColor | undefined {
@@ -104,7 +108,7 @@ export struct IncomeAndExpenditure {
           })
         }
 
-      }.height(186)
+      }.height("100%")
       .width('100%')
       //.backgroundColor(Color.Yellow)
       .scrollable(ScrollDirection.Vertical)

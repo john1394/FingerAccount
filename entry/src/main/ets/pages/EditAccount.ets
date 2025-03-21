@@ -4,6 +4,8 @@ import { CategoryItem, DefaultIncomeCategoryList, DefaultOutcomeCategoryList } f
 import { EditMemo } from './EditParts/EditMemo'
 
 import { IncomeAndExpenditure } from './EditParts/IncomeAndExpenditure'
+import { NumberBoard } from './EditParts/NumberBoard'
+
 import { TimeSelector as TimeSelect } from './EditParts/TimeSelect'
 import { RoundImage } from './RoundImage'
 
@@ -201,19 +203,33 @@ struct EditAccount {
         , selectedImageColor: this.selectedImageColor
         }
 
-      )
+      ).height(230)
+        //.layoutWeight(1)
 
       //第4行，备注
-      EditMemo()
+      EditMemo().height(40).backgroundColor($r("app.color.second_back_color"))
+        .borderWidth(1)
+        .borderColor("#cccccc")
+        .padding(
+          {
+            left:5
+          }
+        )
 
+      //日期选择
       TimeSelect()
+         .height(40)
+        //.backgroundColor(Color.Pink)
+
+      //($r("app.color.second_back_color"))
+        .borderWidth(1)
+        .borderColor("#cccccc")
 
 
-      //余下的空间
-      Column() {
-        Text("other space")
-      }.width("100%")
-      .layoutWeight(1)
+      //数字键盘
+      NumberBoard().layoutWeight(1)
+
+
 
     }.width("100%")
     .height("100%")

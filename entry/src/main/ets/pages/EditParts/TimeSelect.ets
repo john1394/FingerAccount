@@ -17,7 +17,7 @@ export struct TimeSelector {
 
         if(this.selectedToday) {
           Image($r("app.media.calendar_today_48dp_434343"))
-            .width(30).height(30)
+            .width(24).height(24)
 
 
           Text("今天")
@@ -81,6 +81,7 @@ export struct TimeSelector {
       //.backgroundColor(Color.Pink)
 
     }.alignItems(HorizontalAlign.Start)
+    .justifyContent(FlexAlign.Center)
     .padding(
       {
         left: 10
