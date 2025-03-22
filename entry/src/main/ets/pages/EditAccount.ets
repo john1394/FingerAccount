@@ -1,4 +1,4 @@
-import { router } from '@kit.ArkUI'
+import { promptAction, router } from '@kit.ArkUI'
 
 import { CategoryItem, DefaultIncomeCategoryList, DefaultOutcomeCategoryList } from '../models/CategoryList'
 import { EditMemo } from './EditParts/EditMemo'
@@ -22,10 +22,24 @@ struct EditAccount {
   selectedImageColor: ResourceColor;
   @Prop
   selectedCategoryImage: string
+  @State
+  inputAmount: string = "0"
   updateSelectCategory = (name: string, image: string) => {
     this.selectedCategoryName = name;
     this.selectedCategoryImage = image;
 
+  }
+
+  updateAmountValue(inputValue: string) {
+
+    this.inputAmount = inputValue;
+  }
+
+  updateConfirm()
+  {
+    promptAction.showToast({
+      message: `确认了:${this.inputAmount},${this.selectedCategoryName}`
+    })
   }
 
   aboutToAppear(): void {
@@ -51,8 +65,6 @@ struct EditAccount {
 
         Column() {
           Row() {
-
-
             Column() {
               Text("支出")
                 .fontSize(18)
@@ -84,7 +96,6 @@ struct EditAccount {
               } else {
                 Column().height(2).width(50)
               }
-
             }
 
             Column() {
@@ -112,7 +123,6 @@ struct EditAccount {
                 )
 
               if (!this.showOutput) {
-
 
                 Image($r("app.media.horizontal_rule_48dp_000000"))
                   .width(50)
@@ -170,15 +180,21 @@ struct EditAccount {
           }.width(100)
 
           // .backgroundColor(Color.Red)
+          Row() {
+            Text("￥")
+              .fontSize(20).fontWeight(FontWeight.Bolder)
 
-
-          Text("￥10000")
-            .fontSize(20).fontWeight(FontWeight.Bolder)
-            .margin(
-              {
-                right: 10
-              }
-            )
+            Text(this.inputAmount).fontSize(20).fontWeight(FontWeight.Bolder)
+              .margin(
+                {
+                  right: 10
+                }
+              )
+            // .onClick( ()=>
+            // {
+            //   this.inputAmount="2.0"
+            // })
+          }
 
         }.width("100%")
         .height(60)
@@ -190,7 +206,7 @@ struct EditAccount {
       .backgroundColor($r("app.color.white"))
       .margin(
         {
-          bottom: 10
+          bottom: 2
         }
       )
 
@@ -204,41 +220,56 @@ struct EditAccount {
         }
 
       ).height(230)
-        //.layoutWeight(1)
+
+      //.layoutWeight(1)
 
       //第4行，备注
-      EditMemo().height(40).backgroundColor($r("app.color.second_back_color"))
+      EditMemo()
+        .height(40)// .backgroundColor(Color.Pink)
+        .backgroundColor($r("app.color.white"))//.backgroundColor($r("app.color.second_back_color"))
         .borderWidth(1)
         .borderColor("#cccccc")
         .padding(
           {
-            left:5
+            left: 5
+          }
+        )
+        .margin(
+          {
+            top: 2
           }
         )
 
       //日期选择
       TimeSelect()
-         .height(40)
-        //.backgroundColor(Color.Pink)
+        .height(40)
+        .backgroundColor($r("app.color.white"))//.backgroundColor(Color.Pink)
 
-      //($r("app.color.second_back_color"))
+          //($r("app.color.second_back_color"))
         .borderWidth(1)
         .borderColor("#cccccc")
 
 
       //数字键盘
-      NumberBoard().layoutWeight(1)
+      NumberBoard(
+        {
 
+          updateInputValue: (content: string) => {
+            this.updateAmountValue(content)
+          },
+
+          updateConfirm: () => {
+            this.updateConfirm()
+          }
+        }
+
+      ).layoutWeight(1)
 
 
     }.width("100%")
     .height("100%")
     .backgroundColor($r("app.color.back_color"))
 
-  }
-
-  private getCategoryBackColor(item: CategoryItem): ResourceColor | undefined {
-    return this.selectedCategoryName === item.category_name ? $r("app.color.danger") : Color.Gray
   }
 }
 

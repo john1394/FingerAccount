@@ -86,6 +86,7 @@ export struct EditMemo {
           }
         )
         .fontColor('#888888')
+        //.backgroundColor(Color.Pink)
         .onClick(() => {
 
           if (this.dialogController != null) {
@@ -95,6 +96,7 @@ export struct EditMemo {
         )
 
     }.width("100%")
+    //.backgroundColor(Color.Pink)
     .alignItems(HorizontalAlign.Start)
   }
 }

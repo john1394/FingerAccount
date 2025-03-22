@@ -42,7 +42,7 @@ export struct IncomeAndExpenditure {
 
       Scroll() {
 
-        GridRow({ columns: 5 }) {
+        GridRow({ columns: 4 }) {
           ForEach(this.categoryList, (item: CategoryItem) => {
             GridCol() {
               Column({ space: 6 }) {
@@ -95,7 +95,7 @@ export struct IncomeAndExpenditure {
 
             }
            // .backgroundColor(Color.Pink)
-            .border({ width: { left:1,top:1, right: 1,bottom:1 }, color: '#cccccc' })
+            //.border({ width: { left:1,top:1, right: 1,bottom:1 }, color: '#cccccc' })
 
             .padding(
               {
