@@ -2,28 +2,29 @@ import { formatDateyyyymmdd as formatDateymd } from "../../utils/Util"
 
 @Component
 export struct TimeSelector {
-  private selectedDate: Date = new Date()
-
   @State
-  dateText:string="今天"
-
+  selectedDate: Date = new Date()
   @State
-  selectedToday:boolean=true
+  dateText: string = "今天"
+  @State
+  selectedToday: boolean = true
+
+
+  updateSelectedDate: (inputValue: Date) => void = () => {
+  }
 
   build() {
 
     Column() {
       Row({ space: 5 }) {
 
-        if(this.selectedToday) {
+        if (this.selectedToday) {
           Image($r("app.media.calendar_today_48dp_434343"))
             .width(24).height(24)
 
 
           Text("今天")
-        }
-        else
-        {
+        } else {
           Text(this.dateText)
         }
 
@@ -45,16 +46,15 @@ export struct TimeSelector {
             this.selectedDate = value
             console.info("DatePickerDialog:onDateAccept()" + value.toString())
 
-            this.dateText= formatDateymd(this.selectedDate)
+            this.dateText = formatDateymd(this.selectedDate)
 
-            if(formatDateymd(this.selectedDate)===formatDateymd(new Date()))
-            {
-              this.selectedToday=true;
+            if (formatDateymd(this.selectedDate) === formatDateymd(new Date())) {
+              this.selectedToday = true;
+            } else {
+              this.selectedToday = false;
             }
-            else
-            {
-              this.selectedToday=false;
-            }
+
+            this.updateSelectedDate?.(this.selectedDate);
           },
           onCancel: () => {
             console.info("DatePickerDialog:onCancel()")
@@ -80,7 +80,8 @@ export struct TimeSelector {
 
       //.backgroundColor(Color.Pink)
 
-    }.alignItems(HorizontalAlign.Start)
+    }
+    .alignItems(HorizontalAlign.Start)
     .justifyContent(FlexAlign.Center)
     .padding(
       {

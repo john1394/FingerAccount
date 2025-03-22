@@ -23,7 +23,11 @@ struct EditAccount {
   @Prop
   selectedCategoryImage: string
   @State
+  memoText: string = ""
+  @State
   inputAmount: string = "0"
+  @State
+  selectedDate: Date = new Date;
   updateSelectCategory = (name: string, image: string) => {
     this.selectedCategoryName = name;
     this.selectedCategoryImage = image;
@@ -35,10 +39,18 @@ struct EditAccount {
     this.inputAmount = inputValue;
   }
 
-  updateConfirm()
-  {
+  updateSelectedDate(inputValue: Date) {
+
+    this.selectedDate = inputValue;
+  }
+
+  updateMemo(inputValue: string) {
+    this.memoText = inputValue
+  }
+
+  updateConfirm() {
     promptAction.showToast({
-      message: `确认了:${this.inputAmount},${this.selectedCategoryName}`
+      message: `确认了:${this.inputAmount},${this.selectedCategoryName},${this.memoText},${this.selectedDate}`
     })
   }
 
@@ -224,7 +236,15 @@ struct EditAccount {
       //.layoutWeight(1)
 
       //第4行，备注
-      EditMemo()
+      EditMemo(
+        {
+
+          updateMemo: (content: string) => {
+            this.updateMemo(content)
+          },
+        }
+
+      )
         .height(40)// .backgroundColor(Color.Pink)
         .backgroundColor($r("app.color.white"))//.backgroundColor($r("app.color.second_back_color"))
         .borderWidth(1)
@@ -241,13 +261,36 @@ struct EditAccount {
         )
 
       //日期选择
-      TimeSelect()
-        .height(40)
-        .backgroundColor($r("app.color.white"))//.backgroundColor(Color.Pink)
+      TimeSelect(
+        {
+
+
+          updateSelectedDate: (content: Date) => {
+            this.updateSelectedDate(content)
+          }
+        },
+      )
+        .height
+        (
+          40
+        )
+        .backgroundColor
+        (
+          $r
+          (
+            "app.color.white"
+          )
+        )//.backgroundColor(Color.Pink)
 
           //($r("app.color.second_back_color"))
-        .borderWidth(1)
-        .borderColor("#cccccc")
+        .borderWidth
+        (
+          1
+        )
+        .borderColor
+        (
+          "#cccccc"
+        )
 
 
       //数字键盘
@@ -263,7 +306,11 @@ struct EditAccount {
           }
         }
 
-      ).layoutWeight(1)
+      )
+        .layoutWeight
+        (
+          1
+        )
 
 
     }.width("100%")

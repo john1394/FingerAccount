@@ -41,6 +41,9 @@ export struct EditMemo {
     }),
   })
 
+  updateMemo: (inputValue: string) => void = (inputValue: string) => {
+  }
+
   // 在自定义组件即将析构销毁时将dialogController置空
   aboutToDisappear() {
     this.dialogController = null // 将dialogController置空
@@ -59,6 +62,8 @@ export struct EditMemo {
     {
       this.memoShowText="添加备注"
     }
+
+     this.updateMemo?.(this.momoText)
 
   }
 
