@@ -1,9 +1,17 @@
 import { TabBarClass } from '../models/tab'
 import WriteRecord from './WriteRecord'
+import { relationalStore } from '@kit.ArkData';
+import { DatabaseHelper } from '../utils/DatabaseHelper';
+
 
 @Entry
 @Component
 struct Index {
+  aboutToAppear(): void {
+    DatabaseHelper.getInstance().insertTest();
+    //DatabaseHelper.getInstance().selectTest();
+    DatabaseHelper.getInstance().testGetTableData("bills")
+  }
 
   @State
   tabBarList: TabBarClass[] = [
@@ -32,9 +40,9 @@ struct Index {
       selectIcon: $r('app.media.ic_public_contacts_filled')
     }
   ]
-
   @State
   currentIndex: number = 0
+
   @Builder
   CommonTabBar(item: TabBarClass) {
     Column() {
@@ -60,11 +68,11 @@ struct Index {
             if (item.name === "WriteRecord") {
               WriteRecord()
             } else if (item.name === "report") {
-             // Connect()
+              // Connect()
             } else if (item.name === "bill") {
-             // Find()
+              // Find()
             } else if (item.name === "my") {
-             // My()
+              // My()
             }
           }.tabBar(this.CommonTabBar(item))
         })

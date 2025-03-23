@@ -13,7 +13,7 @@
       total_amount INTEGER,
       category TEXT,
       PRIMARY KEY (type, date_key)
-      )
+      );
 
 CREATE INDEX idx_bills_timestamp ON bills(timestamp);       -- 加速时间范围查询
 CREATE INDEX idx_bills_category ON bills(category);        -- 加速分类过滤
