@@ -1,6 +1,7 @@
 import { promptAction, router } from '@kit.ArkUI'
 
 import { CategoryItem, DefaultIncomeCategoryList, DefaultOutcomeCategoryList } from '../models/CategoryList'
+import { DatabaseHelper } from '../utils/DatabaseHelper'
 import { EditMemo } from './EditParts/EditMemo'
 
 import { IncomeAndExpenditure } from './EditParts/IncomeAndExpenditure'
@@ -8,6 +9,8 @@ import { NumberBoard } from './EditParts/NumberBoard'
 
 import { TimeSelector as TimeSelect } from './EditParts/TimeSelect'
 import { RoundImage } from './RoundImage'
+import { ValueType } from '@kit.ArkData'
+import { getDateAtMidnight } from '../utils/Util'
 
 @Entry
 @Component
@@ -49,8 +52,24 @@ struct EditAccount {
   }
 
   updateConfirm() {
-    promptAction.showToast({
-      message: `确认了:${this.inputAmount},${this.selectedCategoryName},${this.memoText},${this.selectedDate}`
+    // promptAction.showToast({
+    //   message: `确认了:${this.inputAmount},${this.selectedCategoryName},${this.memoText},${this.selectedDate}`
+    // })
+
+    let midNight: Date = getDateAtMidnight(this.selectedDate)
+
+    let timestamp: number = midNight.getTime()
+    let extra: string = ""
+    let amountValue: number = Number(this.inputAmount)
+    let fenMoney = amountValue * 100
+
+    let params: ValueType[] = [fenMoney, this.selectedCategoryName, timestamp, this.memoText, extra]
+    DatabaseHelper.getInstance().insertBill(params)
+
+
+    router.pushUrl({
+      url: "pages/WriteRecord",
+      params: {}
     })
   }
 

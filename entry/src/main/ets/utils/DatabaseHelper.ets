@@ -1,8 +1,10 @@
-import { relationalStore } from '@kit.ArkData';
+import { relationalStore, ValueType,  } from '@kit.ArkData';
+import { BusinessError } from '@kit.BasicServicesKit';
+import { RecordItemInfo } from '../models/RecordList';
 
 
-const db_file_name="bill.db"
-const db_file_dir= "customDir/subCustomDir"
+const db_file_name = "bill.db"
+const db_file_dir = "customDir/subCustomDir"
 
 const SQL_CREATE_TABLE =
   'CREATE TABLE IF NOT EXISTS bills (\n' +
@@ -31,6 +33,7 @@ export class DatabaseHelper {
   private static instance: DatabaseHelper;
   private rdbStore: relationalStore.RdbStore | null = null;
   private initPromise: Promise<void> | null = null; // 用于确保初始化只执行一次
+
   // 确保单例模式线程安全
   public static getInstance(): DatabaseHelper {
     if (!DatabaseHelper.instance) {
@@ -69,9 +72,97 @@ export class DatabaseHelper {
     }
   }
 
+  promiseTest1(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      // 模拟异步操作（如网络请求、文件读写）
+      setTimeout(() => {
+        const success = false; // 假设操作成功
+        if (success) {
+          resolve("Data fetched successfully!");
+        } else {
+          throw new Error("my error")
+          reject("Error: Failed to fetch data.");
+        }
+      }, 5000);
+    });
+  }
+
+  promiseTest2(): Promise<void> {
+    let result: Promise<void> = new Promise(async (resolve) => {
+
+      console.log("mystep 2")
+      setTimeout(() => {
+        const success = true; // 假设操作成功
+        if (success) {
+          console.log(" mystep 4");
+          resolve()
+        } else {
+          //throw new Error("my error")
+
+        }
+      }, 5000);
+
+    })
+
+    return result
+
+  }
+
+  async doAsyncTask(): Promise<void> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        console.log("Async task completed");
+        resolve(); // 无返回值，仅表示完成
+      }, 5000);
+    });
+  }
+
+  async test3() {
+    for (let index = 0; index < 100; index++) {
+      console.log("mystep 2 index:" + index)
+    }
+  }
+
+  test2() {
+
+    console.log("mystep 1")
+    let result = this.test3()
+
+    console.log("mystep 3")
+
+    result.then(
+      () => {
+        console.log("mystep 5")
+      }
+    )
+
+    // this.promiseTest1()
+    //   .then((result) => {
+    //     console.log(result); // 成功时输出结果
+    //   })
+    //   .catch((error: Error) => {
+    //     console.error(error.message); // 失败时处理错误
+    //   });
+  }
+
 
   insertTest() {
     this.rdbStore?.executeSync("insert into bills(amount) values('1')");
+  }
+
+  insertBill( params:ValueType[]) {
+    try {
+
+      let sql: string = "insert into bills(amount,category,timestamp,notes,extra_fields) values(?,?,?,?,?)"
+      // 执行插入操作
+      const insertId = this.rdbStore?.executeSync(sql, params)
+      console.log(`Inserted row ID: ${insertId}`);
+      return insertId;
+    } catch (err) {
+      const error = err as BusinessError;
+      console.error(`Insert failed, code: ${error.code}, message: ${error.message}`);
+      return -1;
+    }
   }
 
   selectTest() {
@@ -98,7 +189,8 @@ export class DatabaseHelper {
 
   // 初始化方法必须完整覆盖赋值逻辑
 
-  private async getRdbStorePromise(context: Context, config: relationalStore.StoreConfig): Promise<relationalStore.RdbStore> {
+  private async getRdbStorePromise(context: Context,
+    config: relationalStore.StoreConfig): Promise<relationalStore.RdbStore> {
     return new Promise((resolve, reject) => {
       relationalStore.getRdbStore(context, config, (err, store) => {
         if (err) {
@@ -141,15 +233,16 @@ export class DatabaseHelper {
           // 示例版本升级逻辑，根据需求调整
           if (store.version === 1) {
             // 升级到版本2
-           // store.executeSql('ALTER TABLE EMPLOYEE ADD COLUMN AGE INTEGER');
-           // store.version = 2;
+            // store.executeSql('ALTER TABLE EMPLOYEE ADD COLUMN AGE INTEGER');
+            // store.version = 2;
           }
 
           // 设置当前数据库实例
           this.rdbStore = store;
         } catch (error) {
           console.error('初始化数据库失败:', error);
-          throw  new Error(error)
+          // throw  new Error(error)
+
         }
       })
       ()

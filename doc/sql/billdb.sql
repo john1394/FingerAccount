@@ -1,3 +1,4 @@
+  -- amount 是分钱，是个整数
   CREATE TABLE IF NOT EXISTS bills (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     amount INTEGER,
@@ -19,6 +20,7 @@ CREATE INDEX idx_bills_timestamp ON bills(timestamp);       -- 加速时间范�
 CREATE INDEX idx_bills_category ON bills(category);        -- 加速分类过滤
 CREATE INDEX idx_aggregations_date ON aggregations(date_key);
 
+--
 --CREATE TABLE bill_extensions (
 --  bill_id INTEGER,       -- 关联 bills.id
 --  key TEXT,               -- 字段名（如 "shop"）

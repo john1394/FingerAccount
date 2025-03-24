@@ -1,16 +1,30 @@
 import { TabBarClass } from '../models/tab'
 import WriteRecord from './WriteRecord'
-import { relationalStore } from '@kit.ArkData';
+import { relationalStore, ValueType } from '@kit.ArkData';
 import { DatabaseHelper } from '../utils/DatabaseHelper';
+import { RecordItemInfo } from '../models/RecordList';
 
 
 @Entry
 @Component
 struct Index {
   aboutToAppear(): void {
-    DatabaseHelper.getInstance().insertTest();
+    //DatabaseHelper.getInstance().insertTest();
     //DatabaseHelper.getInstance().selectTest();
-    DatabaseHelper.getInstance().testGetTableData("bills")
+    //DatabaseHelper.getInstance().testGetTableData("bills")
+    //DatabaseHelper.getInstance().test2()
+
+    // let param:RecordItemInfo=
+    //   {
+    //     id: '',
+    //     category_image: '',
+    //     category_name: '',
+    //     amount: 12,
+    //     timestamp: 0
+    //   }
+
+   // let params: ValueType[] = [13]
+   // DatabaseHelper.getInstance().insertBill(params)
   }
 
   @State

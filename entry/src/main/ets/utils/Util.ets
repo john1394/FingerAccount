@@ -66,7 +66,11 @@ export  function formatDateyyyymmdd(date: Date): string {
   return `${year}/${month}/${day}`;
 }
 
-function test2()
-{
-
+export function getDateAtMidnight(date:Date) {
+  // 创建一个新的 Date 对象，避免修改原始日期
+  const result = new Date(date.getTime());
+  // 设置时间为当天的 0 点 0 分 0 秒
+  result.setHours(0, 0, 0, 0);
+  return result;
 }
+
