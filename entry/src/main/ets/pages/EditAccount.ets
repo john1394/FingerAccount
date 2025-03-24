@@ -61,7 +61,8 @@ struct EditAccount {
     let timestamp: number = midNight.getTime()
     let extra: string = ""
     let amountValue: number = Number(this.inputAmount)
-    let fenMoney = amountValue * 100
+
+    let fenMoney: number = Math.round(amountValue * 100);
 
     let params: ValueType[] = [fenMoney, this.selectedCategoryName, timestamp, this.memoText, extra]
     DatabaseHelper.getInstance().insertBill(params)

@@ -1,13 +1,20 @@
 import { DefaultRecordList, RecordItemInfo } from '../models/RecordList'
-import { formatTime, test1 } from '../utils/Util'
+import { formatFen, formatTime, test1 } from '../utils/Util'
 import { router } from '@kit.ArkUI'
+import { DatabaseHelper } from '../utils/DatabaseHelper'
 
 @Preview
 @Entry
 @Component
 struct WriteRecord {
   @State
-  recordList: RecordItemInfo[] = DefaultRecordList
+  recordList: RecordItemInfo[] = []
+
+  aboutToAppear(): void {
+    let allItems: RecordItemInfo[] = DatabaseHelper.getInstance().getAllBillRecord();
+
+    this.recordList = allItems;
+  }
 
   build() {
     Column() {
@@ -219,7 +226,7 @@ struct WriteRecord {
 
                 //右侧块
                 Column() {
-                  Text(`￥${item.amount}`)
+                  Text(`￥${formatFen(item.amount)}`)
                     .margin(
                       {
                         bottom: 10
@@ -293,15 +300,14 @@ struct WriteRecord {
       .backgroundColor(Color.Green)
       .margin(
         {
-          bottom:10
+          bottom: 10
         }
       )
-      .onClick( ()=>
-      {
+      .onClick(() => {
         router.pushUrl(
           {
-            url:"pages/EditAccount",
-            params:"params"
+            url: "pages/EditAccount",
+            params: "params"
           }
 
         )

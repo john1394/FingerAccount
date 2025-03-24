@@ -1,17 +1,17 @@
 import { hilog } from "@kit.PerformanceAnalysisKit";
 
-export  function  test1()
-{
+export function test1() {
   const DOMAIN = 0x0000;
-  let a1=Date.now()
+  let a1 = Date.now()
 
   //hilog.info("", '调试信息: %s',a1.toString());
 
-//  console.info("a1value:"+a1.toString())
- // hilog.info(DOMAIN,  '%{a1value2}s', a1.toString());
-  let str1= formatTime(a1)
-  hilog.info(0,"str1:%s",str1)
+  //  console.info("a1value:"+a1.toString())
+  // hilog.info(DOMAIN,  '%{a1value2}s', a1.toString());
+  let str1 = formatTime(a1)
+  hilog.info(0, "str1:%s", str1)
 }
+
 export function formatTime(time: number) {
   let dateTimeStamp = new Date(time).getTime()
 
@@ -59,14 +59,33 @@ export function formatTime(time: number) {
 /*
   2022/03/21 这样的
  */
-export  function formatDateyyyymmdd(date: Date): string {
+export function formatDateyyyymmdd(date: Date): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始，需要+1
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}/${month}/${day}`;
 }
 
-export function getDateAtMidnight(date:Date) {
+export function formatFen(amount: number) {
+
+  if(amount<100)
+  {
+    return "0."+amount.toString().padStart(2,"0")
+  }
+  else
+  {
+
+
+    let str: string = amount.toString()
+    let first = str.substring(0, str.length - 2)
+    let second = str.substring(str.length - 2, str.length)
+    let result = first + "." + second
+    return result
+  }
+
+}
+
+export function getDateAtMidnight(date: Date) {
   // 创建一个新的 Date 对象，避免修改原始日期
   const result = new Date(date.getTime());
   // 设置时间为当天的 0 点 0 分 0 秒

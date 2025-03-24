@@ -1,4 +1,4 @@
-import { relationalStore, ValueType,  } from '@kit.ArkData';
+import { relationalStore, ValueType, } from '@kit.ArkData';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { RecordItemInfo } from '../models/RecordList';
 
@@ -150,7 +150,7 @@ export class DatabaseHelper {
     this.rdbStore?.executeSync("insert into bills(amount) values('1')");
   }
 
-  insertBill( params:ValueType[]) {
+  insertBill(params: ValueType[]) {
     try {
 
       let sql: string = "insert into bills(amount,category,timestamp,notes,extra_fields) values(?,?,?,?,?)"
@@ -163,6 +163,55 @@ export class DatabaseHelper {
       console.error(`Insert failed, code: ${error.code}, message: ${error.message}`);
       return -1;
     }
+  }
+
+  getAllBillRecord() {
+    let result: RecordItemInfo[] = []
+    try {
+      // 1. 执行 SQL 查询
+      const sql = 'SELECT * FROM bills';
+      const resultSet = this.rdbStore?.querySqlSync(sql); // 或使用 executeSql（需处理结果集）
+
+      while (resultSet?.goToNextRow()) {
+        // 获取列索引
+        const idIndex = resultSet.getColumnIndex('id');
+        const amountIndex = resultSet.getColumnIndex('amount');
+        const categoryIndex = resultSet.getColumnIndex('category');
+        const timestampIndex = resultSet.getColumnIndex('timestamp');
+        const notesIndex = resultSet.getColumnIndex('notes');
+        const extraFieldsIndex = resultSet.getColumnIndex('extra_fields');
+
+        // 获取列值
+        const idValue = resultSet.getLong(idIndex);
+        const amount = resultSet.getLong(amountIndex);
+        const category = resultSet.getString(categoryIndex);
+        const timestamp = resultSet.getLong(timestampIndex);
+        const notes = resultSet.getString(notesIndex);
+        const extraFields = resultSet.getString(extraFieldsIndex);
+
+        console.log(`ID: ${idValue}, Amount: ${amount}, Category: ${category}, Timestamp: ${timestamp}, Notes: ${notes}, Extra Fields: ${extraFields}`);
+
+        let item: RecordItemInfo =
+          {
+            id: idValue,
+            category_image: '',
+            category_name: category,
+            amount: amount,
+            timestamp: timestamp
+          }
+
+        result.push(item);
+      }
+
+      resultSet?.close();
+
+
+    } catch (error) {
+      console.error(`Failed to execute SQL: ${error.message}`);
+
+    }
+
+    return result;
   }
 
   selectTest() {
