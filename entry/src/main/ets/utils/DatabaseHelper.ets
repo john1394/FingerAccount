@@ -165,6 +165,25 @@ export class DatabaseHelper {
     }
   }
 
+
+  deleteBill(id:number) {
+    try {
+
+      let sql: string = "delete from bills where id = ?"
+
+      let params:ValueType[]=[]
+
+      params.push(id);
+      const affected = this.rdbStore?.executeSync(sql, params)
+      console.log(`delete row ID: ${affected}`);
+      return affected;
+    } catch (err) {
+      const error = err as BusinessError;
+      console.error(`delete failed, code: ${error.code}, message: ${error.message}`);
+      return -1;
+    }
+  }
+
   getAllBillRecord() {
     let result: RecordItemInfo[] = []
     try {

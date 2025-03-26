@@ -2,6 +2,7 @@
   "src": [
     "pages/Index",
     "pages/EditAccount",
-    "pages/WriteRecord"
+    "pages/WriteRecord",
+    "pages/BillDetail"
   ]
 }

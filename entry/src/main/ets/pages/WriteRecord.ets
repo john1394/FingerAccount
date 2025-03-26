@@ -1,7 +1,8 @@
 import { DefaultRecordList, RecordItemInfo } from '../models/RecordList'
 import { formatFen, formatTime, test1 } from '../utils/Util'
-import { router } from '@kit.ArkUI'
+import { promptAction, router } from '@kit.ArkUI'
 import { DatabaseHelper } from '../utils/DatabaseHelper'
+import { faceDetector } from '@kit.CoreVisionKit'
 
 @Preview
 @Entry
@@ -9,11 +10,35 @@ import { DatabaseHelper } from '../utils/DatabaseHelper'
 struct WriteRecord {
   @State
   recordList: RecordItemInfo[] = []
+  @State
+  firstAppear: boolean = false
 
-  aboutToAppear(): void {
+  // onPageShow(): void {
+  //
+  //   if (!this.firstAppear) {
+  //     this.loadAllData();
+  //   }
+  // }
+
+  loadAllData() {
     let allItems: RecordItemInfo[] = DatabaseHelper.getInstance().getAllBillRecord();
 
+    allItems.forEach((item: RecordItemInfo) => {
+
+      item.category_image = $r("app.media.ic_edit")
+    }
+    )
+
     this.recordList = allItems;
+  }
+
+  aboutToAppear(): void {
+    this.loadAllData();
+    // if(!this.firstAppear) {
+    //   this.firstAppear = true
+    //
+    // }
+
   }
 
   build() {
@@ -259,6 +284,21 @@ struct WriteRecord {
               .width("100%")
 
             }
+            .onClick(() => {
+
+              promptAction.showToast(
+                {
+                  message: "detail"
+                }
+              )
+              router.pushUrl(
+                {
+                  url: "pages/BillDetail",
+                  params: item
+                }
+              )
+
+            })
           }
           )
         }.backgroundColor($r("app.color.white"))
