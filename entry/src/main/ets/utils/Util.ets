@@ -74,15 +74,41 @@ export function formatDateYMDHan(date: Date): string {
   return `${year}年${month}月${day}日`;
 }
 
+export function trimEndZero(numberText: string): string {
+
+  try {
+    if (numberText.indexOf(".") == -1) {
+      return numberText;
+    }
+
+    let length = numberText.length;
+    let i = length - 1;
+    for (; i > -1; --i) {
+      if (numberText[i] != "0") {
+        break;
+      }
+    }
+
+    if (numberText[i] === ".") {
+      --i;
+    }
+
+    return numberText.substring(0, i + 1)
+
+  } catch (error) {
+    console.log(error)
+    return numberText;
+  }
+
+}
+
 export function getIconCategoryBackcolor(item: RecordItemInfo, currentCategoryName: string): ResourceColor {
   if (item.category_name === currentCategoryName) {
     if (item.bill_type === BillTypeEnum.Outcome) {
       return getOutcomeIconBackColor();
     } else if (item.bill_type === BillTypeEnum.Income) {
       return getIncomeIconBackColor();
-    }
-    else
-    {
+    } else {
       //not imp
       return getOutcomeIconBackColor();
     }

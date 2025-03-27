@@ -12,7 +12,8 @@ import { RoundImage } from './RoundImage'
 import { ValueType } from '@kit.ArkData'
 import { formatFen, getDateAtMidnight,
   getIconCategoryBackcolor,
-  getIncomeIconBackColor, getOutcomeIconBackColor } from '../utils/Util'
+  getIncomeIconBackColor, getOutcomeIconBackColor,
+  trimEndZero } from '../utils/Util'
 import { BillTypeEnum, RecordItemInfo } from '../models/RecordList'
 
 @Entry
@@ -124,7 +125,8 @@ struct EditAccount {
     this.selectedCategoryImage = this.currentItem.category_image;
     this.selectedImageColor = this.currentItem.bill_type === 0 ? getOutcomeIconBackColor() : getIncomeIconBackColor();
     //$r("app.color.danger")
-    this.inputAmountStr = this.currentItem.amount === 0 ? "0" : formatFen(this.currentItem.amount)
+    this.inputAmountStr = this.currentItem.amount === 0 ? "0" :
+      trimEndZero( formatFen(this.currentItem.amount))
     this.categoryList = this.getCategoryList();
     //this.inputAmount=this.currentItem.amount;
 
@@ -383,7 +385,6 @@ struct EditAccount {
       NumberBoard(
         {
 
-          //amount: this.currentItem.amount,
           inputValue: this.inputAmountStr,
           updateInputValue: (content: string) => {
             this.updateAmountValue(content)

@@ -1,4 +1,5 @@
 import { promptAction } from "@kit.ArkUI"
+import { trimEndZero } from "../../utils/Util";
 
 const MaxNumber: number = 100000000;
 
@@ -18,6 +19,7 @@ export struct NumberBoard {
   }
 
   aboutToAppear(): void {
+
 
   }
 
@@ -80,13 +82,7 @@ export struct NumberBoard {
   }
 
   private handleInput(value: string, index: number) {
-    // const result:number = evaluate('3 + 5 * 2-'); // 结果为13
 
-    // promptAction.showToast({
-    //   message: `当前值:${value}`
-    // })
-
-    // let a:number=Math.exp("3+2")
 
     if (value === "0"
       || value === "1"
@@ -158,46 +154,23 @@ export struct NumberBoard {
 
     //1.小数点后最多两个数字
     //2.总值不可超过maxnumber
-    //3.
-    //let aa="399."
-    //let bb=Number(aa);
 
-    //let valueNumber: number = Number(value);
-    //let lastValueNumber=Number(this.inputValue);
-    //let targetValue=this.inputValue+
 
     let targetValue = this.inputValue + value
     let targetNumber: number = Number(targetValue)
 
     //每天不超过1个小目标
     if (targetNumber > MaxNumber) {
-      // promptAction.showToast({
-      //   message: `值:${targetNumber} 超上限`
-      // })
 
       return
     }
 
-
-    //todo 数字上限
-
     this.inputValue = targetValue
 
-    // promptAction.showToast({
-    //   message: `当前值:${this.inputValue}`
-    // })
-
     this.updateInputValue?.(this.inputValue);
-    //this.amount=Number(this.inputValue);
+
   }
 
-  // private add(value: string, index: number) {
-  //
-  // }
-  //
-  // private sub(value: string, index: number) {
-  //
-  // }
 
   private backspace(value: string, index: number) {
 
