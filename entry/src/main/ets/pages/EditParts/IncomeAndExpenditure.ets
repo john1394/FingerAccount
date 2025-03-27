@@ -6,14 +6,14 @@ export struct IncomeAndExpenditure {
   @Prop
   categoryList: CategoryItem[] ;
 
-  @Consume
+  @Prop
   selectedCategoryName: string ;
 
   @Prop
   selectedCategoryImage: string ="";
 
-  @Consume
-  showOutput: boolean ;
+  @Prop
+  isOutput: boolean ;
 
   @Prop
   selectedImageColor:ResourceColor;

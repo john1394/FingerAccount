@@ -2,6 +2,8 @@ import { router } from '@kit.ArkUI'
 import { RecordItemInfo } from '../models/RecordList'
 import { DatabaseHelper } from '../utils/DatabaseHelper';
 import { RoundImage } from './RoundImage'
+import { ValueType } from '@kit.ArkData';
+import { formatDateYMDHan, formatFen } from '../utils/Util';
 
 @Preview
 @Entry
@@ -12,100 +14,184 @@ struct BillDetail {
 
   aboutToAppear(): void {
 
-    // router.getParams() as
     this.currentItem = router.getParams() as RecordItemInfo;
 
   }
 
+  formatBillAmount() {
+    let result: string = ""
+    if (this.currentItem.bill_type === 0) { //支出
+      result = "-" + formatFen(this.currentItem.amount)
+    } else if (this.currentItem.bill_type === 1) {
+      result = formatFen(this.currentItem.amount) + ""
+    }
+
+    return result;
+  }
+
+  formatBillTypeName() {
+    let result: string = ""
+    if (this.currentItem.bill_type === 0) { //支出
+      result = "支出"
+    } else if (this.currentItem.bill_type === 1) {
+      result = "收入"
+    }
+
+    return result;
+  }
+
+  formatMemoText() {
+    let result: string = ""
+    if (this.currentItem.notes === "") { //支出
+      result = "--"
+    } else {
+      result = this.currentItem.notes;
+    }
+
+    return result;
+  }
 
   build() {
 
     Column() {
+
+
+      //第一行
+      Row({ space: 0 }) {
+        Image($r("app.media.ic_public_arrow_left"))
+          .width(30)
+          .height(30)
+
+          .onClick(() => {
+            router.back()
+            // router.back(
+            //   {
+            //     url:"pages/WriteRecord",
+            //     params: { refresh: true }
+            //   }
+            // )
+          })
+          .zIndex(2)
+          .margin(
+            {
+              left: 10,
+              right: 10
+            }
+          )
+
+        Text("详情") {
+        }.fontSize(20)
+        .fontWeight(FontWeight.Bold)
+      }
+      .width("100%")
+      .height(48)
+      .backgroundColor($r("app.color.white"))
+
       Column() {
-        Row({ space: 10 }) {
-          Image($r("app.media.ic_public_arrow_left"))
-            .width(30)
-            .height(30)
-            .onClick(() => {
-              router.back()
-              // router.back(
-              //   {
-              //     url:"pages/WriteRecord",
-              //     params: { refresh: true }
-              //   }
-              // )
-            })
-            .zIndex(2)
-            .margin(
-              {
-                right: 10
-              }
-            )
+      }.height(5)
 
-          Text("详情") {
-          }.fontSize(20)
-          .fontWeight(FontWeight.Bold)
-        }
-        .width("100%")
-        .height(48)
-        .backgroundColor($r("app.color.white"))
+      Column() {
 
-        Column() {
-        }.height(5)
 
         //列表
 
         Column() {
-          List({ space: 10 }) {
 
-
-            ListItem() {
-
-              Row({ space: 10 }) {
-                Row() {
-                  RoundImage(
-                    {
-                      contentWidth: 40,
-                      imageUrl: $r("app.media.ic_edit"),
-                      backColor: $r("app.color.danger")
-                    }
-                  ).margin(
-                    {
-                      left: 10,
-                      right: 20
-                    }
-                  )
-
-                  Text("餐饮")
+          Row({ space: 10 }) {
+            Row() {
+              RoundImage(
+                {
+                  contentWidth: 40,
+                  imageUrl: this.currentItem.category_image,
+                  backColor: $r("app.color.danger")
                 }
-                .height(60)
+              ).margin(
+                {
+                  left: 0,
+                  right: 10
+                }
+              )
 
-                //.backgroundColor(Color.Gray)
-
-                Text("-8.00")
-                  .margin(
-                    {
-                      right: 10
-                    }
-                  )
-
-              }.width("100%")
-              .justifyContent(FlexAlign.SpaceBetween)
-
+              Text(this.currentItem.category_name)
             }
+            //.width("100%")
+            .height(60)
 
+            //.backgroundColor(Color.Pink)
 
-            ListItem() {
-              Text("second")
-            }.height(40)
-          }
+            Text(this.formatBillAmount())
+              .margin(
+                {
+                  right: 10
+                }
+              )
 
+          }.width("100%")
+          .justifyContent(FlexAlign.SpaceBetween)
+
+          //第二行
+          Row({ space: 0 }) {
+            Text("收支类型")
+            Text(this.formatBillTypeName())
+              .margin(
+                {
+                  right: 10
+                }
+              )
+          }.height(60)
           .width("100%")
+          .padding(
+            {
+              left: 10
+            }
+          )
+          .justifyContent(FlexAlign.SpaceBetween)
 
-          // .backgroundColor(Color.Pink)
+          //第三行
+          Row({ space: 0 }) {
+            Text("日期")
+            Text(formatDateYMDHan(new Date(this.currentItem.timestamp)))
+              .margin(
+                {
+                  right: 10
+                }
+              )
+          }.height(60)
+          .width("100%")
+          .padding(
+            {
+              left: 10
+            }
+          )
+          .justifyContent(FlexAlign.SpaceBetween)
 
-        }.borderRadius(5)
-        .backgroundColor($r("app.color.white"))
+          //第四行
+          Row({ space: 0 }) {
+            Text("备注")
+            Text(this.formatMemoText())
+              .margin(
+                {
+                  right: 10
+                }
+              )
+          }.height(60)
+          .width("100%")
+          .padding(
+            {
+              left: 10
+            }
+          )
+          .justifyContent(FlexAlign.SpaceBetween)
+
+        }.backgroundColor($r("app.color.white"))
+        .width("100%")
+        .borderRadius(5)
+        .padding(
+          {
+            left: 10,
+            right: 10
+          }
+        )
 
       }.width("100%")
       .padding(
@@ -122,10 +208,20 @@ struct BillDetail {
       .layoutWeight(1)
 
       Row() {
-        Text('编辑').fontSize(20)
+        Text('编辑')
+          .fontSize(20)
           .fontWeight(FontWeight.Bold)// .backgroundColor(Color.Pink)
           .layoutWeight(1)
           .textAlign(TextAlign.Center)
+          .onClick(() => {
+            router.pushUrl(
+              {
+                url: "pages/EditAccount",
+                params: this.currentItem
+              }
+            )
+          }
+          )
 
         Divider()
           .vertical(true)

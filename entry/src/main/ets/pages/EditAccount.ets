@@ -11,26 +11,32 @@ import { TimeSelector as TimeSelect } from './EditParts/TimeSelect'
 import { RoundImage } from './RoundImage'
 import { ValueType } from '@kit.ArkData'
 import { getDateAtMidnight } from '../utils/Util'
+import { RecordItemInfo } from '../models/RecordList'
 
 @Entry
 @Component
 struct EditAccount {
   @Provide
-  showOutput: boolean = true
+  isOutput: boolean = true
   @State
   categoryList: CategoryItem[] = DefaultOutcomeCategoryList
-  @Provide
+
+  @Prop
   selectedCategoryName: string = "其它"
   @Prop
   selectedImageColor: ResourceColor;
   @Prop
-  selectedCategoryImage: string
+  selectedCategoryImage: ResourceStr
   @State
   memoText: string = ""
   @State
   inputAmount: string = "0"
   @State
   selectedDate: Date = new Date;
+
+  @Prop
+  currentItem:RecordItemInfo;
+
   updateSelectCategory = (name: string, image: string) => {
     this.selectedCategoryName = name;
     this.selectedCategoryImage = image;
@@ -51,6 +57,18 @@ struct EditAccount {
     this.memoText = inputValue
   }
 
+  switchBillType()
+  {
+    if(this.currentItem.bill_type===0)
+    {
+      this.currentItem.bill_type=1
+    }
+    else if(this.currentItem.bill_type===1)
+    {
+      this.currentItem.bill_type=0
+    }
+  }
+
   updateConfirm() {
     // promptAction.showToast({
     //   message: `确认了:${this.inputAmount},${this.selectedCategoryName},${this.memoText},${this.selectedDate}`
@@ -63,8 +81,9 @@ struct EditAccount {
     let amountValue: number = Number(this.inputAmount)
 
     let fenMoney: number = Math.round(amountValue * 100);
+    let bill_type:number=this.isOutput?0:1;
 
-    let params: ValueType[] = [fenMoney, this.selectedCategoryName, timestamp, this.memoText, extra]
+    let params: ValueType[] = [fenMoney, this.selectedCategoryName,bill_type, timestamp, this.memoText, extra]
     DatabaseHelper.getInstance().insertBill(params)
 
 
@@ -75,11 +94,27 @@ struct EditAccount {
   }
 
   aboutToAppear(): void {
-    this.selectedCategoryName = this.categoryList[0].category_name
-    this.selectedCategoryImage = this.categoryList[0].category_image
+
+    this.currentItem= router.getParams() as RecordItemInfo;
+
+    if(this.currentItem===undefined)
+    {
+     this.currentItem=
+       {
+         id:0,
+         category_image: $r("app.media.ic_edit"),
+         category_name: "其它",
+         bill_type:1,
+         amount: 0,
+         timestamp: new Date().getTime(),
+         notes:""
+       }
+    }
+
+    this.selectedCategoryName =this.currentItem.category_name;
+    this.selectedCategoryImage = this.currentItem.category_image;
     this.selectedImageColor = $r("app.color.danger")
 
-    //"app.media.other_houses_48dp_F3F3F3"
   }
 
   build() {
@@ -109,7 +144,8 @@ struct EditAccount {
                 .onClick(() => {
 
                   animateTo({ duration: 300 }, () => {
-                    this.showOutput = !this.showOutput
+                    //this.isOutput = !this.isOutput
+                    this.switchBillType();
 
                   })
 
@@ -121,7 +157,9 @@ struct EditAccount {
                 }
                 )
 
-              if (this.showOutput) {
+              //if (this.isOutput)
+              if(this.currentItem.bill_type===0)
+              {
                 Image($r("app.media.horizontal_rule_48dp_000000"))
                   .width(50)
                   .height(2)
@@ -142,7 +180,8 @@ struct EditAccount {
                 .onClick(() => {
 
                   animateTo({ duration: 300 }, () => {
-                    this.showOutput = !this.showOutput
+                    //this.isOutput = !this.isOutput
+                   this.switchBillType();
 
                   })
 
@@ -154,7 +193,9 @@ struct EditAccount {
 
                 )
 
-              if (!this.showOutput) {
+              //if (!this.isOutput)
+              if(this.currentItem.bill_type===1)
+              {
 
                 Image($r("app.media.horizontal_rule_48dp_000000"))
                   .width(50)
@@ -188,7 +229,7 @@ struct EditAccount {
             RoundImage(
               {
                 contentWidth: 40,
-                imageUrl: $r(this.selectedCategoryImage),
+                imageUrl: this.selectedCategoryImage,
 
                 backColor: this.selectedImageColor
                 //$r("app.color.danger")
@@ -246,6 +287,7 @@ struct EditAccount {
 
       IncomeAndExpenditure(
         {
+          isOutput:this.isOutput,
           updateSelectCategory: this.updateSelectCategory
         , categoryList: this.categoryList
         , selectedImageColor: this.selectedImageColor

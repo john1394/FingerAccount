@@ -1,4 +1,4 @@
-import { formatDateyyyymmdd as formatDateymd } from "../../utils/Util"
+import { formatDateYMD as formatDateymd } from "../../utils/Util"
 
 @Component
 export struct TimeSelector {
