@@ -12,8 +12,8 @@ export struct IncomeAndExpenditure {
   @Prop
   selectedCategoryImage: string ="";
 
-  @Prop
-  isOutput: boolean ;
+  //@Prop
+  //isOutput: boolean ;
 
   @Prop
   selectedImageColor:ResourceColor;

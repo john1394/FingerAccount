@@ -3,7 +3,7 @@ export struct EditMemo {
   dialogController: CustomDialogController | null = new CustomDialogController({
     builder: CustomDialogExample({
 
-      inputText:this.momoText,
+      inputText:this.notesText,
       cancel: () => {
         this.onCancel()
       },
@@ -56,14 +56,14 @@ export struct EditMemo {
   onAccept(txt:string) {
     console.info('Callback when the second button is clicked')
 
-    this.momoText=txt;
-    this.memoShowText=this.momoText;
-    if(txt==="")
-    {
-      this.memoShowText="添加备注"
-    }
+    this.notesText=txt;
+    //this.memoShowText=this.notesText;
+    // if(txt==="")
+    // {
+    //   this.memoShowText="添加备注"
+    // }
 
-     this.updateMemo?.(this.momoText)
+     this.updateMemo?.(this.notesText)
 
   }
 
@@ -73,16 +73,27 @@ export struct EditMemo {
 
 
   @Prop
-  momoText:string=""
+  notesText:string=""
 
-  @State
-  memoShowText:string="添加备注"
+  //@State
+  //memoShowText:string="添加备注"
+  getNotesShowText()
+  {
+    if(this.notesText==="")
+    {
+      return "添加备注"
+    }
+    else
+    {
+      return this.notesText;
+    }
+  }
 
   build() {
 
 
     Column() {
-      Text(this.memoShowText)
+      Text(this.getNotesShowText())
         .margin(
           {
             left: 10,

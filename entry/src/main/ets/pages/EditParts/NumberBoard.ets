@@ -17,6 +17,10 @@ export struct NumberBoard {
   updateConfirm: () => void = () => {
   }
 
+  aboutToAppear(): void {
+
+  }
+
   build() {
     Column() {
 

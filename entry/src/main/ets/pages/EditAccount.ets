@@ -10,17 +10,14 @@ import { NumberBoard } from './EditParts/NumberBoard'
 import { TimeSelector as TimeSelect } from './EditParts/TimeSelect'
 import { RoundImage } from './RoundImage'
 import { ValueType } from '@kit.ArkData'
-import { getDateAtMidnight } from '../utils/Util'
+import { formatFen, getDateAtMidnight } from '../utils/Util'
 import { RecordItemInfo } from '../models/RecordList'
 
 @Entry
 @Component
 struct EditAccount {
-  @Provide
-  isOutput: boolean = true
   @State
   categoryList: CategoryItem[] = DefaultOutcomeCategoryList
-
   @Prop
   selectedCategoryName: string = "其它"
   @Prop
@@ -28,15 +25,11 @@ struct EditAccount {
   @Prop
   selectedCategoryImage: ResourceStr
   @State
-  memoText: string = ""
-  @State
-  inputAmount: string = "0"
+  inputAmountStr: string = "0"
   @State
   selectedDate: Date = new Date;
-
   @Prop
-  currentItem:RecordItemInfo;
-
+  currentItem: RecordItemInfo;
   updateSelectCategory = (name: string, image: string) => {
     this.selectedCategoryName = name;
     this.selectedCategoryImage = image;
@@ -45,7 +38,8 @@ struct EditAccount {
 
   updateAmountValue(inputValue: string) {
 
-    this.inputAmount = inputValue;
+    this.inputAmountStr = inputValue;
+    this.currentItem.amount = Math.round(Number(this.inputAmountStr) * 100)
   }
 
   updateSelectedDate(inputValue: Date) {
@@ -54,18 +48,15 @@ struct EditAccount {
   }
 
   updateMemo(inputValue: string) {
-    this.memoText = inputValue
+    //this.memoText = inputValue
+    this.currentItem.notes = inputValue;
   }
 
-  switchBillType()
-  {
-    if(this.currentItem.bill_type===0)
-    {
-      this.currentItem.bill_type=1
-    }
-    else if(this.currentItem.bill_type===1)
-    {
-      this.currentItem.bill_type=0
+  switchBillType() {
+    if (this.currentItem.bill_type === 0) {
+      this.currentItem.bill_type = 1
+    } else if (this.currentItem.bill_type === 1) {
+      this.currentItem.bill_type = 0
     }
   }
 
@@ -78,13 +69,19 @@ struct EditAccount {
 
     let timestamp: number = midNight.getTime()
     let extra: string = ""
-    let amountValue: number = Number(this.inputAmount)
+    let amountValue: number = Number(this.inputAmountStr)
 
     let fenMoney: number = Math.round(amountValue * 100);
-    let bill_type:number=this.isOutput?0:1;
+    let bill_type: number = this.currentItem.bill_type;
+    //this.isOutput ? 0 : 1;
 
-    let params: ValueType[] = [fenMoney, this.selectedCategoryName,bill_type, timestamp, this.memoText, extra]
-    DatabaseHelper.getInstance().insertBill(params)
+    let params: ValueType[] =
+      [fenMoney, this.selectedCategoryName, bill_type, timestamp, this.currentItem.notes, extra, this.currentItem.id]
+    if (this.currentItem.id === 0) {
+      DatabaseHelper.getInstance().insertBill(params)
+    } else {
+      DatabaseHelper.getInstance().updateBill(params);
+    }
 
 
     router.pushUrl({
@@ -95,25 +92,27 @@ struct EditAccount {
 
   aboutToAppear(): void {
 
-    this.currentItem= router.getParams() as RecordItemInfo;
+    this.currentItem = router.getParams() as RecordItemInfo;
 
-    if(this.currentItem===undefined)
-    {
-     this.currentItem=
-       {
-         id:0,
-         category_image: $r("app.media.ic_edit"),
-         category_name: "其它",
-         bill_type:1,
-         amount: 0,
-         timestamp: new Date().getTime(),
-         notes:""
-       }
+    if (this.currentItem === undefined) {
+      this.currentItem =
+        {
+          id: 0,
+          category_image: $r("app.media.ic_edit"),
+          category_name: "其它",
+          bill_type: 0,
+          amount: 0,
+          timestamp: new Date().getTime(),
+          notes: ""
+        }
     }
 
-    this.selectedCategoryName =this.currentItem.category_name;
+    this.selectedCategoryName = this.currentItem.category_name;
     this.selectedCategoryImage = this.currentItem.category_image;
     this.selectedImageColor = $r("app.color.danger")
+    this.inputAmountStr=this.currentItem.amount===0?"0": formatFen(this.currentItem.amount)
+    //this.inputAmount=this.currentItem.amount;
+
 
   }
 
@@ -158,8 +157,7 @@ struct EditAccount {
                 )
 
               //if (this.isOutput)
-              if(this.currentItem.bill_type===0)
-              {
+              if (this.currentItem.bill_type === 0) {
                 Image($r("app.media.horizontal_rule_48dp_000000"))
                   .width(50)
                   .height(2)
@@ -180,8 +178,8 @@ struct EditAccount {
                 .onClick(() => {
 
                   animateTo({ duration: 300 }, () => {
-                    //this.isOutput = !this.isOutput
-                   this.switchBillType();
+
+                    this.switchBillType();
 
                   })
 
@@ -193,9 +191,7 @@ struct EditAccount {
 
                 )
 
-              //if (!this.isOutput)
-              if(this.currentItem.bill_type===1)
-              {
+              if (this.currentItem.bill_type === 1) {
 
                 Image($r("app.media.horizontal_rule_48dp_000000"))
                   .width(50)
@@ -225,21 +221,17 @@ struct EditAccount {
 
         Row() {
           Row() {
-
             RoundImage(
               {
                 contentWidth: 40,
                 imageUrl: this.selectedCategoryImage,
-
                 backColor: this.selectedImageColor
-                //$r("app.color.danger")
               }
             ).margin(
               {
                 left: 10
               }
             )
-
 
             Text(this.selectedCategoryName)
               .fontSize(20)
@@ -248,25 +240,20 @@ struct EditAccount {
                   left: 10
                 }
               )
-
-
           }.width(100)
 
-          // .backgroundColor(Color.Red)
           Row() {
             Text("￥")
               .fontSize(20).fontWeight(FontWeight.Bolder)
 
-            Text(this.inputAmount).fontSize(20).fontWeight(FontWeight.Bolder)
+            Text(this.inputAmountStr)//this.inputAmount
+              .fontSize(20).fontWeight(FontWeight.Bolder)
               .margin(
                 {
                   right: 10
                 }
               )
-            // .onClick( ()=>
-            // {
-            //   this.inputAmount="2.0"
-            // })
+
           }
 
         }.width("100%")
@@ -287,10 +274,12 @@ struct EditAccount {
 
       IncomeAndExpenditure(
         {
-          isOutput:this.isOutput,
+          //isOutput: this.isOutput,
           updateSelectCategory: this.updateSelectCategory
-        , categoryList: this.categoryList
-        , selectedImageColor: this.selectedImageColor
+        ,
+          categoryList: this.categoryList
+        ,
+          selectedImageColor: this.selectedImageColor
         }
 
       ).height(230)
@@ -301,6 +290,7 @@ struct EditAccount {
       EditMemo(
         {
 
+          notesText: this.currentItem.notes,
           updateMemo: (content: string) => {
             this.updateMemo(content)
           },
@@ -325,8 +315,7 @@ struct EditAccount {
       //日期选择
       TimeSelect(
         {
-
-
+          selectedDate: new Date(this.currentItem.timestamp),
           updateSelectedDate: (content: Date) => {
             this.updateSelectedDate(content)
           }
@@ -359,6 +348,8 @@ struct EditAccount {
       NumberBoard(
         {
 
+          //amount: this.currentItem.amount,
+          inputValue:this.inputAmountStr,
           updateInputValue: (content: string) => {
             this.updateAmountValue(content)
           },

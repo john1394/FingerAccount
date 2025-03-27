@@ -166,6 +166,29 @@ export class DatabaseHelper {
     }
   }
 
+  updateBill(params: ValueType[]) {
+    try {
+//(amount,category,bill_type,timestamp,notes,extra_fields)
+      const sql = `UPDATE bills
+  SET amount = ?,
+      category = ?,
+      bill_type = ?,
+      timestamp = ?,
+      notes = ?,
+      extra_fields = ?
+  WHERE id = ?`;
+
+      // 执行插入操作
+      const updateId = this.rdbStore?.executeSync(sql, params)
+      console.log(`affected row ID: ${updateId}`);
+      return updateId;
+    } catch (err) {
+      const error = err as BusinessError;
+      console.error(`Insert failed, code: ${error.code}, message: ${error.message}`);
+      return -1;
+    }
+  }
+
 
   deleteBill(id:number) {
     try {

@@ -1,4 +1,4 @@
-import { formatDateYMD as formatDateymd } from "../../utils/Util"
+import { formatDateYMD, formatDateYMD as formatDateymd, formatDateYMDHan } from "../../utils/Util"
 
 @Component
 export struct TimeSelector {
@@ -8,9 +8,30 @@ export struct TimeSelector {
   dateText: string = "今天"
   @State
   selectedToday: boolean = true
-
-
   updateSelectedDate: (inputValue: Date) => void = () => {
+  }
+
+  selectedDayIsToday() {
+    let today = new Date();
+    let todayStr = formatDateYMD(today)
+    let selectedStr = formatDateYMD(this.selectedDate);
+    if (todayStr === selectedStr) {
+      return true
+    } else {
+      return false;
+    }
+  }
+
+  getDataStr()
+  {
+    if(this.selectedDayIsToday())
+    {
+      return "今天"
+    }
+    else
+    {
+      return formatDateYMDHan(this.selectedDate)
+    }
   }
 
   build() {
@@ -18,17 +39,17 @@ export struct TimeSelector {
     Column() {
       Row({ space: 5 }) {
 
-        if (this.selectedToday) {
+        if (this.selectedDayIsToday()) {
           Image($r("app.media.calendar_today_48dp_434343"))
             .width(24).height(24)
 
 
           Text("今天")
         } else {
-          Text(this.dateText)
+          Text(formatDateYMDHan(this.selectedDate))
         }
 
-      }.width(100)
+      }.width(150)
       .onClick(() => {
         this.getUIContext().showDatePickerDialog
         ({
@@ -46,7 +67,8 @@ export struct TimeSelector {
             this.selectedDate = value
             console.info("DatePickerDialog:onDateAccept()" + value.toString())
 
-            this.dateText = formatDateymd(this.selectedDate)
+            this.dateText =this.getDataStr();
+              //formatDateymd(this.selectedDate)
 
             if (formatDateymd(this.selectedDate) === formatDateymd(new Date())) {
               this.selectedToday = true;
