@@ -16,6 +16,12 @@ export interface RecordItemInfo {
 
 }
 
+export enum BillTypeEnum {
+  Outcome=0, // 文本
+  Income=1, // 图片
+
+}
+
 export const DefaultRecordList: RecordItemInfo[] = [
 
   {

@@ -105,11 +105,6 @@ export const DefaultIncomeCategoryList: CategoryItem[] = [
   ,
   {
     category_image: "app.media.flight_48dp_F3F3F3",
-    category_name: "投资"
-  }
-  ,
-  {
-    category_image: "app.media.flight_48dp_F3F3F3",
     category_name: "意外"
   }
   ,

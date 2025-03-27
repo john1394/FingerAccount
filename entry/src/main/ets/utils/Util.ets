@@ -1,4 +1,5 @@
 import { hilog } from "@kit.PerformanceAnalysisKit";
+import { BillTypeEnum, RecordItemInfo } from "../models/RecordList";
 
 export function test1() {
   const DOMAIN = 0x0000;
@@ -73,14 +74,43 @@ export function formatDateYMDHan(date: Date): string {
   return `${year}年${month}月${day}日`;
 }
 
+export function getIconCategoryBackcolor(item: RecordItemInfo, currentCategoryName: string): ResourceColor {
+  if (item.category_name === currentCategoryName) {
+    if (item.bill_type === BillTypeEnum.Outcome) {
+      return getOutcomeIconBackColor();
+    } else if (item.bill_type === BillTypeEnum.Income) {
+      return getIncomeIconBackColor();
+    }
+    else
+    {
+      //not imp
+      return getOutcomeIconBackColor();
+    }
+
+  } else {
+    return getIconUnselectBackColor();
+  }
+
+}
+
+export function getOutcomeIconBackColor() {
+  return $r("app.color.danger");
+}
+
+export function getIncomeIconBackColor() {
+  return Color.Green;
+}
+
+export function getIconUnselectBackColor() {
+  return Color.Gray
+}
+
+
 export function formatFen(amount: number) {
 
-  if(amount<100)
-  {
-    return "0."+amount.toString().padStart(2,"0")
-  }
-  else
-  {
+  if (amount < 100) {
+    return "0." + amount.toString().padStart(2, "0")
+  } else {
 
 
     let str: string = amount.toString()

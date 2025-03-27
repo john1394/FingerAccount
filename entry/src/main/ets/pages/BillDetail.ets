@@ -3,7 +3,7 @@ import { RecordItemInfo } from '../models/RecordList'
 import { DatabaseHelper } from '../utils/DatabaseHelper';
 import { RoundImage } from './RoundImage'
 import { ValueType } from '@kit.ArkData';
-import { formatDateYMDHan, formatFen } from '../utils/Util';
+import { formatDateYMDHan, formatFen, getIncomeIconBackColor, getOutcomeIconBackColor } from '../utils/Util';
 
 @Preview
 @Entry
@@ -106,7 +106,8 @@ struct BillDetail {
                 {
                   contentWidth: 40,
                   imageUrl: this.currentItem.category_image,
-                  backColor: $r("app.color.danger")
+                  backColor: this.currentItem.bill_type===0?getOutcomeIconBackColor():getIncomeIconBackColor()
+
                 }
               ).margin(
                 {

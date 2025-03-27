@@ -1,19 +1,24 @@
 import { CategoryItem, DefaultOutcomeCategoryList } from "../../models/CategoryList"
+import { RecordItemInfo } from "../../models/RecordList";
+import {
+  getIconCategoryBackcolor,
+  getIconUnselectBackColor, getIncomeIconBackColor, getOutcomeIconBackColor } from "../../utils/Util";
 import { RoundImage } from "../RoundImage"
 
 @Component
 export struct IncomeAndExpenditure {
   @Prop
-  categoryList: CategoryItem[] ;
+  categoryList: CategoryItem[]=[] ;
 
-  @Prop
-  selectedCategoryName: string ;
+  // @Prop
+  // selectedCategoryName: string="" ;
 
   @Prop
   selectedCategoryImage: string ="";
 
-  //@Prop
-  //isOutput: boolean ;
+
+  @Prop
+  bill_type:number=0;
 
   @Prop
   selectedImageColor:ResourceColor;
@@ -21,12 +26,32 @@ export struct IncomeAndExpenditure {
   @State
   blockHeight:number=210
     //186;
+  @Prop
+  currentItem: RecordItemInfo;
 
 
 
-  private getCategoryBackColor(item: CategoryItem): ResourceColor | undefined {
-    return this.selectedCategoryName === item.category_name ? this.selectedImageColor : Color.Gray
-  }
+  // private getCategoryBackColor(item: CategoryItem): ResourceColor | undefined {
+  //
+  //   if(this.selectedCategoryName === item.category_name)
+  //   {
+  //     if(this.bill_type===0)
+  //     {
+  //       return getOutcomeIconBackColor();
+  //     }
+  //     else
+  //     {
+  //       return getIncomeIconBackColor();
+  //     }
+  //   }
+  //   else
+  //   {
+  //     return getIconUnselectBackColor();
+  //   }
+  //
+  //
+  //   return this.selectedCategoryName === item.category_name ? this.selectedImageColor : Color.Gray
+  // }
 
   updateSelectCategory = (name: string,image:string) => {
 
@@ -53,16 +78,15 @@ export struct IncomeAndExpenditure {
                     contentWidth: 40,
                     imageUrl: $r(item.category_image),
 
-                    backColor:
-                    this.getCategoryBackColor(item)
+                    backColor:getIconCategoryBackcolor(this.currentItem,item.category_name)
+                    //this.getCategoryBackColor(item)
 
                   }
                 ).onClick(() => {
-
-
                   this.updateSelectCategory(item.category_name,item.category_image)
-                  this.selectedCategoryName=item.category_name
-                  this.selectedCategoryImage=item.category_image
+                  //this.selectedCategoryName=item.category_name
+                  this.currentItem.category_name=item.category_name
+                  //this.selectedCategoryImage=item.category_image
 
                 }
                 )
@@ -74,13 +98,13 @@ export struct IncomeAndExpenditure {
                     TextAlign.Center
                   )
                   .width(60)
-                 // .backgroundColor(Color.Orange)
+
                   .margin(
                     {
                       top: 5
                     }
                   )
-                //.fontColor($r("app.color.white"))
+
               }
               .padding(
                 {
@@ -91,8 +115,6 @@ export struct IncomeAndExpenditure {
                 }
               )
               .height(70)
-
-
             }
            // .backgroundColor(Color.Pink)
             //.border({ width: { left:1,top:1, right: 1,bottom:1 }, color: '#cccccc' })
@@ -110,7 +132,6 @@ export struct IncomeAndExpenditure {
 
       }.height("100%")
       .width('100%')
-      //.backgroundColor(Color.Yellow)
       .scrollable(ScrollDirection.Vertical)
 
     }
