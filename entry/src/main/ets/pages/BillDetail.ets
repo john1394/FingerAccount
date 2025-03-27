@@ -9,6 +9,7 @@ import { formatDateYMDHan, formatFen } from '../utils/Util';
 @Entry
 @Component
 struct BillDetail {
+  @State showDialog: boolean = false // 控制对话框显示
   @Prop
   currentItem: RecordItemInfo;
 
@@ -63,6 +64,8 @@ struct BillDetail {
           .height(30)
 
           .onClick(() => {
+
+
             router.back()
             // router.back(
             //   {
@@ -236,13 +239,43 @@ struct BillDetail {
           .layoutWeight(1)
           .onClick(() => {
 
-            //del
-            DatabaseHelper.getInstance().deleteBill(this.currentItem.id)
-            //router.back()
-            router.pushUrl({
-              url: "pages/WriteRecord",
-              params: {}
-            })
+            this.getUIContext().showAlertDialog(
+              {
+                title: '确定删除',
+                message: '是否确定删除这笔帐单',
+                autoCancel: true,
+
+                alignment: DialogAlignment.Center,
+                offset: { dx: 0, dy: -20 },
+                gridCount: 3,
+
+                buttons: [{
+                  value: '取消',
+
+                  action: () => {
+                    console.info('Callback when the first button is clicked')
+                  },
+                }
+                  ,
+                  {
+                    enabled: true,
+                    defaultFocus: true,
+                    style: DialogButtonStyle.HIGHLIGHT,
+                    value: '确定',
+                    action: () => {
+                      console.info('Callback when the second button is clicked')
+                      //   del
+                      DatabaseHelper.getInstance().deleteBill(this.currentItem.id)
+
+                      router.pushUrl({
+                        url: "pages/WriteRecord",
+                        params: {}
+                      })
+                    }
+                  }
+                ]
+              }
+            )
 
           }
           )
