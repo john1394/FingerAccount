@@ -2,35 +2,31 @@ import { CategoryItem, DefaultOutcomeCategoryList } from "../../models/CategoryL
 import { RecordItemInfo } from "../../models/RecordList";
 import {
   getIconCategoryBackcolor,
-  getIconUnselectBackColor, getIncomeIconBackColor, getOutcomeIconBackColor } from "../../utils/Util";
+  getIconUnselectBackColor,
+  getIncomeIconBackColor,
+  getOutcomeIconBackColor
+} from "../../utils/Util";
 import { RoundImage } from "../RoundImage"
+import { router, Router } from "@kit.ArkUI";
 
 @Component
 export struct IncomeAndExpenditure {
   @Prop
-  categoryList: CategoryItem[]=[] ;
-
+  categoryList: CategoryItem[] = [];
   // @Prop
   // selectedCategoryName: string="" ;
 
   @Prop
-  selectedCategoryImage: string ="";
-
-
+  selectedCategoryImage: string = "";
   @Prop
-  bill_type:number=0;
-
+  bill_type: number = 0;
   @Prop
-  selectedImageColor:ResourceColor;
-
+  selectedImageColor: ResourceColor;
   @State
-  blockHeight:number=210
-    //186;
+  blockHeight: number = 210
+  //186;
   @Prop
   currentItem: RecordItemInfo;
-
-
-
   // private getCategoryBackColor(item: CategoryItem): ResourceColor | undefined {
   //
   //   if(this.selectedCategoryName === item.category_name)
@@ -53,12 +49,12 @@ export struct IncomeAndExpenditure {
   //   return this.selectedCategoryName === item.category_name ? this.selectedImageColor : Color.Gray
   // }
 
-  updateSelectCategory = (name: string,image:string) => {
+  updateSelectCategory = (name: string, image: string) => {
 
   }
 
   aboutToAppear(): void {
-   // this.selectedCategoryImage="app.media.other_houses_48dp_F3F3F3";
+    // this.selectedCategoryImage="app.media.other_houses_48dp_F3F3F3";
   }
 
   build() {
@@ -76,20 +72,25 @@ export struct IncomeAndExpenditure {
                     contentWidth: 50,
                     imageUrl: $r(item.category_image),
 
-                    backColor:getIconCategoryBackcolor(this.currentItem,item.category_name)
-                    //this.getCategoryBackColor(item)
+                    backColor: getIconCategoryBackcolor(this.currentItem, item.category_name)
 
                   }
                 ).onClick(() => {
-                  this.updateSelectCategory(item.category_name,item.category_image)
-                  //this.selectedCategoryName=item.category_name
-                  this.currentItem.category_name=item.category_name
-                  //this.selectedCategoryImage=item.category_image
+
+                  if (item.category_name === "设置") {
+                    router.pushUrl({
+                      url: "pages/CategoryManage",
+                      params: { "a": "b" }
+                    })
+                  } else {
+
+                    this.updateSelectCategory(item.category_name, item.category_image)
+                    this.currentItem.category_name = item.category_name
+                  }
 
                 }
                 )
 
-                //.fillColor($r("app.color"))
                 Text(item.category_name)
                   .fontSize(14)
                   .textAlign(
@@ -114,7 +115,7 @@ export struct IncomeAndExpenditure {
               )
               .height(70)
             }
-           // .backgroundColor(Color.Pink)
+            // .backgroundColor(Color.Pink)
             //.border({ width: { left:1,top:1, right: 1,bottom:1 }, color: '#cccccc' })
 
             .padding(
@@ -127,13 +128,14 @@ export struct IncomeAndExpenditure {
             )
           })
         }
-        //.height("100%")
+
         .alignItems(ItemAlign.Start)
         //.backgroundColor(Color.Pink)
 
       }.height("100%")
       .width('100%')
       .scrollable(ScrollDirection.Vertical)
+      .scrollBar(BarState.Off)
 
     }
     .width("100%")

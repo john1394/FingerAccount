@@ -3,6 +3,8 @@
     "pages/Index",
     "pages/EditAccount",
     "pages/WriteRecord",
-    "pages/BillDetail"
+    "pages/BillDetail",
+    "pages/CategoryManage",
+    "pages/BillReport"
   ]
 }

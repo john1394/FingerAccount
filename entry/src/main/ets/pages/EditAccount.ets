@@ -57,21 +57,18 @@ struct EditAccount {
   switchBillType() {
     if (this.currentItem.bill_type === BillTypeEnum.Outcome) {
       this.currentItem.bill_type =BillTypeEnum.Income
-        //1
+
     } else if (this.currentItem.bill_type === BillTypeEnum.Income) {
       this.currentItem.bill_type = BillTypeEnum.Outcome
     }
 
     this.categoryList=this.getCategoryList();
-    //this.selectedCategoryName=
+
     this.currentItem.category_name= this.categoryList[0].category_name;
 
   }
 
   updateConfirm() {
-    // promptAction.showToast({
-    //   message: `确认了:${this.inputAmount},${this.selectedCategoryName},${this.memoText},${this.selectedDate}`
-    // })
 
     let midNight: Date = getDateAtMidnight(this.selectedDate)
 
@@ -81,7 +78,6 @@ struct EditAccount {
 
     let fenMoney: number = Math.round(amountValue * 100);
     let bill_type: number = this.currentItem.bill_type;
-    //this.isOutput ? 0 : 1;
 
 
     if (this.currentItem.id === 0) {
@@ -98,7 +94,7 @@ struct EditAccount {
 
 
     router.pushUrl({
-      url: "pages/WriteRecord",
+      url: "pages/Index",
       params: {}
     })
   }

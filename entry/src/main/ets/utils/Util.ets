@@ -77,6 +77,10 @@ export function formatDateYMDHan(date: Date): string {
 export function trimEndZero(numberText: string): string {
 
   try {
+    if (!numberText) {
+      return numberText;
+    }
+
     if (numberText.indexOf(".") == -1) {
       return numberText;
     }

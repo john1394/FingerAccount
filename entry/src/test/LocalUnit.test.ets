@@ -48,6 +48,11 @@ export default function localUnitTest() {
       expect(a7==="100.2").assertTrue();
       let a8= trimEndZero("0.00");
       expect(a8==="0").assertTrue();
+      let a9= trimEndZero("");
+      expect(a9==="").assertTrue();
+
+      let a10= trimEndZero(".");
+      expect(a10==="").assertTrue();
 
     });
 

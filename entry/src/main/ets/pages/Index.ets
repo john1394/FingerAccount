@@ -1,8 +1,9 @@
 import { TabBarClass } from '../models/tab'
+import BillReport from './BillReport'
+import My from './My'
 import WriteRecord from './WriteRecord'
-import { relationalStore, ValueType } from '@kit.ArkData';
-import { DatabaseHelper } from '../utils/DatabaseHelper';
-import { RecordItemInfo } from '../models/RecordList';
+
+
 
 
 @Entry
@@ -23,8 +24,8 @@ struct Index {
     //     timestamp: 0
     //   }
 
-   // let params: ValueType[] = [13]
-   // DatabaseHelper.getInstance().insertBill(params)
+    // let params: ValueType[] = [13]
+    // DatabaseHelper.getInstance().insertBill(params)
   }
 
   @State
@@ -36,10 +37,10 @@ struct Index {
       selectIcon: $r('app.media.ic_public_message_filled')
     },
     {
-      icon: $r('app.media.ic_public_contacts_group'),
+      icon: $r('app.media.ic_gallery_discover'),
       name: 'report',
-      title: '图表',
-      selectIcon: $r('app.media.ic_public_contacts_group_filled')
+      title: '报表',
+      selectIcon: $r('app.media.ic_gallery_discover_filled')
     },
     // {
     //   icon: $r('app.media.ic_gallery_discover'),
@@ -82,11 +83,9 @@ struct Index {
             if (item.name === "WriteRecord") {
               WriteRecord()
             } else if (item.name === "report") {
-              // Connect()
-            } else if (item.name === "bill") {
-              // Find()
+               BillReport()
             } else if (item.name === "my") {
-              // My()
+              My()
             }
           }.tabBar(this.CommonTabBar(item))
         })
@@ -99,4 +98,6 @@ struct Index {
 
   }
 }
+
+
 
