@@ -4,7 +4,8 @@ export struct RoundImage {
 
   @Prop
   contentWidth:number=40
-
+  @Prop
+  innerPadding:number=12
 
   @Prop
   imageUrl:ResourceStr=""
@@ -17,9 +18,8 @@ export struct RoundImage {
     Column() {
 
       Image(this.imageUrl)
-        .width(this.contentWidth-16)
-        .height(this.contentWidth-16)
-
+        .width(this.contentWidth-this.innerPadding)
+        .height(this.contentWidth-this.innerPadding)
 
     }
     .justifyContent(FlexAlign.Center)

@@ -1,8 +1,9 @@
-import { DefaultRecordList, RecordItemInfo } from '../models/RecordList'
+
 import { formatFen, formatTime, test1 } from '../utils/Util'
 import { promptAction, router } from '@kit.ArkUI'
 import { DatabaseHelper } from '../utils/DatabaseHelper'
-import { faceDetector } from '@kit.CoreVisionKit'
+import { RecordItemInfo } from '../models/RecordList'
+
 
 @Preview
 @Entry
@@ -284,6 +285,7 @@ struct WriteRecord {
               .width("100%")
 
             }
+            //.backgroundColor(Color.Yellow)
             .onClick(() => {
 
               promptAction.showToast(
@@ -301,7 +303,9 @@ struct WriteRecord {
             })
           }
           )
-        }.backgroundColor($r("app.color.white"))
+        }.alignListItem(ListItemAlign.Start)
+        .backgroundColor($r("app.color.white"))
+        //.backgroundColor(Color.Pink)
         .borderRadius(5)
 
       }

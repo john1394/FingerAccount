@@ -1,10 +1,76 @@
 import { relationalStore, ValueType, } from '@kit.ArkData';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { RecordItemInfo } from '../models/RecordList';
+import { CategoryItem } from '../models/CategoryList';
+import { BillTypeEnum, RecordItemInfo } from '../models/RecordList';
 
 
 const db_file_name = "bill.db"
 const db_file_dir = "customDir/subCustomDir"
+
+
+const init_category_table_sql = `
+CREATE TABLE IF NOT EXISTS category (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+category_name TEXT,
+image_url TEXT,
+bill_type INTEGER,
+timestamp INTEGER
+);
+`;
+
+//用;分隔，语句中不能有;号
+const init_category_data_sql = `
+insert into category(category_name,image_url,bill_type,timestamp) values('其它','ic_cat_out_qita','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('餐饮','ic_cat_out_canyin','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('购物','ic_cat_out_gouwu','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('服饰','ic_cat_out_fushi','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('日用','ic_cat_out_riyong','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('数码','ic_cat_out_shuma','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('美妆','ic_cat_out_meizhuang','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('护肤','ic_cat_out_hufu','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('软件','ic_cat_out_ruanjian','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('住房','ic_cat_out_zufang','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('交通','ic_cat_out_jiaotong','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('娱乐','ic_cat_out_yule','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('医疗','ic_cat_out_yiliao','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('通讯','ic_cat_out_tongxun','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('汽车','ic_cat_out_qiche','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('学习','ic_cat_out_xuexi','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('办公','ic_cat_out_bangong','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('运动','ic_cat_out_yundong','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('社交','ic_cat_out_sejiao','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('人情','ic_cat_out_renqin','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('育儿','ic_cat_out_yuer','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('宠物','ic_cat_out_congwu','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('旅行','ic_cat_out_luxing','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('度假','ic_cat_out_dujia','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('烟酒','ic_cat_out_yanjiu','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('设置','ic_cat_out_setting','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+
+
+
+insert into category(category_name,image_url,bill_type,timestamp) values('其它','ic_cat_in_qita','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('工资','ic_cat_in_gongzhi','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('奖金','ic_cat_in_jiangjin','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('加班','ic_cat_in_jiaban','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('福利','ic_cat_in_fuli','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('公积金','ic_cat_in_gjj','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('红包','ic_cat_in_hongbao','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('兼职','ic_cat_in_jianzhi','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('副业','ic_cat_in_fuye','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('退税','ic_cat_in_tuisui','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('投资','ic_cat_in_touzhi','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('意外所得','ic_cat_in_yiwai','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+insert into category(category_name,image_url,bill_type,timestamp) values('设置','ic_cat_in_setting','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+
+
+`;
+
+// const init_income_category_sql = `
+// insert into category(category_name,image_url,bill_type,timestamp) values('其它','ic_cat_in_qita','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+// insert into category(category_name,image_url,bill_type,timestamp) values('工资','ic_cat_in_gongzhi','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+// `;
+
 
 const SQL_CREATE_TABLE =
   'CREATE TABLE IF NOT EXISTS bills (\n' +
@@ -168,7 +234,7 @@ export class DatabaseHelper {
 
   updateBill(params: ValueType[]) {
     try {
-//(amount,category,bill_type,timestamp,notes,extra_fields)
+
       const sql = `UPDATE bills
   SET amount = ?,
       category = ?,
@@ -190,12 +256,12 @@ export class DatabaseHelper {
   }
 
 
-  deleteBill(id:number) {
+  deleteBill(id: number) {
     try {
 
       let sql: string = "delete from bills where id = ?"
 
-      let params:ValueType[]=[]
+      let params: ValueType[] = []
 
       params.push(id);
       const affected = this.rdbStore?.executeSync(sql, params)
@@ -206,6 +272,44 @@ export class DatabaseHelper {
       console.error(`delete failed, code: ${error.code}, message: ${error.message}`);
       return -1;
     }
+  }
+
+
+  getCategoryByType(billType:BillTypeEnum): CategoryItem[] {
+    let result: CategoryItem[] = [];
+    try {
+      const sql = 'SELECT * FROM category where bill_type=? order by id';
+      let params:ValueType[]=[];
+      params.push(billType.valueOf());
+
+      const resultSet = this.rdbStore?.querySqlSync(sql,params); // 或使用 executeSql（需处理结果集）
+      while (resultSet?.goToNextRow()) {
+
+        // 获取列值
+        const id = resultSet.getLong(resultSet.getColumnIndex('id'));
+        const category_name = resultSet.getString(resultSet.getColumnIndex('category_name'));
+        const image_url = "app.media."+resultSet.getString(resultSet.getColumnIndex('image_url'));
+        const bill_type = resultSet.getLong(resultSet.getColumnIndex('bill_type'));
+        const timestamp = resultSet.getLong(resultSet.getColumnIndex('timestamp'));
+
+        console.log(`ID: ${id}, category_name: ${category_name}, image_url: ${image_url}, bill_type:${bill_type}}, Timestamp: ${timestamp}`);
+
+        let item: CategoryItem =
+          {
+            category_image: image_url,
+            category_name: category_name,
+          }
+
+        result.push(item);
+      }
+
+      resultSet?.close();
+
+    } catch (error) {
+      console.error(`Failed to execute SQL: ${error.message}`);
+
+    }
+    return result
   }
 
   getAllBillRecord() {
@@ -241,10 +345,10 @@ export class DatabaseHelper {
             id: idValue,
             category_image: '',
             category_name: category,
-            bill_type:bill_type,
+            bill_type: bill_type,
             amount: amount,
             timestamp: timestamp,
-            notes:notes
+            notes: notes
           }
 
         result.push(item);
@@ -320,9 +424,25 @@ export class DatabaseHelper {
           // 处理数据库版本和表结构
           if (store.version === 0) {
             // 初始版本，创建表结构
-            store.executeSql(SQL_CREATE_TABLE);
-            store.executeSql(SQL2);
-            store.executeSql(SQL_index1);
+
+            let lines = init_category_data_sql.split(";");
+
+            lines = lines.filter(line => line.trim() != ""
+            )
+            store.executeSync(SQL_CREATE_TABLE);
+            store.executeSync(SQL2);
+            store.executeSync(SQL_index1);
+            //初始化数据
+            store.executeSync(init_category_table_sql);
+
+
+            lines.forEach((line) => {
+
+              console.log(line);
+              store.executeSync(line);
+            })
+
+
             store.version = 1;
           }
 
@@ -347,6 +467,4 @@ export class DatabaseHelper {
 
     await this.initPromise;
   }
-
-
 }

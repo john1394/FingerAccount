@@ -70,12 +70,10 @@ export struct IncomeAndExpenditure {
         GridRow({ columns: 4 }) {
           ForEach(this.categoryList, (item: CategoryItem) => {
             GridCol() {
-              Column({ space: 6 }) {
-
-
+              Column({ space: 0 }) {
                 RoundImage(
                   {
-                    contentWidth: 40,
+                    contentWidth: 50,
                     imageUrl: $r(item.category_image),
 
                     backColor:getIconCategoryBackcolor(this.currentItem,item.category_name)
@@ -129,6 +127,9 @@ export struct IncomeAndExpenditure {
             )
           })
         }
+        //.height("100%")
+        .alignItems(ItemAlign.Start)
+        //.backgroundColor(Color.Pink)
 
       }.height("100%")
       .width('100%')

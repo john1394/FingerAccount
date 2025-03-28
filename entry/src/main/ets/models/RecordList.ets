@@ -27,7 +27,7 @@ export const DefaultRecordList: RecordItemInfo[] = [
   {
     id: 123,
     // 类型图片
-    category_image: $r("app.media.ic_edit"),
+    category_image: $r("app.media.ic_cat_out_tongxun"),
     // 类型名称
     category_name: "其它",
     bill_type:0,
