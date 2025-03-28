@@ -21,12 +21,10 @@ import { BillTypeEnum, RecordItemInfo } from '../models/RecordList'
 struct EditAccount {
   @State
   categoryList: CategoryItem[] = [];
-  @Prop
-  selectedCategoryName: string = "其它"
+
   @Prop
   selectedImageColor: ResourceColor;
-  @Prop
-  selectedCategoryImage: ResourceStr
+
   @State
   inputAmountStr: string = "0"
   @State
@@ -34,8 +32,9 @@ struct EditAccount {
   @Prop
   currentItem: RecordItemInfo;
   updateSelectCategory = (name: string, image: string) => {
-    this.selectedCategoryName = name;
-    this.selectedCategoryImage = image;
+
+    this.currentItem.category_name=name;
+    this.currentItem.category_image=image;
 
   }
 
@@ -87,12 +86,12 @@ struct EditAccount {
 
     if (this.currentItem.id === 0) {
       let params: ValueType[] =
-        [fenMoney, this.selectedCategoryName, bill_type, timestamp, this.currentItem.notes, extra]
+        [fenMoney, this.currentItem.category_name, bill_type, timestamp, this.currentItem.notes, extra]
 
       DatabaseHelper.getInstance().insertBill(params)
     } else {
       let params: ValueType[] =
-        [fenMoney, this.selectedCategoryName, bill_type, timestamp, this.currentItem.notes, extra, this.currentItem.id]
+        [fenMoney, this.currentItem.category_name, bill_type, timestamp, this.currentItem.notes, extra, this.currentItem.id]
 
       DatabaseHelper.getInstance().updateBill(params);
     }
@@ -121,8 +120,9 @@ struct EditAccount {
         }
     }
 
-    this.selectedCategoryName = this.currentItem.category_name;
-    this.selectedCategoryImage = this.currentItem.category_image;
+   // this.selectedCategoryName = this.currentItem.category_name;
+   // this.selectedCategoryImage = this.currentItem.category_image;
+
     this.selectedImageColor = this.currentItem.bill_type === 0 ? getOutcomeIconBackColor() : getIncomeIconBackColor();
     //$r("app.color.danger")
     this.inputAmountStr = this.currentItem.amount === 0 ? "0" :
@@ -180,7 +180,9 @@ struct EditAccount {
                  // this.categoryList =this.getCategoryList();
                     //DefaultOutcomeCategoryList
                   //todo list长度要不为空
-                  this.selectedCategoryName = this.getCategoryList()[0].category_name
+                  //this.selectedCategoryName = this.getCategoryList()[0].category_name
+                  this.currentItem.category_name=this.getCategoryList()[0].category_name
+
                   this.selectedImageColor =getOutcomeIconBackColor();
                     //$r("app.color.danger")
 
@@ -258,7 +260,8 @@ struct EditAccount {
                 contentWidth: 40,
                 imageUrl:this.currentItem.category_image,
                 //this.selectedCategoryImage,
-                backColor:getIconCategoryBackcolor(this.currentItem,this.currentItem.category_name)
+                backColor:
+                getIconCategoryBackcolor(this.currentItem,this.currentItem.category_name)
                 //this.selectedImageColor
               }
             ).margin(
