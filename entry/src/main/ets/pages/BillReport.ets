@@ -1,14 +1,76 @@
 import { DEFAULT } from '@ohos/hypium';
 import { ColumnData } from '../models/BillReportModel'
 
+import { McLineChart, McPieChart, Options } from '@mcui/mccharts'
+import {
+  getWeekBoundaries,
+  DayPair,
+  formatDateYMDHan,
+  getMonthBoundaries,
+  getYearBoundaries,
+  shiftWeek,
+  shiftMonth,
+  shiftYear
+} from '../utils/Util';
+
 
 @Preview
 @Entry
 @Component
 struct BillReport {
   @Prop
-  isOutput: boolean = true
+  dayBoundary: DayPair;
+  @State
+  fromBeginDateStr: string = "";
+  @State maxData: number[] = [11, 11, 15, 13, 12, 130, 10]
+  //@State minData: number[] = [1, -20, 2, 5, 3, 2, 0]
+  // 初始化折线图数据
+  @State seriesOption: Options = new Options({
+    xAxis: {
+      data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+    },
+    yAxis: {
+      name: '金额'
+    },
+    series: [
+      {
+        name: '支出金额',
+        data: this.maxData
+      }
+    // {
+    //   name: '最低气温',
+    //   data: this.minData
+    // }
+    ]
+  })
+  //饼图数据
+  @State defOption: Options = new Options({
 
+
+    title: {
+      show: true,
+      left: 50,
+      top: 20,
+      text: "类别统计", // 标题文本
+      textStyle: { fontSize: 40 }
+
+    }
+  ,
+
+    series: [
+      {
+        data: [
+          { value: 435, name: '其它' },
+          { value: 310, name: '餐饮' },
+          { value: 234, name: '我心澎湃' },
+          { value: 135, name: '蓝河' },
+          { value: 548, name: '鸿蒙' }
+        ]
+      }
+    ]
+  })
+  @Prop
+  isOutput: boolean = true
   @State
   DateSelectBorderWidth: number = 3;
   @State columns: ColumnData[] = [
@@ -34,6 +96,50 @@ struct BillReport {
     })
 
     this.columns = newColumns;
+
+    //
+    if (this.columns[0].selected) {
+      this.dayBoundary = getWeekBoundaries(new Date());
+    } else if (this.columns[1].selected) {
+      this.dayBoundary = getMonthBoundaries(new Date());
+    } else if (this.columns[2].selected) {
+      this.dayBoundary = getYearBoundaries(new Date());
+    }
+
+    this.fromBeginDateStr = this.formatDayBoundary(this.dayBoundary);
+  }
+
+  shiftDate(left: boolean) {
+    //todo 限制边界
+    if (this.columns[0].selected) {
+      this.dayBoundary = shiftWeek(this.dayBoundary, left);
+    } else if (this.columns[1].selected) {
+
+      this.dayBoundary = shiftMonth(this.dayBoundary, left);
+
+    } else if (this.columns[2].selected) {
+      this.dayBoundary = shiftYear(this.dayBoundary, left);
+    }
+
+    this.fromBeginDateStr = this.formatDayBoundary(this.dayBoundary);
+  }
+
+  aboutToAppear(): void {
+    let currentDate = new Date();
+    //currentDate.setDate(currentDate.getDate()-28)
+    this.dayBoundary = getWeekBoundaries(currentDate);
+    // this.weekPair = getWeekBoundaries(currentDate)
+
+    //this.fromBeginDateStr = this.formatWeekPair();
+    //this.fromBeginDateStr = this.formatWeekPair(getMonthBoundaries( currentDate));
+    //getYearBoundaries( currentDate)
+    this.fromBeginDateStr = this.formatDayBoundary(this.dayBoundary);
+  }
+
+  formatDayBoundary(boundary: DayPair) {
+    //周,月 ，年
+
+    return formatDateYMDHan(boundary.begin) + "-" + formatDateYMDHan(boundary.end);
   }
 
   build() {
@@ -186,18 +292,18 @@ struct BillReport {
           Image($r("app.media.arrow_circle_left_48dp_000000"))
             .width(40)
             .height(40)
-
         }.height("100%")
-        //.backgroundColor(Color.Brown)
         .justifyContent(FlexAlign.Center)
-
         .layoutWeight(1)
+        .onClick(() => {
+
+          this.shiftDate(true);
+        })
+
 
         Column() {
-          Text("2025年03月24日-2025年03月30日")
-         // Text("2025年03月")
+          Text(this.fromBeginDateStr)// Text("2025年03月")
             .fontSize(16)
-
 
         }.layoutWeight(4)
 
@@ -209,6 +315,10 @@ struct BillReport {
         }.height("100%")
         .justifyContent(FlexAlign.Center)
         .layoutWeight(1)
+        .onClick(() => {
+
+          this.shiftDate(false);
+        })
 
       }
       .backgroundColor($r("app.color.back_color"))
@@ -218,7 +328,29 @@ struct BillReport {
       .height(50)
 
 
-      // .backgroundColor(Color.Pink)
+      //第四行 折线图
+
+      Row() {
+        McLineChart({
+          options: this.seriesOption
+        })
+      }
+      .height('40%')
+      //.backgroundColor(Color.Pink)
+      .margin(
+        {
+          bottom: 10
+        }
+      )
+
+      //第五行 饼图
+      Row() {
+        McPieChart({
+          options: this.defOption
+        })
+      }
+      //.backgroundColor(Color.Gray)
+      .height('40%')
 
     }
     .width("100%")
@@ -230,3 +362,5 @@ struct BillReport {
 }
 
 export default BillReport
+
+

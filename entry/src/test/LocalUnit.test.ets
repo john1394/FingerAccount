@@ -3,6 +3,13 @@ import { trimEndZero } from '../main/ets/utils/Util';
 import { asset } from '@kit.AssetStoreKit';
 
 export default function localUnitTest() {
+
+  let currentDate=new Date(2025,0,1);
+
+ // currentDate.setFullYear(currentDate.getFullYear()-1);
+  currentDate.setMonth(-1)
+
+  console.log("hi")
   describe('localUnitTest', () => {
     // Defines a test suite. Two parameters are supported: test suite name and test suite function.
     beforeAll(() => {
