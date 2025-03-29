@@ -116,6 +116,7 @@ struct BillReport {
     //todo 限制边界
     if (this.columns[0].selected) {
       this.dayBoundary = shiftWeek(this.dayBoundary, left);
+      this.updateWeekData();
     } else if (this.columns[1].selected) {
 
       this.dayBoundary = shiftMonth(this.dayBoundary, left);
@@ -138,6 +139,10 @@ struct BillReport {
     //getYearBoundaries( currentDate)
     this.fromBeginDateStr = this.formatDayBoundary(this.dayBoundary);
 
+    this.updateWeekData();
+  }
+
+  private updateWeekData() {
     let sumData =
       DatabaseHelper.getInstance().getDaySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime());
 
@@ -145,22 +150,35 @@ struct BillReport {
 
     sumData.map(u => {
       map.set(u.timeBase, u.amount);
-    })
+    });
 
+    let yData: number[] = [];
     let i: number = 0;
     for (i = 0; i < 7; i++) {
-      this.maxData.push(0);
+      yData.push(0);
     }
 
     for (i = 0; i < 7; i++) {
-      let dateItem: Date = new Date(this.dayBoundary.begin)
+      let dateItem: Date = new Date(this.dayBoundary.begin);
       dateItem.setDate(dateItem.getDate() + i);
 
-      let dateStr = formatDateYMD1(dateItem)
+      let dateStr = formatDateYMD1(dateItem);
       if (map.has(dateStr)) {
-        this.maxData[i] = map.get(dateStr) ?? 0;
+        yData[i] = map.get(dateStr) ?? 0;
       }
     }
+
+    //this.maxData=yData;
+
+    this.seriesOption.setVal({
+      series: [
+        {
+          name: '支出金额',
+          data: yData
+        }
+      ]
+    })
+
   }
 
   formatDayBoundary(boundary: DayPair) {
