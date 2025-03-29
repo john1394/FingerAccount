@@ -10,8 +10,10 @@ import {
   getYearBoundaries,
   shiftWeek,
   shiftMonth,
-  shiftYear
+  shiftYear,
+  formatDateYMD1
 } from '../utils/Util';
+import { DatabaseHelper } from '../utils/DatabaseHelper';
 
 
 @Preview
@@ -22,7 +24,8 @@ struct BillReport {
   dayBoundary: DayPair;
   @State
   fromBeginDateStr: string = "";
-  @State maxData: number[] = [11, 11, 15, 13, 12, 130, 10]
+  @State maxData: number[] = []
+  //[0, 0, 0, 0, 0, 0, 0]
   //@State minData: number[] = [1, -20, 2, 5, 3, 2, 0]
   // 初始化折线图数据
   @State seriesOption: Options = new Options({
@@ -134,6 +137,30 @@ struct BillReport {
     //this.fromBeginDateStr = this.formatWeekPair(getMonthBoundaries( currentDate));
     //getYearBoundaries( currentDate)
     this.fromBeginDateStr = this.formatDayBoundary(this.dayBoundary);
+
+    let sumData =
+      DatabaseHelper.getInstance().getDaySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime());
+
+    let map: Map<string, number> = new Map<string, number>();
+
+    sumData.map(u => {
+      map.set(u.timeBase, u.amount);
+    })
+
+    let i: number = 0;
+    for (i = 0; i < 7; i++) {
+      this.maxData.push(0);
+    }
+
+    for (i = 0; i < 7; i++) {
+      let dateItem: Date = new Date(this.dayBoundary.begin)
+      dateItem.setDate(dateItem.getDate() + i);
+
+      let dateStr = formatDateYMD1(dateItem)
+      if (map.has(dateStr)) {
+        this.maxData[i] = map.get(dateStr) ?? 0;
+      }
+    }
   }
 
   formatDayBoundary(boundary: DayPair) {
@@ -362,5 +389,6 @@ struct BillReport {
 }
 
 export default BillReport
+
 
 

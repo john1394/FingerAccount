@@ -1,5 +1,6 @@
 import { relationalStore, ValueType, } from '@kit.ArkData';
 import { BusinessError } from '@kit.BasicServicesKit';
+import { SumData } from '../models/BillReportModel';
 import { CategoryItem } from '../models/CategoryList';
 import { BillTypeEnum, RecordItemInfo } from '../models/RecordList';
 
@@ -312,11 +313,52 @@ export class DatabaseHelper {
     return result
   }
 
+    getDaySum(begin:number,end:number):SumData[]
+  {
+
+    let result: SumData[] = [];
+    try {
+      const sql =`SELECT SUM(amount) as total,  strftime('%Y-%m-%d', timestamp/1000, 'unixepoch','localtime') AS date
+                 FROM bills
+                 where timestamp>=? and timestamp <=?
+                 group by date order  by date asc`
+      let params:ValueType[]=[begin,end];
+
+
+      const resultSet = this.rdbStore?.querySqlSync(sql,params); // 或使用 executeSql（需处理结果集）
+      while (resultSet?.goToNextRow()) {
+
+        // 获取列值
+        const total = resultSet.getLong(resultSet.getColumnIndex('total'));
+        const date = resultSet.getString(resultSet.getColumnIndex('date'));
+
+
+        console.log(`total: ${total}, date: ${date}`);
+
+        let item: SumData =
+          {
+            amount: total,
+            timeBase: date,
+          }
+
+        result.push(item);
+      }
+
+      resultSet?.close();
+
+    } catch (error) {
+      console.error(`Failed to execute SQL: ${error.message}`);
+
+    }
+
+    return result
+  }
+
   getAllBillRecord() {
     let result: RecordItemInfo[] = []
     try {
       // 1. 执行 SQL 查询
-      const sql = 'SELECT * FROM bills';
+      const sql = 'SELECT * FROM bills order by timestamp desc';
       const resultSet = this.rdbStore?.querySqlSync(sql); // 或使用 executeSql（需处理结果集）
 
       while (resultSet?.goToNextRow()) {

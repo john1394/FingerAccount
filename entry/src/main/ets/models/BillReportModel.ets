@@ -1,3 +1,9 @@
+export  interface  SumData
+{
+  amount:number,
+  timeBase:string
+}
+
 export class ColumnData {
   uid: string;
   txt: string;
