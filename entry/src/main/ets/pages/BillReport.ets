@@ -11,9 +11,13 @@ import {
   shiftWeek,
   shiftMonth,
   shiftYear,
-  formatDateYMD1
+  formatDateYMD1,
+  formatDateYM1,
+  formatFen,
+  roundAmountFen2Yuan
 } from '../utils/Util';
 import { DatabaseHelper } from '../utils/DatabaseHelper';
+import { BillTypeEnum } from '../models/RecordList';
 
 
 @Preview
@@ -24,31 +28,9 @@ struct BillReport {
   dayBoundary: DayPair;
   @State
   fromBeginDateStr: string = "";
-  @State maxData: number[] = []
-  //[0, 0, 0, 0, 0, 0, 0]
-  //@State minData: number[] = [1, -20, 2, 5, 3, 2, 0]
-  // 初始化折线图数据
-  @State seriesOption: Options = new Options({
-    xAxis: {
-      data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-    },
-    yAxis: {
-      name: '金额'
-    },
-    series: [
-      {
-        name: '支出金额',
-        data: this.maxData
-      }
-    // {
-    //   name: '最低气温',
-    //   data: this.minData
-    // }
-    ]
-  })
-  //饼图数据
-  @State defOption: Options = new Options({
-
+  @State
+  lineOption: Options = new Options({})
+  @State pieOption: Options = new Options({
 
     title: {
       show: true,
@@ -103,10 +85,13 @@ struct BillReport {
     //
     if (this.columns[0].selected) {
       this.dayBoundary = getWeekBoundaries(new Date());
+      this.updateWeekData()
     } else if (this.columns[1].selected) {
       this.dayBoundary = getMonthBoundaries(new Date());
+      this.updateMonthData();
     } else if (this.columns[2].selected) {
       this.dayBoundary = getYearBoundaries(new Date());
+      this.updateYearData();
     }
 
     this.fromBeginDateStr = this.formatDayBoundary(this.dayBoundary);
@@ -120,9 +105,11 @@ struct BillReport {
     } else if (this.columns[1].selected) {
 
       this.dayBoundary = shiftMonth(this.dayBoundary, left);
+      this.updateMonthData();
 
     } else if (this.columns[2].selected) {
       this.dayBoundary = shiftYear(this.dayBoundary, left);
+      this.updateYearData();
     }
 
     this.fromBeginDateStr = this.formatDayBoundary(this.dayBoundary);
@@ -142,13 +129,155 @@ struct BillReport {
     this.updateWeekData();
   }
 
-  private updateWeekData() {
+  private updateYearData() {
+    let bill_type = this.isOutput ? BillTypeEnum.Outcome : BillTypeEnum.Income;
+    let monthCount: number = this.dayBoundary.end.getMonth() - this.dayBoundary.begin.getMonth() + 1;
+
+    let xData: string[] = []
+
+    for (let i = 0; i < monthCount; i++) {
+      xData.push((i + 1).toString() + "月");
+    }
+
     let sumData =
-      DatabaseHelper.getInstance().getDaySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime());
+      DatabaseHelper.getInstance()
+        .getMonthSum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), bill_type);
 
     let map: Map<string, number> = new Map<string, number>();
 
     sumData.map(u => {
+      map.set(u.timeBase, u.amount);
+    });
+
+    let yData: number[] = [];
+    let i: number = 0;
+    for (i = 0; i < monthCount; i++) {
+      yData.push(0);
+    }
+
+    for (i = 0; i < monthCount; i++) {
+      let dateItem: Date = new Date(this.dayBoundary.begin);
+      dateItem.setMonth(dateItem.getMonth() + i);
+
+      let dateStr = formatDateYM1(dateItem);
+      if (map.has(dateStr)) {
+        yData[i] = map.get(dateStr) ?? 0;
+      }
+    }
+
+    let yShowNumber: number[] = []
+    yData.forEach((item) => {
+      yShowNumber.push(roundAmountFen2Yuan(item));
+    })
+
+    let yTitle = bill_type === BillTypeEnum.Outcome ? "支出金额" : "收入金额";
+    this.lineOption.setVal({
+      series: [
+        {
+          name: yTitle,
+          data: yShowNumber
+        }
+      ],
+      yAxis: {
+        name: '金额'
+      },
+      xAxis:
+      {
+        data: xData
+      , axisLabel:
+      {
+        interval: 1
+      }
+      }
+    })
+  }
+
+  private updateReport() {
+    if (this.columns[0].selected) {
+      this.updateWeekData()
+    } else if (this.columns[1].selected) {
+      this.updateMonthData();
+    } else if (this.columns[2].selected) {
+      this.updateYearData();
+    }
+  }
+
+  private updateMonthData() {
+    let bill_type = this.isOutput ? BillTypeEnum.Outcome : BillTypeEnum.Income;
+    let dayCount: number = this.dayBoundary.end.getDate() - this.dayBoundary.begin.getDate() + 1;
+
+    let xData: string[] = []
+
+    for (let i = 0; i < dayCount; i++) {
+      xData.push(i.toString());
+    }
+
+    let sumData =
+      DatabaseHelper.getInstance()
+        .getDaySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), bill_type);
+
+    let map: Map<string, number> = new Map<string, number>();
+
+    sumData.map(u => {
+      map.set(u.timeBase, u.amount);
+    });
+
+    let yData: number[] = [];
+    let i: number = 0;
+    for (i = 0; i < dayCount; i++) {
+      yData.push(0);
+    }
+
+    for (i = 0; i < dayCount; i++) {
+      let dateItem: Date = new Date(this.dayBoundary.begin);
+      dateItem.setDate(dateItem.getDate() + i);
+
+      let dateStr = formatDateYMD1(dateItem);
+      if (map.has(dateStr)) {
+        yData[i] = map.get(dateStr) ?? 0;
+      }
+    }
+
+    let yShowNumber: number[] = []
+    yData.forEach((item) => {
+      yShowNumber.push(roundAmountFen2Yuan(item));
+    })
+
+    let yTitle = bill_type === BillTypeEnum.Outcome ? "支出金额" : "收入金额";
+    this.lineOption.setVal({
+      series: [
+        {
+          name: '支出金额',
+          data: yShowNumber
+        }
+      ],
+      yAxis: {
+        name: yTitle
+      },
+      xAxis:
+      {
+        data: xData
+      , axisLabel:
+      {
+        interval: 5
+      }
+      }
+
+    })
+
+  }
+
+  private updateWeekData() {
+
+    let bill_type = this.isOutput ? BillTypeEnum.Outcome : BillTypeEnum.Income;
+    let sumData =
+      DatabaseHelper.getInstance()
+        .getDaySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), bill_type);
+
+    let map: Map<string, number> = new Map<string, number>();
+
+    sumData.map(u => {
+
       map.set(u.timeBase, u.amount);
     });
 
@@ -168,15 +297,32 @@ struct BillReport {
       }
     }
 
-    //this.maxData=yData;
+    let yTitle = bill_type === BillTypeEnum.Outcome ? "支出金额" : "收入金额";
+    let xData = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
 
-    this.seriesOption.setVal({
+    let yShowNumber: number[] = []
+    yData.forEach((item) => {
+      yShowNumber.push(roundAmountFen2Yuan(item));
+    })
+
+    this.lineOption.setVal({
       series: [
         {
-          name: '支出金额',
-          data: yData
+          name: yTitle,
+          data: yShowNumber
         }
-      ]
+      ],
+      yAxis: {
+        name: '金额'
+      },
+      xAxis:
+      {
+        data: xData
+      , axisLabel:
+      {
+        interval: 0
+      }
+      }
     })
 
   }
@@ -228,6 +374,7 @@ struct BillReport {
           .layoutWeight(1)
           .onClick(() => {
             this.isOutput = !this.isOutput
+            this.updateReport()
           })
 
 
@@ -263,6 +410,7 @@ struct BillReport {
           .layoutWeight(1)
           .onClick(() => {
             this.isOutput = !this.isOutput
+            this.updateReport()
           })
 
         }
@@ -377,7 +525,7 @@ struct BillReport {
 
       Row() {
         McLineChart({
-          options: this.seriesOption
+          options: this.lineOption
         })
       }
       .height('40%')
@@ -391,7 +539,7 @@ struct BillReport {
       //第五行 饼图
       Row() {
         McPieChart({
-          options: this.defOption
+          options: this.pieOption
         })
       }
       //.backgroundColor(Color.Gray)

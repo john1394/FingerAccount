@@ -313,16 +313,57 @@ export class DatabaseHelper {
     return result
   }
 
-    getDaySum(begin:number,end:number):SumData[]
+    getDaySum(begin:number,end:number,bill_type:BillTypeEnum):SumData[]
   {
 
     let result: SumData[] = [];
     try {
       const sql =`SELECT SUM(amount) as total,  strftime('%Y-%m-%d', timestamp/1000, 'unixepoch','localtime') AS date
                  FROM bills
-                 where timestamp>=? and timestamp <=?
+                 where bill_type=? and timestamp>=? and timestamp <=?
                  group by date order  by date asc`
-      let params:ValueType[]=[begin,end];
+      let params:ValueType[]=[bill_type, begin,end];
+
+
+      const resultSet = this.rdbStore?.querySqlSync(sql,params); // 或使用 executeSql（需处理结果集）
+      while (resultSet?.goToNextRow()) {
+
+        // 获取列值
+        const total = resultSet.getLong(resultSet.getColumnIndex('total'));
+        const date = resultSet.getString(resultSet.getColumnIndex('date'));
+
+
+        console.log(`total: ${total}, date: ${date}`);
+
+        let item: SumData =
+          {
+            amount: total,
+            timeBase: date,
+          }
+
+        result.push(item);
+      }
+
+      resultSet?.close();
+
+    } catch (error) {
+      console.error(`Failed to execute SQL: ${error.message}`);
+
+    }
+
+    return result
+  }
+
+  getMonthSum(begin:number,end:number,bill_type:BillTypeEnum):SumData[]
+  {
+
+    let result: SumData[] = [];
+    try {
+      const sql =`SELECT SUM(amount) as total,  strftime('%Y-%m', timestamp/1000, 'unixepoch','localtime') AS date
+                 FROM bills
+                 where bill_type=? and timestamp>=? and timestamp <=?
+                 group by date order  by date asc`
+      let params:ValueType[]=[bill_type, begin,end];
 
 
       const resultSet = this.rdbStore?.querySqlSync(sql,params); // 或使用 executeSql（需处理结果集）

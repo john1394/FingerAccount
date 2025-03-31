@@ -43,7 +43,7 @@ export function shiftMonth(dayPair: DayPair, left: boolean): DayPair {
   let deltaNumber = left ? -1 : 1;
   const begin = new Date(dayPair.begin); // 创建副本，避免修改原对象
   begin.setDate(1);
-  begin.setMonth(begin.getMonth()+deltaNumber);
+  begin.setMonth(begin.getMonth() + deltaNumber);
 
   const end = new Date(begin);
   end.setMonth(end.getMonth() + 1); // 跳到下个月
@@ -54,15 +54,16 @@ export function shiftMonth(dayPair: DayPair, left: boolean): DayPair {
 
 export function shiftYear(dayPair: DayPair, left: boolean): DayPair {
   let deltaNumber = left ? -1 : 1;
-  const beginYear = dayPair.begin.getFullYear()+deltaNumber;
+  const beginYear = dayPair.begin.getFullYear() + deltaNumber;
   const begin = new Date(beginYear, 0, 1); // 月份从 0 开始（0=1月）
   const end = new Date(beginYear, 11, 31); // 12月=11
   return { begin, end };
 }
 
 // 获取当前月份的第一天和最后一天
-export function getMonthBoundaries(currentDate: Date): DayPair {
-
+export function getMonthBoundaries(currentDateParam: Date): DayPair {
+  let currentDate = new Date(currentDateParam)
+  currentDate.setHours(0, 0, 0, 0)
   // 月份第一天（直接设为 1 号）
   const firstDay = new Date(currentDate);
   firstDay.setDate(1);
@@ -75,7 +76,9 @@ export function getMonthBoundaries(currentDate: Date): DayPair {
   return { begin: firstDay, end: lastDay };
 }
 
-export function getWeekBoundaries(currentDate: Date): DayPair {
+export function getWeekBoundaries(currentDateParam: Date): DayPair {
+  let currentDate = new Date(currentDateParam)
+  currentDate.setHours(0, 0, 0, 0)
   const currentDay = currentDate.getDay(); // 0（周日）到 6（周六）
 
   // 计算到周一的天数差
@@ -149,6 +152,13 @@ export function formatDateYMD1(date: Date): string {
   const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始，需要+1
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+}
+
+export function formatDateYM1(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始，需要+1
+
+  return `${year}-${month}`;
 }
 
 export function formatDateYMDHan(date: Date): string {
@@ -231,6 +241,10 @@ export function getIconUnselectBackColor() {
   return Color.Gray
 }
 
+export  function roundAmountFen2Yuan(amount:number)
+{
+  return Math.round(amount/100)
+}
 
 export function formatFen(amount: number) {
 
