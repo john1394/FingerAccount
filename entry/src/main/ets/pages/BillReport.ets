@@ -18,12 +18,16 @@ import {
 } from '../utils/Util';
 import { DatabaseHelper } from '../utils/DatabaseHelper';
 import { BillTypeEnum } from '../models/RecordList';
-
+const yAxisText:string="元";
 
 @Preview
 @Entry
 @Component
 struct BillReport {
+
+
+
+
   @Prop
   dayBoundary: DayPair;
   @State
@@ -38,7 +42,6 @@ struct BillReport {
       top: 20,
       text: "类别统计", // 标题文本
       textStyle: { fontSize: 40 }
-
     }
   ,
 
@@ -172,6 +175,7 @@ struct BillReport {
 
     let yTitle = bill_type === BillTypeEnum.Outcome ? "支出金额" : "收入金额";
     this.lineOption.setVal({
+      animation: false,
       series: [
         {
           name: yTitle,
@@ -179,14 +183,15 @@ struct BillReport {
         }
       ],
       yAxis: {
-        name: '金额'
+        name: yAxisText
       },
       xAxis:
       {
         data: xData
       , axisLabel:
       {
-        interval: 1
+        interval: 1,
+        fontSize: 36
       }
       }
     })
@@ -243,16 +248,21 @@ struct BillReport {
       yShowNumber.push(roundAmountFen2Yuan(item));
     })
 
-    let yTitle = bill_type === BillTypeEnum.Outcome ? "支出金额" : "收入金额";
+    let yTitle = (bill_type === BillTypeEnum.Outcome ? "支出金额" : "收入金额");
     this.lineOption.setVal({
+      animation: false,
       series: [
         {
-          name: '支出金额',
+          name: yTitle,
+          label:
+          {
+            fontSize: 36,
+          },
           data: yShowNumber
         }
       ],
       yAxis: {
-        name: yTitle
+        name: yAxisText
       },
       xAxis:
       {
@@ -260,6 +270,7 @@ struct BillReport {
       , axisLabel:
       {
         interval: 5
+       , fontSize: 36
       }
       }
 
@@ -306,21 +317,52 @@ struct BillReport {
     })
 
     this.lineOption.setVal({
+
+      legend: {
+        show: true,
+        // align: 'right', // 图例与文本的对齐方式
+        // left: '10%', // 距离左侧位置
+        // itemGap: 10, // 图例每项之间的间隔。横向布局时为水平间隔，纵向布局时为纵向间隔。
+        // itemTextGap: 5, // 图例图例之间的间隔。
+        // itemWidth: 8, // 图例标记的图形高度。
+        // itemHeight: 8, // 图例标记的图形高度。
+        textStyle: {
+          fontSize: 42
+        },
+        textUnselectedStyle:
+        {
+          fontSize: 42
+        }
+      },
+      animation: false,
       series: [
         {
           name: yTitle,
+          label:
+          {
+            fontSize: 36,
+          },
           data: yShowNumber
         }
       ],
       yAxis: {
-        name: '金额'
+        name: yAxisText,
+        nameTextStyle:
+        {
+          fontSize: 36
+        },
+        axisLabel:
+        {
+          fontSize: 36
+        }
       },
       xAxis:
       {
         data: xData
       , axisLabel:
       {
-        interval: 0
+        interval: 0,
+        fontSize: 36
       }
       }
     })
