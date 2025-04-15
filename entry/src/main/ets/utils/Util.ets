@@ -229,6 +229,12 @@ export function getIconCategoryBackcolor(item: RecordItemInfo, currentCategoryNa
 
 }
 
+export function getIconSelectImageColor(bill_type: BillTypeEnum) {
+  return bill_type === 0 ? getOutcomeIconBackColor() : getIncomeIconBackColor();
+
+}
+
+
 export function getOutcomeIconBackColor() {
   return $r("app.color.danger");
 }
@@ -241,9 +247,8 @@ export function getIconUnselectBackColor() {
   return Color.Gray
 }
 
-export  function roundAmountFen2Yuan(amount:number)
-{
-  return Math.round(amount/100)
+export function roundAmountFen2Yuan(amount: number) {
+  return Math.round(amount / 100)
 }
 
 export function formatFen(amount: number) {

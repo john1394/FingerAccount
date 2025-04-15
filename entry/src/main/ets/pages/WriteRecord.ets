@@ -1,8 +1,9 @@
-
-import { formatFen, formatTime, test1 } from '../utils/Util'
+import { formatFen, getIconCategoryBackcolor } from '../utils/Util'
 import { promptAction, router } from '@kit.ArkUI'
 import { DatabaseHelper } from '../utils/DatabaseHelper'
-import { RecordItemInfo } from '../models/RecordList'
+import { BillTypeEnum, RecordItemInfo } from '../models/RecordList'
+import CategoryMapSingleton from '../models/CategoryMapSingleton'
+import { RoundImage } from './RoundImage'
 
 
 @Preview
@@ -14,19 +15,14 @@ struct WriteRecord {
   @State
   firstAppear: boolean = false
 
-  // onPageShow(): void {
-  //
-  //   if (!this.firstAppear) {
-  //     this.loadAllData();
-  //   }
-  // }
-
   loadAllData() {
     let allItems: RecordItemInfo[] = DatabaseHelper.getInstance().getAllBillRecord();
 
     allItems.forEach((item: RecordItemInfo) => {
 
-      item.category_image = $r("app.media.ic_edit")
+      item.category_image =
+        $r(CategoryMapSingleton.getInstance().get(item.category_name, item.bill_type)!.category_image)
+      //$r("app.media.ic_edit")
     }
     )
 
@@ -35,6 +31,7 @@ struct WriteRecord {
 
   aboutToAppear(): void {
     this.loadAllData();
+
     // if(!this.firstAppear) {
     //   this.firstAppear = true
     //
@@ -229,17 +226,33 @@ struct WriteRecord {
               Row({ space: 10 }) {
 
                 Row() {
-                  Image(item.category_image)
-                    .width(24)
-                    .height(24)
-                    .margin(
-                      {
-                        right: 5
-                      }
-                    )
+                  // Image(item.category_image)
+                  //   .width(24)
+                  //   .height(24)
+                  //   .margin(
+                  //     {
+                  //       right: 5
+                  //     }
+                  //   )
+                  //   .backgroundColor(getIconSelectImageColor(item.bill_type))
+                  RoundImage(
+                    {
+                      contentWidth: 30,
+                      imageUrl: item.category_image,
+                      //this.selectedCategoryImage,
+                      backColor:
+                      getIconCategoryBackcolor(item, item.category_name)
+                      //this.selectedImageColor
+                    }
+                  ).margin(
+                    {
+                      left: 10,
+                      right: 10
+                    }
+                  )
 
                   Text(item.category_name)
-                    .fontSize(18)
+                    .fontSize(16)
                 }.justifyContent(FlexAlign.Start)
                 .padding(
                   {
@@ -252,30 +265,32 @@ struct WriteRecord {
 
                 //右侧块
                 Column() {
-                  Text(`￥${formatFen(item.amount)}`)
+                  Text((item.bill_type == BillTypeEnum.Income ? "+" : "-") + `￥${formatFen(item.amount)}`)
                     .margin(
                       {
                         bottom: 10
                       }
-                    ).textAlign(TextAlign.End)
+                    )
+                    .textAlign(TextAlign.End)
                     .fontWeight(FontWeight.Bold)// .backgroundColor(Color.Pink)
-                    .fontColor($r("app.color.text_primary"))
+                    .fontColor(item.bill_type == BillTypeEnum.Income ? Color.Green :
+                    $r("app.color.danger"))//"//.text_primary"))
+                    .fontSize(14)
 
 
-                  Text(formatTime(item.timestamp))
-                    .textAlign(TextAlign.End)// .backgroundColor(Color.Yellow)
-                    .fontColor($r("app.color.text_second"))
+                  // Text(formatTime(item.timestamp))
+                  //   .textAlign(TextAlign.End)// .backgroundColor(Color.Yellow)
+                  //   .fontColor($r("app.color.text_second"))
+                  //   .fontSize(14)
                 }.width(120)
                 .alignItems(HorizontalAlign.End)
 
                 .padding(
                   {
-
                     top: 10,
                     right: 10,
                     bottom: 10
                   }
-
                 )
 
                 // .backgroundColor(Color.Red)

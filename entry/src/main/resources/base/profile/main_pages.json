@@ -5,6 +5,7 @@
     "pages/WriteRecord",
     "pages/BillDetail",
     "pages/CategoryManage",
-    "pages/BillReport"
+    "pages/BillReport",
+    "pages/MyTestPage"
   ]
 }

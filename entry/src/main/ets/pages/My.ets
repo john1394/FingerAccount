@@ -35,7 +35,7 @@ struct My {
 
           Column({ space: 10 }) {
             Text("指尖记帐").fontSize(18).fontColor($r('app.color.text_primary'))
-            Text("邮箱：xxxx").fontColor(
+            Text("邮箱：john1394@163.com").fontColor(
               $r('app.color.text_second')).fontSize(14)
           }.alignItems(HorizontalAlign.Start)
         }

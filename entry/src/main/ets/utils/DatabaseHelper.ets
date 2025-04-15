@@ -67,12 +67,6 @@ insert into category(category_name,image_url,bill_type,timestamp) values('设置
 
 `;
 
-// const init_income_category_sql = `
-// insert into category(category_name,image_url,bill_type,timestamp) values('其它','ic_cat_in_qita','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
-// insert into category(category_name,image_url,bill_type,timestamp) values('工资','ic_cat_in_gongzhi','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
-// `;
-
-
 const SQL_CREATE_TABLE =
   'CREATE TABLE IF NOT EXISTS bills (\n' +
     '    id INTEGER PRIMARY KEY AUTOINCREMENT,\n' +
@@ -276,20 +270,58 @@ export class DatabaseHelper {
   }
 
 
-  getCategoryByType(billType:BillTypeEnum): CategoryItem[] {
+  // getCategoryByType(billType:BillTypeEnum): CategoryItem[] {
+  //   let result: CategoryItem[] = [];
+  //   try {
+  //     const sql = 'SELECT * FROM category where bill_type=? order by id';
+  //     let params:ValueType[]=[];
+  //     params.push(billType.valueOf());
+  //
+  //     const resultSet = this.rdbStore?.querySqlSync(sql,params); // 或使用 executeSql（需处理结果集）
+  //     while (resultSet?.goToNextRow()) {
+  //
+  //       // 获取列值
+  //       const id = resultSet.getLong(resultSet.getColumnIndex('id'));
+  //       const category_name = resultSet.getString(resultSet.getColumnIndex('category_name'));
+  //       const image_url = "app.media."+resultSet.getString(resultSet.getColumnIndex('image_url'));
+  //       const bill_type = resultSet.getLong(resultSet.getColumnIndex('bill_type'));
+  //       const timestamp = resultSet.getLong(resultSet.getColumnIndex('timestamp'));
+  //
+  //       console.log(`ID: ${id}, category_name: ${category_name}, image_url: ${image_url}, bill_type:${bill_type}}, Timestamp: ${timestamp}`);
+  //
+  //       let item: CategoryItem =
+  //         {
+  //           category_image: image_url,
+  //           category_name: category_name,
+  //           bill_type:bill_type
+  //         }
+  //
+  //       result.push(item);
+  //     }
+  //
+  //     resultSet?.close();
+  //
+  //   } catch (error) {
+  //     console.error(`Failed to execute SQL: ${error.message}`);
+  //
+  //   }
+  //   return result
+  // }
+
+  getCategoryData(): CategoryItem[] {
     let result: CategoryItem[] = [];
     try {
-      const sql = 'SELECT * FROM category where bill_type=? order by id';
-      let params:ValueType[]=[];
-      params.push(billType.valueOf());
+      const sql = 'SELECT * FROM category order by id';
+      let params: ValueType[] = [];
+      //params.push(billType.valueOf());
 
-      const resultSet = this.rdbStore?.querySqlSync(sql,params); // 或使用 executeSql（需处理结果集）
+      const resultSet = this.rdbStore?.querySqlSync(sql, params); // 或使用 executeSql（需处理结果集）
       while (resultSet?.goToNextRow()) {
 
         // 获取列值
         const id = resultSet.getLong(resultSet.getColumnIndex('id'));
         const category_name = resultSet.getString(resultSet.getColumnIndex('category_name'));
-        const image_url = "app.media."+resultSet.getString(resultSet.getColumnIndex('image_url'));
+        const image_url = "app.media." + resultSet.getString(resultSet.getColumnIndex('image_url'));
         const bill_type = resultSet.getLong(resultSet.getColumnIndex('bill_type'));
         const timestamp = resultSet.getLong(resultSet.getColumnIndex('timestamp'));
 
@@ -299,6 +331,7 @@ export class DatabaseHelper {
           {
             category_image: image_url,
             category_name: category_name,
+            bill_type: bill_type
           }
 
         result.push(item);
@@ -313,19 +346,19 @@ export class DatabaseHelper {
     return result
   }
 
-    getDaySum(begin:number,end:number,bill_type:BillTypeEnum):SumData[]
-  {
+
+  getDaySum(begin: number, end: number, bill_type: BillTypeEnum): SumData[] {
 
     let result: SumData[] = [];
     try {
-      const sql =`SELECT SUM(amount) as total,  strftime('%Y-%m-%d', timestamp/1000, 'unixepoch','localtime') AS date
+      const sql = `SELECT SUM(amount) as total,  strftime('%Y-%m-%d', timestamp/1000, 'unixepoch','localtime') AS date
                  FROM bills
                  where bill_type=? and timestamp>=? and timestamp <=?
                  group by date order  by date asc`
-      let params:ValueType[]=[bill_type, begin,end];
+      let params: ValueType[] = [bill_type, begin, end];
 
 
-      const resultSet = this.rdbStore?.querySqlSync(sql,params); // 或使用 executeSql（需处理结果集）
+      const resultSet = this.rdbStore?.querySqlSync(sql, params); // 或使用 executeSql（需处理结果集）
       while (resultSet?.goToNextRow()) {
 
         // 获取列值
@@ -354,19 +387,18 @@ export class DatabaseHelper {
     return result
   }
 
-  getMonthSum(begin:number,end:number,bill_type:BillTypeEnum):SumData[]
-  {
+  getMonthSum(begin: number, end: number, bill_type: BillTypeEnum): SumData[] {
 
     let result: SumData[] = [];
     try {
-      const sql =`SELECT SUM(amount) as total,  strftime('%Y-%m', timestamp/1000, 'unixepoch','localtime') AS date
+      const sql = `SELECT SUM(amount) as total,  strftime('%Y-%m', timestamp/1000, 'unixepoch','localtime') AS date
                  FROM bills
                  where bill_type=? and timestamp>=? and timestamp <=?
                  group by date order  by date asc`
-      let params:ValueType[]=[bill_type, begin,end];
+      let params: ValueType[] = [bill_type, begin, end];
 
 
-      const resultSet = this.rdbStore?.querySqlSync(sql,params); // 或使用 executeSql（需处理结果集）
+      const resultSet = this.rdbStore?.querySqlSync(sql, params); // 或使用 executeSql（需处理结果集）
       while (resultSet?.goToNextRow()) {
 
         // 获取列值
@@ -472,19 +504,6 @@ export class DatabaseHelper {
 
   // 初始化方法必须完整覆盖赋值逻辑
 
-  private async getRdbStorePromise(context: Context,
-    config: relationalStore.StoreConfig): Promise<relationalStore.RdbStore> {
-    return new Promise((resolve, reject) => {
-      relationalStore.getRdbStore(context, config, (err, store) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(store);
-        }
-      });
-    });
-  }
-
   async initDatabase(context: Context): Promise<void> {
     if (this.rdbStore) {
       return; // 已初始化，直接返回
@@ -549,5 +568,18 @@ export class DatabaseHelper {
     }
 
     await this.initPromise;
+  }
+
+  private async getRdbStorePromise(context: Context,
+    config: relationalStore.StoreConfig): Promise<relationalStore.RdbStore> {
+    return new Promise((resolve, reject) => {
+      relationalStore.getRdbStore(context, config, (err, store) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(store);
+        }
+      });
+    });
   }
 }

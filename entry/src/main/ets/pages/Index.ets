@@ -10,22 +10,7 @@ import WriteRecord from './WriteRecord'
 @Component
 struct Index {
   aboutToAppear(): void {
-    //DatabaseHelper.getInstance().insertTest();
-    //DatabaseHelper.getInstance().selectTest();
-    //DatabaseHelper.getInstance().testGetTableData("bills")
-    //DatabaseHelper.getInstance().test2()
 
-    // let param:RecordItemInfo=
-    //   {
-    //     id: '',
-    //     category_image: '',
-    //     category_name: '',
-    //     amount: 12,
-    //     timestamp: 0
-    //   }
-
-    // let params: ValueType[] = [13]
-    // DatabaseHelper.getInstance().insertBill(params)
   }
 
   @State

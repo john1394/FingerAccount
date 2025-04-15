@@ -1,8 +1,7 @@
-import { router } from '@kit.ArkUI'
-import { RecordItemInfo } from '../models/RecordList'
+import { router } from '@kit.ArkUI';
+import { RecordItemInfo } from '../models/RecordList';
 import { DatabaseHelper } from '../utils/DatabaseHelper';
-import { RoundImage } from './RoundImage'
-import { ValueType } from '@kit.ArkData';
+import { RoundImage } from './RoundImage';
 import { formatDateYMDHan, formatFen, getIncomeIconBackColor, getOutcomeIconBackColor } from '../utils/Util';
 
 @Preview
@@ -64,15 +63,8 @@ struct BillDetail {
           .height(30)
 
           .onClick(() => {
-
-
             router.back()
-            // router.back(
-            //   {
-            //     url:"pages/WriteRecord",
-            //     params: { refresh: true }
-            //   }
-            // )
+
           })
           .zIndex(2)
           .margin(
@@ -106,7 +98,7 @@ struct BillDetail {
                 {
                   contentWidth: 40,
                   imageUrl: this.currentItem.category_image,
-                  backColor: this.currentItem.bill_type===0?getOutcomeIconBackColor():getIncomeIconBackColor()
+                  backColor: this.currentItem.bill_type === 0 ? getOutcomeIconBackColor() : getIncomeIconBackColor()
 
                 }
               ).margin(

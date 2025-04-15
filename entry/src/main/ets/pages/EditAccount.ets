@@ -1,4 +1,4 @@
-import { promptAction, router } from '@kit.ArkUI'
+import { router } from '@kit.ArkUI'
 
 import { CategoryItem, DefaultIncomeCategoryList, DefaultOutcomeCategoryList } from '../models/CategoryList'
 import { DatabaseHelper } from '../utils/DatabaseHelper'
@@ -10,10 +10,14 @@ import { NumberBoard } from './EditParts/NumberBoard'
 import { TimeSelector as TimeSelect } from './EditParts/TimeSelect'
 import { RoundImage } from './RoundImage'
 import { ValueType } from '@kit.ArkData'
-import { formatFen, getDateAtMidnight,
+import {
+  formatFen,
+  getDateAtMidnight,
   getIconCategoryBackcolor,
-  getIncomeIconBackColor, getOutcomeIconBackColor,
-  trimEndZero } from '../utils/Util'
+  getIncomeIconBackColor,
+  getOutcomeIconBackColor,
+  trimEndZero
+} from '../utils/Util'
 import { BillTypeEnum, RecordItemInfo } from '../models/RecordList'
 
 @Entry
@@ -21,10 +25,8 @@ import { BillTypeEnum, RecordItemInfo } from '../models/RecordList'
 struct EditAccount {
   @State
   categoryList: CategoryItem[] = [];
-
   @Prop
   selectedImageColor: ResourceColor;
-
   @State
   inputAmountStr: string = "0"
   @State
@@ -33,8 +35,8 @@ struct EditAccount {
   currentItem: RecordItemInfo;
   updateSelectCategory = (name: string, image: string) => {
 
-    this.currentItem.category_name=name;
-    this.currentItem.category_image=image;
+    this.currentItem.category_name = name;
+    this.currentItem.category_image = image;
 
   }
 
@@ -56,15 +58,15 @@ struct EditAccount {
 
   switchBillType() {
     if (this.currentItem.bill_type === BillTypeEnum.Outcome) {
-      this.currentItem.bill_type =BillTypeEnum.Income
+      this.currentItem.bill_type = BillTypeEnum.Income
 
     } else if (this.currentItem.bill_type === BillTypeEnum.Income) {
       this.currentItem.bill_type = BillTypeEnum.Outcome
     }
 
-    this.categoryList=this.getCategoryList();
+    this.categoryList = this.getCategoryList();
 
-    this.currentItem.category_name= this.categoryList[0].category_name;
+    this.currentItem.category_name = this.categoryList[0].category_name;
 
   }
 
@@ -87,7 +89,8 @@ struct EditAccount {
       DatabaseHelper.getInstance().insertBill(params)
     } else {
       let params: ValueType[] =
-        [fenMoney, this.currentItem.category_name, bill_type, timestamp, this.currentItem.notes, extra, this.currentItem.id]
+        [fenMoney, this.currentItem.category_name, bill_type, timestamp, this.currentItem.notes, extra,
+          this.currentItem.id]
 
       DatabaseHelper.getInstance().updateBill(params);
     }
@@ -102,13 +105,12 @@ struct EditAccount {
   aboutToAppear(): void {
 
     this.currentItem = router.getParams() as RecordItemInfo;
-
     if (this.currentItem === undefined) {
       this.currentItem =
         {
           id: 0,
-          category_image: $r("app.media.ic_edit"),
-          category_name: "其它",
+          category_image: DefaultOutcomeCategoryList[0].category_image,
+          category_name: DefaultOutcomeCategoryList[0].category_name,
           bill_type: 0,
           amount: 0,
           timestamp: new Date().getTime(),
@@ -116,15 +118,12 @@ struct EditAccount {
         }
     }
 
-   // this.selectedCategoryName = this.currentItem.category_name;
-   // this.selectedCategoryImage = this.currentItem.category_image;
+    this.categoryList = this.getCategoryList();
 
     this.selectedImageColor = this.currentItem.bill_type === 0 ? getOutcomeIconBackColor() : getIncomeIconBackColor();
-    //$r("app.color.danger")
+
     this.inputAmountStr = this.currentItem.amount === 0 ? "0" :
-      trimEndZero( formatFen(this.currentItem.amount))
-    this.categoryList = this.getCategoryList();
-    //this.inputAmount=this.currentItem.amount;
+    trimEndZero(formatFen(this.currentItem.amount))
 
 
   }
@@ -134,7 +133,6 @@ struct EditAccount {
       return DefaultOutcomeCategoryList;
     } else if (this.currentItem.bill_type === 1) {
       return DefaultIncomeCategoryList;
-
     }
 
     return []
@@ -173,14 +171,14 @@ struct EditAccount {
 
                   })
 
-                 // this.categoryList =this.getCategoryList();
-                    //DefaultOutcomeCategoryList
+                  // this.categoryList =this.getCategoryList();
+                  //DefaultOutcomeCategoryList
                   //todo list长度要不为空
                   //this.selectedCategoryName = this.getCategoryList()[0].category_name
-                  this.currentItem.category_name=this.getCategoryList()[0].category_name
+                  this.currentItem.category_name = this.getCategoryList()[0].category_name
 
-                  this.selectedImageColor =getOutcomeIconBackColor();
-                    //$r("app.color.danger")
+                  this.selectedImageColor = getOutcomeIconBackColor();
+                  //$r("app.color.danger")
 
                 }
                 )
@@ -211,17 +209,11 @@ struct EditAccount {
 
                   })
 
-                  //this.categoryList =
-                    //DefaultIncomeCategoryList
-                  //this.selectedCategoryName =
-                    //this.currentItem.category_name
-                  //DefaultIncomeCategoryList[0].category_name
-                  //this.selectedImageColor = Color.Green
                 }
 
                 )
 
-              if (this.currentItem.bill_type ===BillTypeEnum.Income ) {
+              if (this.currentItem.bill_type === BillTypeEnum.Income) {
 
                 Image($r("app.media.horizontal_rule_48dp_000000"))
                   .width(50)
@@ -254,10 +246,10 @@ struct EditAccount {
             RoundImage(
               {
                 contentWidth: 40,
-                imageUrl:this.currentItem.category_image,
+                imageUrl: this.currentItem.category_image,
                 //this.selectedCategoryImage,
                 backColor:
-                getIconCategoryBackcolor(this.currentItem,this.currentItem.category_name)
+                getIconCategoryBackcolor(this.currentItem, this.currentItem.category_name)
                 //this.selectedImageColor
               }
             ).margin(
