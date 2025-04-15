@@ -1,4 +1,3 @@
-import { DatabaseHelper } from '../utils/DatabaseHelper';
 import CategoryMapSingleton from './CategoryMapSingleton';
 
 export interface CategoryItem {
@@ -13,9 +12,9 @@ export interface CategoryItem {
 }
 
 
-function getDefaultCategoryMap(): CategoryItem[] {
-  return DatabaseHelper.getInstance().getCategoryData();
-}
+// function getDefaultCategoryMap(): CategoryItem[] {
+//   return DatabaseHelper.getInstance().getCategoryData();
+// }
 
 function getDefaultIncomeCategoryList() {
   let items: CategoryItem[] = [];
@@ -42,8 +41,6 @@ function getDefaultOutcomeCategoryList() {
 
 }
 
-
-//export const DefaultCategoryMap = getDefaultCategoryMap();
 
 export const DefaultIncomeCategoryList: CategoryItem[] = getDefaultIncomeCategoryList()
 

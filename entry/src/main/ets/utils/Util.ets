@@ -1,18 +1,73 @@
-import { hilog } from "@kit.PerformanceAnalysisKit";
-import { BillTypeEnum, RecordItemInfo } from "../models/RecordList";
+import { BillTypeEnum, RecordItemInfo } from '../models/RecordList';
 
 export function test1() {
-  const DOMAIN = 0x0000;
-  let a1 = Date.now()
 
-  let str1 = formatTime(a1)
-  hilog.info(0, "str1:%s", str1)
+
+  let a2 = 22.00;
+
+  let b1 = a2.toFixed(2)
+
+  console.log(b1)
+
+  // let dt1 = new Date(2025, 3, 30);
+  //
+  //
+  // let dt2: Date = new Date(dt1)
+  //
+  // dt2.setDate(dt2.getDate() + 8)
+  // const DOMAIN = 0x0000;
+  // let a1 = Date.now()
+  //
+  // let str1 = formatTime(a1)
+  // hilog.info(0, "str1:%s", str1)
 }
 
 
 export interface DayPair {
   begin: Date;
   end: Date;
+}
+
+export function getDayOutcomeSum(list: RecordItemInfo[]) {
+  const totalExpense: number = list.reduce(
+    (sum: number, currentItem: RecordItemInfo) =>
+    (currentItem.bill_type === BillTypeEnum.Outcome ? sum + currentItem.amount : sum),
+    0
+  );
+
+  return totalExpense
+}
+
+export function getDayIncomeSum(list: RecordItemInfo[]) {
+  const totalExpense: number = list.reduce(
+    (sum: number, currentItem: RecordItemInfo) =>
+    (currentItem.bill_type === BillTypeEnum.Income ? sum + currentItem.amount : sum),
+    0
+  );
+
+  return totalExpense
+}
+
+
+export function groupRecordItemInfoByTimestamp(list: RecordItemInfo[]): Map<string, RecordItemInfo[]> {
+
+
+  const groupedMap = new Map<string, RecordItemInfo[]>();
+
+  for (const item of list) {
+    const timeFormat = formatDateMDWeekHan(new Date(item.timestamp))
+
+    if (groupedMap.has(timeFormat)) {
+      // 如果已经有该 category_name 的分组，将当前 item 添加到对应的子列表中
+      groupedMap.get(timeFormat)?.push(item);
+    } else {
+      // 如果没有该 category_name 的分组，创建一个新的子列表并添加当前 item
+      groupedMap.set(timeFormat, [item]);
+    }
+  }
+
+  return groupedMap;
+
 }
 
 // 获取当前年份的第一天和最后一天
@@ -23,7 +78,8 @@ export function getYearBoundaries(currentDate: Date): DayPair {
   const firstDay = new Date(currentYear, 0, 1); // 月份从 0 开始（0=1月）
 
   // 年的最后一天（12月31日）
-  const lastDay = new Date(currentYear, 11, 31); // 12月=11
+  const lastDay = new Date(currentYear + 1, 0, 1)
+  //new Date(currentYear, 11, 31); // 12月=11
 
   return { begin: firstDay, end: lastDay };
 }
@@ -71,7 +127,7 @@ export function getMonthBoundaries(currentDateParam: Date): DayPair {
   // 月份最后一天：下个月的第 0 天即为本月最后一天
   const lastDay = new Date(firstDay);
   lastDay.setMonth(lastDay.getMonth() + 1); // 跳到下个月
-  lastDay.setDate(0); // 设为上个月最后一天
+  // lastDay.setDate(0); // 设为上个月最后一天
 
   return { begin: firstDay, end: lastDay };
 }
@@ -166,6 +222,19 @@ export function formatDateYMDHan(date: Date): string {
   const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始，需要+1
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}年${month}月${day}日`;
+}
+
+export function getDayOfWeek(date: Date): string {
+  const daysOfWeek = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+  return daysOfWeek[date.getDay()];
+}
+
+export function formatDateMDWeekHan(date: Date): string {
+  // const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始，需要+1
+  const day = String(date.getDate()).padStart(2, '0');
+  const week = getDayOfWeek(date);
+  return `${month}月${day}日 ${week}`;
 }
 
 export function formatDateYMHan(date: Date): string {

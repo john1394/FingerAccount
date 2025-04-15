@@ -1,8 +1,13 @@
-export  interface  SumData
-{
-  amount:number,
-  timeBase:string
+export interface SumData {
+  amount: number,
+  timeBase: string
 }
+
+export interface MonthAmountData {
+  outcome: number,
+  income: number
+}
+
 
 export class ColumnData {
   uid: string;
@@ -26,7 +31,6 @@ export class ColumnData {
       return this.unSelectedFontColor;
     }
   }
-
 
 
   getBackColor(): ResourceColor {

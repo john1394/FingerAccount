@@ -270,44 +270,6 @@ export class DatabaseHelper {
   }
 
 
-  // getCategoryByType(billType:BillTypeEnum): CategoryItem[] {
-  //   let result: CategoryItem[] = [];
-  //   try {
-  //     const sql = 'SELECT * FROM category where bill_type=? order by id';
-  //     let params:ValueType[]=[];
-  //     params.push(billType.valueOf());
-  //
-  //     const resultSet = this.rdbStore?.querySqlSync(sql,params); // 或使用 executeSql（需处理结果集）
-  //     while (resultSet?.goToNextRow()) {
-  //
-  //       // 获取列值
-  //       const id = resultSet.getLong(resultSet.getColumnIndex('id'));
-  //       const category_name = resultSet.getString(resultSet.getColumnIndex('category_name'));
-  //       const image_url = "app.media."+resultSet.getString(resultSet.getColumnIndex('image_url'));
-  //       const bill_type = resultSet.getLong(resultSet.getColumnIndex('bill_type'));
-  //       const timestamp = resultSet.getLong(resultSet.getColumnIndex('timestamp'));
-  //
-  //       console.log(`ID: ${id}, category_name: ${category_name}, image_url: ${image_url}, bill_type:${bill_type}}, Timestamp: ${timestamp}`);
-  //
-  //       let item: CategoryItem =
-  //         {
-  //           category_image: image_url,
-  //           category_name: category_name,
-  //           bill_type:bill_type
-  //         }
-  //
-  //       result.push(item);
-  //     }
-  //
-  //     resultSet?.close();
-  //
-  //   } catch (error) {
-  //     console.error(`Failed to execute SQL: ${error.message}`);
-  //
-  //   }
-  //   return result
-  // }
-
   getCategoryData(): CategoryItem[] {
     let result: CategoryItem[] = [];
     try {
@@ -393,7 +355,7 @@ export class DatabaseHelper {
     try {
       const sql = `SELECT SUM(amount) as total,  strftime('%Y-%m', timestamp/1000, 'unixepoch','localtime') AS date
                  FROM bills
-                 where bill_type=? and timestamp>=? and timestamp <=?
+                 where bill_type=? and timestamp>=? and timestamp <?
                  group by date order  by date asc`
       let params: ValueType[] = [bill_type, begin, end];
 
@@ -479,6 +441,62 @@ export class DatabaseHelper {
 
     return result;
   }
+
+  getBillRecordMonth(begin: number, end: number) {
+    let result: RecordItemInfo[] = []
+    try {
+      // 1. 执行 SQL 查询
+      const sql = 'SELECT * FROM bills where timestamp>=? and timestamp<? order by timestamp desc';
+
+      let params: ValueType[] = [begin, end];
+      const resultSet = this.rdbStore?.querySqlSync(sql, params); // 或使用 executeSql（需处理结果集）
+
+      while (resultSet?.goToNextRow()) {
+        // 获取列索引
+        const idIndex = resultSet.getColumnIndex('id');
+        const amountIndex = resultSet.getColumnIndex('amount');
+        const categoryIndex = resultSet.getColumnIndex('category');
+        const bill_type_Index = resultSet.getColumnIndex('bill_type');
+        const timestampIndex = resultSet.getColumnIndex('timestamp');
+        const notesIndex = resultSet.getColumnIndex('notes');
+        const extraFieldsIndex = resultSet.getColumnIndex('extra_fields');
+
+        // 获取列值
+        const idValue = resultSet.getLong(idIndex);
+        const amount = resultSet.getLong(amountIndex);
+        const category = resultSet.getString(categoryIndex);
+        const bill_type = resultSet.getLong(bill_type_Index);
+        const timestamp = resultSet.getLong(timestampIndex);
+        const notes = resultSet.getString(notesIndex);
+        const extraFields = resultSet.getString(extraFieldsIndex);
+
+        console.log(`ID: ${idValue}, Amount: ${amount}, Category: ${category}, bill_type:${bill_type}}, Timestamp: ${timestamp}, Notes: ${notes}, Extra Fields: ${extraFields}`);
+
+        let item: RecordItemInfo =
+          {
+            id: idValue,
+            category_image: '',
+            category_name: category,
+            bill_type: bill_type,
+            amount: amount,
+            timestamp: timestamp,
+            notes: notes
+          }
+
+        result.push(item);
+      }
+
+      resultSet?.close();
+
+
+    } catch (error) {
+      console.error(`Failed to execute SQL: ${error.message}`);
+
+    }
+
+    return result;
+  }
+
 
   selectTest() {
     try {
