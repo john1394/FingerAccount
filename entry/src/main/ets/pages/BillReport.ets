@@ -18,6 +18,7 @@ import {
 import { DatabaseHelper } from '../utils/DatabaseHelper';
 import { BillTypeEnum } from '../models/RecordList';
 import { CategoryPieChart, PieDataController } from '../components/CategoryPieChart';
+import { BizConstants } from '../utils/BizConstants';
 
 const yAxisText: string = "元";
 
@@ -588,7 +589,8 @@ struct BillReport {
 
   private updatePieData(bill_type: BillTypeEnum) {
     let categorySum = DatabaseHelper.getInstance()
-      .getCategorySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), bill_type);
+      .getCategorySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), bill_type,
+        BizConstants.Category_Limit);
 
     this.pieData = categorySum.map(item => ({
       value: item.amount / 100,

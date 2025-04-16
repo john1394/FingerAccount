@@ -308,13 +308,13 @@ export class DatabaseHelper {
     return result
   }
 
-  getCategorySum(begin: number, end: number, bill_type: BillTypeEnum): CategorySumData[] {
+  getCategorySum(begin: number, end: number, bill_type: BillTypeEnum, limit: number): CategorySumData[] {
 
     let result: CategorySumData[] = [];
     try {
       const sql = `select sum(amount) as total ,category from bills
                  where bill_type=? and timestamp>=? and timestamp <?
-                 group by category order by total asc`
+                 group by category order by total asc limit ${limit}`
       let params: ValueType[] = [bill_type, begin, end];
 
 

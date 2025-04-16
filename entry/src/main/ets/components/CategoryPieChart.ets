@@ -22,14 +22,14 @@ export struct CategoryPieChart {
     title: {
       show: true,
       text: '类别',
-      left: 40,
-      top: 20,
+      left: 15,
+      top: 25,
       textStyle: { fontSize: 50 }
     },
     legend: {
       show: true,
       left: 50,
-      top: 50,
+      top: 20,
       orient: 'horizontal',
       itemGap: 10,
       itemTextGap: 10,
@@ -39,7 +39,7 @@ export struct CategoryPieChart {
         color: '#000',
         fontWeight: 'normal',
         fontFamily: 'sans-serif',
-        fontSize: 40
+        fontSize: 45
       }
     },
     tooltip: {
@@ -49,7 +49,7 @@ export struct CategoryPieChart {
       textStyle: {
         // 文本样式配置
         color: '#000',
-        fontSize: 18
+        fontSize: 14
       }
     },
     series: [
@@ -61,7 +61,7 @@ export struct CategoryPieChart {
         labelLine:
         {
           style:
-          { fontSize: 40 }
+          { fontSize: 45 }
         }
       }
     ]
@@ -84,21 +84,21 @@ export struct CategoryPieChart {
 
         Text("test1")
           .onClick(() => {
-            this.legendOption.setVal(
-              {
-                series: [
-                  {
-                    data: [
-                      { value: 435, name: 'IOS' },
-                      { value: 310, name: '安卓' },
-                      { value: 234, name: '我心澎湃' },
-                      { value: 135, name: '蓝河' },
-                      { value: 1548, name: '鸿蒙' }
-                    ]
-                  }
-                ]
-              }
-            )
+            // this.legendOption.setVal(
+            //   {
+            //     series: [
+            //       {
+            //         data: [
+            //           { value: 435, name: 'IOS' },
+            //           { value: 310, name: '安卓' },
+            //           { value: 234, name: '我心澎湃' },
+            //           { value: 135, name: '蓝河' },
+            //           { value: 1548, name: '鸿蒙' }
+            //         ]
+            //       }
+            //     ]
+            //   }
+            // )
           }
           )
       }
