@@ -12,7 +12,6 @@ import { RoundImage } from './RoundImage'
 import { ValueType } from '@kit.ArkData'
 import {
   formatFen,
-  getDateAtMidnight,
   getIconCategoryBackcolor,
   getIncomeIconBackColor,
   getOutcomeIconBackColor,
@@ -72,9 +71,10 @@ struct EditAccount {
 
   updateConfirm() {
 
-    let midNight: Date = getDateAtMidnight(this.selectedDate)
+    // let midNight: Date = getDateAtMidnight(this.selectedDate)
 
-    let timestamp: number = midNight.getTime()
+    let timestamp: number = this.selectedDate.getTime()
+    //midNight.getTime()
     let extra: string = ""
     let amountValue: number = Number(this.inputAmountStr)
 
@@ -82,6 +82,7 @@ struct EditAccount {
     let bill_type: number = this.currentItem.bill_type;
 
 
+    // 入库，id存在则更新，不存在则插入
     if (this.currentItem.id === 0) {
       let params: ValueType[] =
         [fenMoney, this.currentItem.category_name, bill_type, timestamp, this.currentItem.notes, extra]
@@ -118,6 +119,7 @@ struct EditAccount {
         }
     }
 
+    this.selectedDate = new Date(this.currentItem.timestamp)
     this.categoryList = this.getCategoryList();
 
     this.selectedImageColor = this.currentItem.bill_type === 0 ? getOutcomeIconBackColor() : getIncomeIconBackColor();

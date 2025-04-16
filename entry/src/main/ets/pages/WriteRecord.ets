@@ -68,7 +68,7 @@ struct WriteRecord {
     this.currentMonthSaved = this.currentMonthIncome - this.currentMonthOutcome;
 
 
-    this.recordList = allItems;
+    //this.recordList = allItems;
 
     this.groupedRecordList = groupRecordItemInfoByTimestamp(allItems);
 
@@ -226,64 +226,63 @@ struct WriteRecord {
       .backgroundColor($r("app.color.back_color"))
 
       //第2节
-      Column() {
-
-        Column() {
-
-
-          Row() {
-
-            Text("今日支出:")
-              .fontSize(16)
-              .fontColor($r("app.color.text_primary"))
-            Text("￥100.00")
-              .fontSize(18).fontWeight(FontWeight.Bold)
-
-
-          }.width("100%")
-
-          Row() {
-
-            Text("今日收入:")
-              .fontSize(16)
-            Text("￥200.00")
-              .fontSize(18).fontWeight(FontWeight.Bold)
-              .fontColor($r("app.color.text_second"))
-
-          }.width("100%")
-          .margin(
-            {
-              top: 10
-            }
-          )
-
-        }
-        .borderRadius(5)
-        .height("100%")
-        .width("100%")
-        .backgroundColor($r("app.color.white"))
-        .padding(
-          {
-            left: 10,
-            top: 10,
-            right: 10,
-            bottom: 10
-          }
-        )
-
-      }
-      .height(100)
-
-      .width("100%")
-      .padding(
-        {
-          left: 10,
-          right: 10,
-          top: 10,
-          bottom: 10
-        }
-      )
-      .backgroundColor($r("app.color.back_color"))
+      // Column() {
+      //
+      //   Column() {
+      //
+      //
+      //     Row() {
+      //
+      //       Text("今日支出:")
+      //         .fontSize(16)
+      //         .fontColor($r("app.color.text_primary"))
+      //       Text("￥100.00")
+      //         .fontSize(18).fontWeight(FontWeight.Bold)
+      //
+      //
+      //     }.width("100%")
+      //
+      //     Row() {
+      //
+      //       Text("今日收入:")
+      //         .fontSize(16)
+      //       Text("￥200.00")
+      //         .fontSize(18).fontWeight(FontWeight.Bold)
+      //         .fontColor($r("app.color.text_second"))
+      //
+      //     }.width("100%")
+      //     .margin(
+      //       {
+      //         top: 10
+      //       }
+      //     )
+      //
+      //   }
+      //   .borderRadius(5)
+      //   .height("100%")
+      //   .width("100%")
+      //   .backgroundColor($r("app.color.white"))
+      //   .padding(
+      //     {
+      //       left: 10,
+      //       top: 10,
+      //       right: 10,
+      //       bottom: 10
+      //     }
+      //   )
+      //
+      // }
+      // .height(100)
+      // .width("100%")
+      // .padding(
+      //   {
+      //     left: 10,
+      //     right: 10,
+      //     top: 10,
+      //     bottom: 10
+      //   }
+      // )
+      // .backgroundColor($r("app.color.back_color"))
 
 
       //列表
@@ -411,6 +410,7 @@ struct WriteRecord {
         .backgroundColor($r("app.color.white"))
         //.backgroundColor(Color.Pink)
         .borderRadius(5)
+        .scrollBar(BarState.Off)
 
       }
       .padding(
@@ -426,8 +426,8 @@ struct WriteRecord {
 
       Row({ space: 8 }) {
         Image($r("app.media.edit_48dp_FFFFFF"))
-          .width(30)
-          .height(30)// .backgroundColor($r("app.color.white"))
+          .width(24)
+          .height(24)// .backgroundColor($r("app.color.white"))
 
           .margin(
             {
@@ -438,12 +438,12 @@ struct WriteRecord {
             }
           )
 
-        Text("记一笔").fontSize(18)
+        Text("记一笔").fontSize(16)
           .fontWeight(FontWeight.Bold)
           .fontColor($r("app.color.white"))
       }
-      .width(120)
-      .height(40)
+      .width(110)
+      .height(38)
       .borderRadius(8)
       .backgroundColor(Color.Green)
       .margin(
