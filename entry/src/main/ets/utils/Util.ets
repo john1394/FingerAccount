@@ -149,6 +149,17 @@ export function getWeekBoundaries(currentDateParam: Date): DayPair {
   return { begin: monday, end: sunday }
 }
 
+export function getDateDiffInDays(dateBegin: Date, dateEnd: Date): number {
+
+  // 2. 计算时间戳差并转换为天数
+  const timeDiff = Math.abs(dateEnd.getTime() - dateBegin.getTime());
+  return Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+}
+
+
+
+
+
 export function formatTime(time: number) {
   let dateTimeStamp = new Date(time).getTime()
 
