@@ -1,3 +1,13 @@
+export  interface PieData {
+  value: number,
+  name: string
+}
+
+export  interface CategorySumData {
+  amount: number,
+  category: string
+}
+
 export interface SumData {
   amount: number,
   timeBase: string

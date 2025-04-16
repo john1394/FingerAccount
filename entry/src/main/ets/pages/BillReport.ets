@@ -1,4 +1,4 @@
-import { ColumnData } from '../models/BillReportModel';
+import { ColumnData, PieData } from '../models/BillReportModel';
 
 import { McLineChart, Options } from '@mcui/mccharts';
 import {
@@ -17,7 +17,7 @@ import {
 } from '../utils/Util';
 import { DatabaseHelper } from '../utils/DatabaseHelper';
 import { BillTypeEnum } from '../models/RecordList';
-import { CategoryPieChart } from '../components/CategoryPieChart';
+import { CategoryPieChart, PieDataController } from '../components/CategoryPieChart';
 
 const yAxisText: string = "元";
 
@@ -25,35 +25,15 @@ const yAxisText: string = "元";
 @Entry
 @Component
 struct BillReport {
+  pieDataController: PieDataController = new PieDataController();
+  @State
+  pieData: PieData[] = []
   @Prop
   dayBoundary: DayPair;
   @State
   fromBeginDateStr: string = "";
   @State
   lineOption: Options = new Options({})
-  @State pieOption: Options = new Options({
-
-    title: {
-      show: true,
-      left: 50,
-      top: 20,
-      text: "类别统计", // 标题文本
-      textStyle: { fontSize: 40 }
-    }
-  ,
-
-    series: [
-      {
-        data: [
-          { value: 435, name: '其它' },
-          { value: 310, name: '餐饮' },
-          { value: 234, name: '我心澎湃' },
-          { value: 135, name: '蓝河' },
-          { value: 548, name: '鸿蒙' }
-        ]
-      }
-    ]
-  })
   @Prop
   isOutput: boolean = true
   @State
@@ -117,13 +97,7 @@ struct BillReport {
 
   aboutToAppear(): void {
     let currentDate = new Date();
-    //currentDate.setDate(currentDate.getDate()-28)
     this.dayBoundary = getWeekBoundaries(currentDate);
-    // this.weekPair = getWeekBoundaries(currentDate)
-
-    //this.fromBeginDateStr = this.formatWeekPair();
-    //this.fromBeginDateStr = this.formatWeekPair(getMonthBoundaries( currentDate));
-    //getYearBoundaries( currentDate)
     this.fromBeginDateStr = this.formatDayBoundary(this.dayBoundary);
 
     this.updateWeekData();
@@ -339,15 +313,22 @@ struct BillReport {
         }
       ).padding(10)
 
-      CategoryPieChart()
+      Column() {
+        CategoryPieChart
+        (
+          {
+            controller: this.pieDataController,
+            pieData: this.pieData
+          }
+        )
+          .backgroundColor($r("app.color.white"))
+          .height('280')
+          .borderRadius(8)
+          .padding(10)
+      }.width("100%")
+      .padding(10)
+
       //第五行 饼图
-      // Row() {
-      //   McPieChart({
-      //     options: this.pieOption
-      //   })
-      // }
-      // //.backgroundColor(Color.Gray)
-      // .height('40%')
 
     }
     .width("100%")
@@ -420,6 +401,9 @@ struct BillReport {
       }
       }
     })
+
+    //pie图
+    this.updatePieData(bill_type)
   }
 
   private updateReport() {
@@ -436,7 +420,6 @@ struct BillReport {
     let bill_type = this.isOutput ? BillTypeEnum.Outcome : BillTypeEnum.Income;
     let dayCount: number = getDateDiffInDays(new Date(this.dayBoundary.begin.getTime())
       , new Date(this.dayBoundary.end.getTime()))
-    //this.dayBoundary.end.getDate() - this.dayBoundary.begin.getDate() + 1;
 
     let xData: string[] = []
 
@@ -502,6 +485,9 @@ struct BillReport {
       }
 
     })
+
+    //pie图
+    this.updatePieData(bill_type)
 
   }
 
@@ -594,6 +580,23 @@ struct BillReport {
       }
     })
 
+    //更新饼图数据
+    this.updatePieData(bill_type);
+
+
+  }
+
+  private updatePieData(bill_type: BillTypeEnum) {
+    let categorySum = DatabaseHelper.getInstance()
+      .getCategorySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), bill_type);
+
+    this.pieData = categorySum.map(item => ({
+      value: item.amount / 100,
+      name: item.category // 将 category 映射为 name
+    } as PieData
+    ));
+
+    this.pieDataController.updateData(this.pieData);
   }
 }
 

@@ -1,6 +1,6 @@
 import { relationalStore, ValueType, } from '@kit.ArkData';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { SumData } from '../models/BillReportModel';
+import { CategorySumData, SumData } from '../models/BillReportModel';
 import { CategoryItem } from '../models/CategoryList';
 import { BillTypeEnum, RecordItemInfo } from '../models/RecordList';
 
@@ -308,6 +308,45 @@ export class DatabaseHelper {
     return result
   }
 
+  getCategorySum(begin: number, end: number, bill_type: BillTypeEnum): CategorySumData[] {
+
+    let result: CategorySumData[] = [];
+    try {
+      const sql = `select sum(amount) as total ,category from bills
+                 where bill_type=? and timestamp>=? and timestamp <?
+                 group by category order by total asc`
+      let params: ValueType[] = [bill_type, begin, end];
+
+
+      const resultSet = this.rdbStore?.querySqlSync(sql, params); // 或使用 executeSql（需处理结果集）
+      while (resultSet?.goToNextRow()) {
+
+        // 获取列值
+        const total = resultSet.getLong(resultSet.getColumnIndex('total'));
+        const date = resultSet.getString(resultSet.getColumnIndex('category'));
+
+
+        console.log(`total: ${total}, date: ${date}`);
+
+        let item: CategorySumData =
+          {
+            amount: total,
+            category: date,
+          }
+
+        result.push(item);
+      }
+
+      resultSet?.close();
+
+    } catch (error) {
+      console.error(`Failed to execute SQL: ${error.message}`);
+
+    }
+
+    return result
+  }
+
 
   getDaySum(begin: number, end: number, bill_type: BillTypeEnum): SumData[] {
 
@@ -315,7 +354,7 @@ export class DatabaseHelper {
     try {
       const sql = `SELECT SUM(amount) as total,  strftime('%Y-%m-%d', timestamp/1000, 'unixepoch','localtime') AS date
                  FROM bills
-                 where bill_type=? and timestamp>=? and timestamp <=?
+                 where bill_type=? and timestamp>=? and timestamp <?
                  group by date order  by date asc`
       let params: ValueType[] = [bill_type, begin, end];
 
