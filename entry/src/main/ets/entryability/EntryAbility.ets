@@ -3,6 +3,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { test1 } from '../utils/Util';
 import { DatabaseHelper } from '../utils/DatabaseHelper';
+import { BudgetStore } from '../utils/BudgetStore';
 
 const DOMAIN = 0x0000;
 
@@ -26,7 +27,12 @@ export default class EntryAbility extends UIAbility {
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
 
-    windowStage.loadContent('pages/Index', (err) => {
+    BudgetStore.init(this.context)
+
+    windowStage.loadContent(
+      'pages/Index'
+      //"pages/SheetDemo"
+      , (err) => {
       if (err.code) {
         hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
         return;

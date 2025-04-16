@@ -6,6 +6,7 @@
     "pages/BillDetail",
     "pages/CategoryManage",
     "pages/BillReport",
-    "pages/MyTestPage"
+    "pages/MyTestPage",
+    "pages/SheetDemo"
   ]
 }

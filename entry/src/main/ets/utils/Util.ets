@@ -336,6 +336,7 @@ export function formatFen(amount: number) {
 
 }
 
+
 export function getDateAtMidnight(date: Date) {
   // 创建一个新的 Date 对象，避免修改原始日期
   const result = new Date(date.getTime());

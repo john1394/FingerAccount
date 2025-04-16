@@ -11,6 +11,8 @@ import { DatabaseHelper } from '../utils/DatabaseHelper'
 import { BillTypeEnum, RecordItemInfo } from '../models/RecordList'
 import CategoryMapSingleton from '../models/CategoryMapSingleton'
 import { RoundImage } from './RoundImage'
+import { BudgetStore } from '../utils/BudgetStore'
+import { emitter } from '@kit.BasicServicesKit'
 
 
 @Preview
@@ -32,7 +34,13 @@ struct WriteRecord {
   @State
   currentMonthSaved: number = 0;
   @State
-  currentMonthBudget: number = 0;
+  monthBudget: number = 0;
+  @State
+  monthBudgetRemain: number = 0;
+  @State
+  monthBudgetInputText: string = "";
+  @State
+  isShowBudgetSheet: boolean = false;
 
   loadAllData() {
 
@@ -67,9 +75,6 @@ struct WriteRecord {
 
     this.currentMonthSaved = this.currentMonthIncome - this.currentMonthOutcome;
 
-
-    //this.recordList = allItems;
-
     this.groupedRecordList = groupRecordItemInfoByTimestamp(allItems);
 
 
@@ -77,12 +82,62 @@ struct WriteRecord {
 
   aboutToAppear(): void {
     this.loadAllData();
+    this.getBudgetFromStore()
+    // 订阅
+    emitter.on(BudgetStore.budget_key, () => {
+      // this.list = StoreClass.getAllChatLastMessage()
+      this.getBudgetFromStore()
+    })
 
-    // if(!this.firstAppear) {
-    //   this.firstAppear = true
-    //
-    // }
+  }
 
+  @Builder
+  BudgetSheetBuilder() {
+    Column({ space: 10 }) {
+
+      Row({ space: 5 }) {
+        Text("￥")
+        TextInput({
+          placeholder: "请输入本月预算",
+          text: $$this.monthBudgetInputText
+        }
+        ).defaultFocus(true)
+          .type(InputType.Number)
+          .maxLength(10)
+          .layoutWeight(1)
+
+      }.width("100%")
+      //.backgroundColor(Color.Pink)
+      .padding(10)
+
+      Row() {
+        Button("确定")
+          .type(ButtonType.Normal)
+          .backgroundColor(Color.Green)
+          .borderRadius(8)
+          .height(30)
+          .width("100%")
+          .onClick(() => {
+
+            let tempNum = Number(this.monthBudgetInputText)
+
+            //分单位
+            this.monthBudget = isNaN(tempNum) ? 0 : tempNum * 100
+            //emit 接收
+
+            BudgetStore.addMonthBudget(this.monthBudget)
+
+            this.isShowBudgetSheet = false
+          })
+
+      }.width("100%")
+      .padding(10)
+      .justifyContent(FlexAlign.Center)
+
+    }.width('100%').height(300)
+    .padding(10)
+
+    // .backgroundColor(Color.Pink)
   }
 
   build() {
@@ -151,7 +206,7 @@ struct WriteRecord {
               Text("本月支出:")
                 .fontSize(16)
                 .fontColor($r("app.color.text_primary"))
-              Text("￥" + Math.round(this.currentMonthOutcome / 100).toFixed(2))
+              Text("￥" + (this.currentMonthOutcome / 100).toFixed(2))
                 .fontSize(18).fontWeight(FontWeight.Bold)
             }.layoutWeight(1)
 
@@ -160,7 +215,7 @@ struct WriteRecord {
 
               Text("本月收入:")
                 .fontSize(16)
-              Text(Math.round(this.currentMonthIncome / 100).toFixed(2))
+              Text((this.currentMonthIncome / 100).toFixed(2))
                 .fontSize(14).fontWeight(FontWeight.Bold)
                 .fontColor($r("app.color.text_second"))
 
@@ -175,23 +230,27 @@ struct WriteRecord {
 
               Text("预算剩余:")
                 .fontSize(16)
-              Text("" + this.currentMonthBudget)
+              Text(this.monthBudget === 0 ? "未设置预算" : (this.monthBudgetRemain / 100).toFixed(2))
                 .fontSize(14).fontWeight(FontWeight.Bold)
+
 
             }.layoutWeight(1)
             .onClick(() => {
-              AlertDialog.show(
-                {
-                  message: "编辑预算"
-                }
-              )
+
+              this.isShowBudgetSheet = !this.isShowBudgetSheet
             })
+            .bindSheet($$this.isShowBudgetSheet, this.BudgetSheetBuilder(), {
+              detents: [SheetSize.MEDIUM],
+              preferType: SheetType.CENTER,
+              title: { title: "设置预算" },
+            })
+
 
             Row() {
 
               Text("本月结余:")
                 .fontSize(16)
-              Text("" + Math.round(this.currentMonthSaved / 100).toFixed(2))
+              Text("" + (this.currentMonthSaved / 100).toFixed(2))
                 .fontSize(14).fontWeight(FontWeight.Bold)
 
             }.layoutWeight(1)
@@ -302,10 +361,10 @@ struct WriteRecord {
                   Text(itemKey)
                     .fontColor($r("app.color.text_second"))
                     .fontSize(14)
-                  Text("支出:" + Math.round(getDayOutcomeSum(this.groupedRecordList.get(itemKey)) / 100).toFixed(2))
+                  Text("支出:" + (getDayOutcomeSum(this.groupedRecordList.get(itemKey)) / 100).toFixed(2))
                     .fontColor($r("app.color.text_second"))
                     .fontSize(14)
-                  Text("收入:" + Math.round(getDayIncomeSum(this.groupedRecordList.get(itemKey)) / 100).toFixed(2))
+                  Text("收入:" + (getDayIncomeSum(this.groupedRecordList.get(itemKey)) / 100).toFixed(2))
                     .fontColor($r("app.color.text_second"))
                     .fontSize(14)
                 }.width("100%")
@@ -466,6 +525,12 @@ struct WriteRecord {
     .width("100%")
     .height("100%")
     .backgroundColor($r("app.color.back_color"))
+  }
+
+  private getBudgetFromStore() {
+    this.monthBudget = BudgetStore.getMonthBudget()
+    this.monthBudgetInputText = (this.monthBudget / 100).toString();
+    this.monthBudgetRemain = this.monthBudget + this.currentMonthSaved
   }
 }
 
