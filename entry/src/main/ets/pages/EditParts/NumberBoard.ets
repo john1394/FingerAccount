@@ -1,5 +1,4 @@
-import { promptAction } from "@kit.ArkUI"
-import { trimEndZero } from "../../utils/Util";
+import { promptAction } from '@kit.ArkUI';
 
 const MaxNumber: number = 100000000;
 
@@ -15,7 +14,7 @@ export struct NumberBoard {
   prevType: number = 0; //0 为数字，1为加减号
   updateInputValue: (inputValue: string) => void = (inputValue: string) => {
   }
-  updateConfirm: () => void = () => {
+  updateConfirm: (isWriteAgain: boolean) => void = () => {
   }
 
   aboutToAppear(): void {
@@ -104,7 +103,13 @@ export struct NumberBoard {
     } else if (value === ".") {
       this.addDot();
     } else if (value === "确定") {
-      this.confirm(value, index);
+      this.confirm(false);
+    } else if (value === "再记") {
+
+
+      this.confirm(true);
+      this.amount = 0;
+      this.inputValue = "0"
     }
 
 
@@ -114,7 +119,7 @@ export struct NumberBoard {
 
   }
 
-  private confirm(value: string, index: number) {
+  private confirm(writeAgain: boolean) {
 
     if (this.inputValue === "") {
       this.inputValue = "0"
@@ -132,7 +137,7 @@ export struct NumberBoard {
       return
     }
 
-    this?.updateConfirm()
+    this?.updateConfirm(writeAgain)
   }
 
   private inputNumber(value: string, index: number) {
@@ -170,7 +175,6 @@ export struct NumberBoard {
     this.updateInputValue?.(this.inputValue);
 
   }
-
 
   private backspace(value: string, index: number) {
 

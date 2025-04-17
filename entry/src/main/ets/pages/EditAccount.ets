@@ -1,4 +1,4 @@
-import { router } from '@kit.ArkUI'
+import { promptAction, router } from '@kit.ArkUI'
 
 import { CategoryItem, DefaultIncomeCategoryList, DefaultOutcomeCategoryList } from '../models/CategoryList'
 import { DatabaseHelper } from '../utils/DatabaseHelper'
@@ -69,11 +69,16 @@ struct EditAccount {
 
   }
 
-  updateConfirm() {
+  updateConfirm(isWriteAgain: boolean) {
 
     // let midNight: Date = getDateAtMidnight(this.selectedDate)
+    let currentDate = new Date();
+    let timestamp: number = new Date(this.selectedDate.getFullYear(), this.selectedDate.getMonth(),
+      this.selectedDate.getDate(), currentDate.getHours(), currentDate.getMinutes(), currentDate.getSeconds()
+    ,currentDate.getMilliseconds()
+    ).getTime()
 
-    let timestamp: number = this.selectedDate.getTime()
+    //this.selectedDate.getTime()
     //midNight.getTime()
     let extra: string = ""
     let amountValue: number = Number(this.inputAmountStr)
@@ -97,10 +102,25 @@ struct EditAccount {
     }
 
 
-    router.pushUrl({
-      url: "pages/Index",
-      params: {}
-    })
+    if (!isWriteAgain) {
+      router.pushUrl({
+        url: "pages/Index",
+        params: {}
+      })
+    } else {
+
+
+      this.updateMemo("")
+      this.updateAmountValue("0")
+      //后面的记录就是新加记录
+      this.currentItem.id = 0;
+      //清零
+      promptAction.showToast({
+        message: "记录成功"
+      })
+
+    }
+
   }
 
   aboutToAppear(): void {
@@ -149,7 +169,11 @@ struct EditAccount {
           .width(30)
           .height(30)
           .onClick(() => {
-            router.back()
+            //router.back()
+            router.pushUrl({
+              url: "pages/Index",
+              params: {}
+            })
           })
           .zIndex(2)
 
@@ -383,8 +407,8 @@ struct EditAccount {
             this.updateAmountValue(content)
           },
 
-          updateConfirm: () => {
-            this.updateConfirm()
+          updateConfirm: (writeAgain: boolean) => {
+            this.updateConfirm(writeAgain)
           }
         }
 
