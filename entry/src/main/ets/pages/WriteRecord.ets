@@ -290,122 +290,166 @@ struct WriteRecord {
       Column() {
 
 
-        List() {
+        Stack() {
+          List() {
 
 
-          ForEach(Array.from(this.groupedRecordList.keys()), (itemKey: string) => {
-            ListItem() {
+            ForEach(Array.from(this.groupedRecordList.keys()), (itemKey: string) => {
+              ListItem() {
 
-              //表头
-              Column() {
-                Row() {
-                  Text(itemKey)
-                    .fontColor($r("app.color.text_second"))
-                    .fontSize(14)
-                  Text("支出:" + (getDayOutcomeSum(this.groupedRecordList.get(itemKey)) / 100).toFixed(2))
-                    .fontColor($r("app.color.text_second"))
-                    .fontSize(14)
-                  Text("收入:" + (getDayIncomeSum(this.groupedRecordList.get(itemKey)) / 100).toFixed(2))
-                    .fontColor($r("app.color.text_second"))
-                    .fontSize(14)
-                }.width("100%")
-                .height(30)
-                //.backgroundColor(Color.Pink)
-                .backgroundColor($r("app.color.back_color"))
-                .justifyContent(FlexAlign.SpaceAround)
+                //表头
+                Column() {
+                  Row() {
+                    Text(itemKey)
+                      .fontColor($r("app.color.text_second"))
+                      .fontSize(14)
+                    Text("支出:" + (getDayOutcomeSum(this.groupedRecordList.get(itemKey)) / 100).toFixed(2))
+                      .fontColor($r("app.color.text_second"))
+                      .fontSize(14)
+                    Text("收入:" + (getDayIncomeSum(this.groupedRecordList.get(itemKey)) / 100).toFixed(2))
+                      .fontColor($r("app.color.text_second"))
+                      .fontSize(14)
+                  }.width("100%")
+                  .height(30)
+                  //.backgroundColor(Color.Pink)
+                  .backgroundColor($r("app.color.back_color"))
+                  .justifyContent(FlexAlign.SpaceAround)
 
-                //分组下的子行
-                ForEach(this.groupedRecordList.get(itemKey), (item: RecordItemInfo) => {
-                  Row({ space: 10 }) {
+                  //分组下的子行
+                  ForEach(this.groupedRecordList.get(itemKey), (item: RecordItemInfo) => {
+                    Row({ space: 10 }) {
 
-                    Row() {
+                      Row() {
 
-                      RoundImage(
-                        {
-                          contentWidth: 30,
-                          imageUrl: item.category_image,
-                          backColor:
-                          getIconCategoryBackcolor(item, item.category_name)
-                        }
-                      ).margin(
+                        RoundImage(
+                          {
+                            contentWidth: 30,
+                            imageUrl: item.category_image,
+                            backColor:
+                            getIconCategoryBackcolor(item, item.category_name)
+                          }
+                        ).margin(
+                          {
+                            left: 10,
+                            right: 10
+                          }
+                        )
+
+                        Text(item.category_name)
+                          .fontSize(16)
+                      }.justifyContent(FlexAlign.Start)
+                      .padding(
                         {
                           left: 10,
-                          right: 10
+                          top: 10,
+                          right: 10,
+                          bottom: 10
                         }
                       )
 
-                      Text(item.category_name)
-                        .fontSize(16)
-                    }.justifyContent(FlexAlign.Start)
-                    .padding(
-                      {
-                        left: 10,
-                        top: 10,
-                        right: 10,
-                        bottom: 10
-                      }
-                    )
-
-                    //右侧块
-                    Column() {
-                      Text((item.bill_type == BillTypeEnum.Income ? "+" : "-") + `￥${formatFen(item.amount)}`)
-                        .margin(
-                          {
-                            bottom: 10
-                          }
-                        )
-                        .textAlign(TextAlign.End)
-                        .fontWeight(FontWeight.Bold)// .backgroundColor(Color.Pink)
-                        .fontColor(item.bill_type == BillTypeEnum.Income ? Color.Green :
-                        $r("app.color.danger"))//"//.text_primary"))
-                        .fontSize(14)
+                      //右侧块
+                      Column() {
+                        Text((item.bill_type == BillTypeEnum.Income ? "+" : "-") + `￥${formatFen(item.amount)}`)
+                          .margin(
+                            {
+                              bottom: 10
+                            }
+                          )
+                          .textAlign(TextAlign.End)
+                          .fontWeight(FontWeight.Bold)// .backgroundColor(Color.Pink)
+                          .fontColor(item.bill_type == BillTypeEnum.Income ? Color.Green :
+                          $r("app.color.danger"))//"//.text_primary"))
+                          .fontSize(14)
 
 
-                    }.width(120)
-                    .alignItems(HorizontalAlign.End)
+                      }.width(120)
+                      .alignItems(HorizontalAlign.End)
 
-                    .padding(
-                      {
-                        top: 10,
-                        right: 10,
-                        bottom: 10
-                      }
-                    )
+                      .padding(
+                        {
+                          top: 10,
+                          right: 10,
+                          bottom: 10
+                        }
+                      )
+
+                    }.justifyContent(FlexAlign.SpaceBetween)
+                    .width("100%")
+                    .onClick(() => {
+
+                      promptAction.showToast(
+                        {
+                          message: "detail"
+                        }
+                      )
+                      router.pushUrl(
+                        {
+                          url: "pages/BillDetail",
+                          params: item
+                        }
+                      )
+
+                    })
+                  }
+                  )
 
 
-                  }.justifyContent(FlexAlign.SpaceBetween)
-                  .width("100%")
-                  .onClick(() => {
-
-                    promptAction.showToast(
-                      {
-                        message: "detail"
-                      }
-                    )
-                    router.pushUrl(
-                      {
-                        url: "pages/BillDetail",
-                        params: item
-                      }
-                    )
-
-                  })
                 }
-                )
-
+                .width("100%")
 
               }
-              .width("100%")
 
             }
+            )
+          }.alignListItem(ListItemAlign.Start)
+          .backgroundColor($r("app.color.white"))
+          //.backgroundColor(Color.Pink)
+          .borderRadius(5)
+          .scrollBar(BarState.Off)
 
+          //底部加号按钮
+
+          Row({ space: 8 }) {
+            Image($r("app.media.edit_48dp_FFFFFF"))
+              .width(24)
+              .height(24)// .backgroundColor($r("app.color.white"))
+
+              .margin(
+                {
+                  left: 10,
+                  top: 10,
+                  right: 0,
+                  bottom: 10
+                }
+              )
+
+            Text("记一笔").fontSize(16)
+              .fontWeight(FontWeight.Bold)
+              .fontColor($r("app.color.white"))
           }
+          .width(110)
+          .height(38)
+          .borderRadius(8)
+          .backgroundColor(Color.Green)
+          .margin(
+            {
+              bottom: 10
+            }
           )
-        }.alignListItem(ListItemAlign.Start)
-        .backgroundColor($r("app.color.white"))
-        //.backgroundColor(Color.Pink)
-        .borderRadius(5)
-        .scrollBar(BarState.Off)
+          .onClick(() => {
+            router.pushUrl(
+              {
+                url: "pages/EditAccount",
+                params: "params"
+              }
+
+            )
+
+          })
+
+        }.width("100%")
+        .height("100%")
+        .alignContent(Alignment.Bottom)
 
       }
       .padding(
@@ -416,46 +460,6 @@ struct WriteRecord {
           bottom: 10
         }
       ).layoutWeight(1)
-
-      //底部加号按钮
-
-      Row({ space: 8 }) {
-        Image($r("app.media.edit_48dp_FFFFFF"))
-          .width(24)
-          .height(24)// .backgroundColor($r("app.color.white"))
-
-          .margin(
-            {
-              left: 10,
-              top: 10,
-              right: 0,
-              bottom: 10
-            }
-          )
-
-        Text("记一笔").fontSize(16)
-          .fontWeight(FontWeight.Bold)
-          .fontColor($r("app.color.white"))
-      }
-      .width(110)
-      .height(38)
-      .borderRadius(8)
-      .backgroundColor(Color.Green)
-      .margin(
-        {
-          bottom: 10
-        }
-      )
-      .onClick(() => {
-        router.pushUrl(
-          {
-            url: "pages/EditAccount",
-            params: "params"
-          }
-
-        )
-
-      })
 
     }
     .width("100%")
