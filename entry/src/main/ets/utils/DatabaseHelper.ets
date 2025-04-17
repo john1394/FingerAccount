@@ -46,7 +46,7 @@ insert into category(category_name,image_url,bill_type,timestamp) values('宠物
 insert into category(category_name,image_url,bill_type,timestamp) values('旅行','ic_cat_out_luxing','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
 insert into category(category_name,image_url,bill_type,timestamp) values('度假','ic_cat_out_dujia','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
 insert into category(category_name,image_url,bill_type,timestamp) values('烟酒','ic_cat_out_yanjiu','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
-insert into category(category_name,image_url,bill_type,timestamp) values('设置','ic_cat_out_setting','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+
 
 
 
@@ -62,10 +62,13 @@ insert into category(category_name,image_url,bill_type,timestamp) values('副业
 insert into category(category_name,image_url,bill_type,timestamp) values('退税','ic_cat_in_tuisui','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
 insert into category(category_name,image_url,bill_type,timestamp) values('投资','ic_cat_in_touzhi','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
 insert into category(category_name,image_url,bill_type,timestamp) values('意外所得','ic_cat_in_yiwai','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
-insert into category(category_name,image_url,bill_type,timestamp) values('设置','ic_cat_in_setting','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+
 
 
 `;
+
+//insert into category(category_name,image_url,bill_type,timestamp) values('设置','ic_cat_out_setting','0' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+//insert into category(category_name,image_url,bill_type,timestamp) values('设置','ic_cat_in_setting','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
 
 const SQL_CREATE_TABLE =
   'CREATE TABLE IF NOT EXISTS bills (\n' +
@@ -312,13 +315,12 @@ export class DatabaseHelper {
 
     let result: CategorySumData[] = [];
     try {
-        let sql:string = `select sum(amount) as total ,category,COUNT(*) AS rows from bills
+      let sql: string = `select sum(amount) as total ,category,COUNT(*) AS rows from bills
                  where bill_type=? and timestamp>=? and timestamp <?
                  group by category order by total asc`
 
-      if(limit)
-      {
-        sql+=` limit ${limit}`
+      if (limit) {
+        sql += ` limit ${limit}`
       }
 
       let params: ValueType[] = [bill_type, begin, end];
@@ -339,7 +341,7 @@ export class DatabaseHelper {
           {
             amount: total,
             category: date,
-            rows:rows
+            rows: rows
           }
 
         result.push(item);

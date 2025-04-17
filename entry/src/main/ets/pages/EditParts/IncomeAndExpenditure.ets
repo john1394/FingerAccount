@@ -13,8 +13,7 @@ import { router, Router } from "@kit.ArkUI";
 export struct IncomeAndExpenditure {
   @Prop
   categoryList: CategoryItem[] = [];
-  // @Prop
-  // selectedCategoryName: string="" ;
+
 
   @Prop
   selectedCategoryImage: string = "";
@@ -27,34 +26,14 @@ export struct IncomeAndExpenditure {
   //186;
   @Prop
   currentItem: RecordItemInfo;
-  // private getCategoryBackColor(item: CategoryItem): ResourceColor | undefined {
-  //
-  //   if(this.selectedCategoryName === item.category_name)
-  //   {
-  //     if(this.bill_type===0)
-  //     {
-  //       return getOutcomeIconBackColor();
-  //     }
-  //     else
-  //     {
-  //       return getIncomeIconBackColor();
-  //     }
-  //   }
-  //   else
-  //   {
-  //     return getIconUnselectBackColor();
-  //   }
-  //
-  //
-  //   return this.selectedCategoryName === item.category_name ? this.selectedImageColor : Color.Gray
-  // }
+
 
   updateSelectCategory = (name: string, image: string) => {
 
   }
 
   aboutToAppear(): void {
-    // this.selectedCategoryImage="app.media.other_houses_48dp_F3F3F3";
+
   }
 
   build() {
@@ -115,8 +94,6 @@ export struct IncomeAndExpenditure {
               )
               .height(70)
             }
-            // .backgroundColor(Color.Pink)
-            //.border({ width: { left:1,top:1, right: 1,bottom:1 }, color: '#cccccc' })
 
             .padding(
               {
@@ -130,7 +107,7 @@ export struct IncomeAndExpenditure {
         }
 
         .alignItems(ItemAlign.Start)
-        //.backgroundColor(Color.Pink)
+
 
       }.height("100%")
       .width('100%')

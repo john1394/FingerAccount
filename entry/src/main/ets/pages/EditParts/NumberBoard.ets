@@ -40,6 +40,7 @@ export struct NumberBoard {
                 }
                 .width("100%")
                 .height("100%")
+
                 .backgroundColor(this.buttonBackColor)
               } else {
 
@@ -49,7 +50,7 @@ export struct NumberBoard {
                   .type(ButtonType.Normal)
                   .fontColor($r("app.color.text_primary"))
                   .backgroundColor(this.buttonBackColor)
-                  .fontSize(20)
+                  .fontSize(18)
                   .fontWeight(FontWeight.Bold)//.textAlign(TextAlign.Center)
 
                   .width("100%")
@@ -58,7 +59,7 @@ export struct NumberBoard {
 
             }
             .alignItems(HorizontalAlign.Center)
-            .height(80)
+            .height(50)
             .width("100%")
 
             .onClick(() => this.handleInput(item, index))

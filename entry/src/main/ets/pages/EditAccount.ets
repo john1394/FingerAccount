@@ -75,7 +75,7 @@ struct EditAccount {
     let currentDate = new Date();
     let timestamp: number = new Date(this.selectedDate.getFullYear(), this.selectedDate.getMonth(),
       this.selectedDate.getDate(), currentDate.getHours(), currentDate.getMinutes(), currentDate.getSeconds()
-    ,currentDate.getMilliseconds()
+      , currentDate.getMilliseconds()
     ).getTime()
 
     //this.selectedDate.getTime()
@@ -336,9 +336,10 @@ struct EditAccount {
           selectedImageColor: this.selectedImageColor
         }
 
-      ).height(230)
+      )//.height(250)
+        //.height(230)
 
-      //.layoutWeight(1)
+        .layoutWeight(1)
 
       //第4行，备注
       EditMemo(
@@ -375,33 +376,15 @@ struct EditAccount {
           }
         },
       )
-        .height
-        (
-          40
-        )
-        .backgroundColor
-        (
-          $r
-          (
-            "app.color.white"
-          )
-        )//.backgroundColor(Color.Pink)
-
-          //($r("app.color.second_back_color"))
-        .borderWidth
-        (
-          1
-        )
-        .borderColor
-        (
-          "#cccccc"
-        )
+        .height(40)
+        .backgroundColor($r("app.color.white"))
+        .borderWidth(1)
+        .borderColor("#cccccc")
 
 
       //数字键盘
       NumberBoard(
         {
-
           inputValue: this.inputAmountStr,
           updateInputValue: (content: string) => {
             this.updateAmountValue(content)
@@ -413,10 +396,7 @@ struct EditAccount {
         }
 
       )
-        .layoutWeight
-        (
-          1
-        )
+      //.height(320)
 
 
     }.width("100%")
