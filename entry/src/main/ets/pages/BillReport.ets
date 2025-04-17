@@ -349,11 +349,7 @@ struct BillReport {
               .borderRadius(8)
           }
           .width("100%")
-          // .height(300)
           .padding(10)
-
-          Blank().height(200)
-          // Text("end")
 
         }.width("100%")
 
@@ -366,16 +362,11 @@ struct BillReport {
       .scrollable(ScrollDirection.Vertical)
       .scrollBar(BarState.Off)
       .width("100%")
-
-      //.height("100%")
-
-
-      //.height("100%")
+      //非常重要,解决了scroll不适应的问题!!!
+      .layoutWeight(1)
 
     }
     .width("100%")
-    //.height("100%")
-    //.backgroundColor(Color.Pink)
     .backgroundColor($r("app.color.back_color"))
 
   }

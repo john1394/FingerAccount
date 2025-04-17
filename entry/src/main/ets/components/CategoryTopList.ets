@@ -15,7 +15,10 @@ export struct CategoryTopList {
       }.width("100%")
       .padding(10)
 
-      ForEach([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], (item: number) => {
+      ForEach(
+        []
+        //[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        , (item: number) => {
         Row() {
 
           RoundImage(
@@ -66,7 +69,6 @@ export struct CategoryTopList {
 
 
     }.width("100%")
-    //.backgroundColor(Color.Gray)
     .justifyContent(FlexAlign.Start)
     .padding(
       {
