@@ -355,7 +355,7 @@ struct BillReport {
 
         .padding(10)
 
-        .backgroundColor(Color.Pink)
+        //.backgroundColor(Color.Pink)
 
       }
       // .backgroundColor(Color.Pink)
