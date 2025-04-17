@@ -19,11 +19,12 @@ import { DatabaseHelper } from '../utils/DatabaseHelper';
 import { BillTypeEnum } from '../models/RecordList';
 import { CategoryPieChart, PieDataController } from '../components/CategoryPieChart';
 import { BizConstants } from '../utils/BizConstants';
+import { CategoryTopList } from '../components/CategoryTopList';
 
 const yAxisText: string = "元";
 
-@Preview
-@Entry
+// @Preview
+// @Entry
 @Component
 struct BillReport {
   pieDataController: PieDataController = new PieDataController();
@@ -298,42 +299,82 @@ struct BillReport {
       .height(50)
 
 
-      //第四行 折线图
+      Scroll() {
+        Column({ space: 10 }) {
 
-      Row() {
-        McLineChart({
-          options: this.lineOption
-        })
-          .borderRadius(8)
-          .backgroundColor($r("app.color.white"))
-      }
-      .height(240)
-      .margin(
-        {
-          bottom: 10
-        }
-      ).padding(10)
+          //第四行 折线图
 
-      Column() {
-        CategoryPieChart
-        (
-          {
-            controller: this.pieDataController,
-            pieData: this.pieData
+          Column() {
+            McLineChart({
+              options: this.lineOption
+            })
+              .borderRadius(8)
+              .backgroundColor($r("app.color.white"))
+              .padding(
+                {
+                  left: 10,
+                  right: 10,
+                  bottom: 10,
+                  top: 10
+                }
+              )
           }
-        )
-          .backgroundColor($r("app.color.white"))
-          .height('280')
-          .borderRadius(8)
+          .height(240)
           .padding(10)
-      }.width("100%")
-      .padding(10)
 
-      //第五行 饼图
+
+          //第五行 饼图
+          Column() {
+            CategoryPieChart
+            (
+              {
+                controller: this.pieDataController,
+                pieData: this.pieData
+              }
+            )
+              .backgroundColor($r("app.color.white"))// .height(280)
+              .borderRadius(8)
+              .padding(10)
+          }
+          .width("100%")
+          .height(280)
+          .padding(10)
+          .visibility(Visibility.Visible)
+
+
+          //第6行 排行列表
+          Column() {
+            CategoryTopList()
+              .backgroundColor($r("app.color.white"))// .backgroundColor(Color.Gray)
+              .borderRadius(8)
+          }
+          .width("100%")
+          // .height(300)
+          .padding(10)
+
+          Blank().height(200)
+          // Text("end")
+
+        }.width("100%")
+
+        .padding(10)
+
+        .backgroundColor(Color.Pink)
+
+      }
+      // .backgroundColor(Color.Pink)
+      .scrollable(ScrollDirection.Vertical)
+      .scrollBar(BarState.Off)
+      .width("100%")
+
+      //.height("100%")
+
+
+      //.height("100%")
 
     }
     .width("100%")
-    .height("100%")
+    //.height("100%")
     //.backgroundColor(Color.Pink)
     .backgroundColor($r("app.color.back_color"))
 

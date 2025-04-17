@@ -11,13 +11,6 @@ export struct CategoryPieChart {
   controller: PieDataController = new PieDataController();
   @Link
   pieData: PieData[];
-  // [
-  // // { value: 435, name: 'IOS' },
-  // // { value: 310, name: '安卓' },
-  // // { value: 234, name: '我心澎湃' },
-  // // { value: 135, name: '蓝河' },
-  // // { value: 1548, name: '鸿蒙' }
-  // ]
   @State legendOption: Options = new Options({
     title: {
       show: true,
@@ -82,28 +75,11 @@ export struct CategoryPieChart {
           options: this.legendOption
         })
 
-        Text("test1")
-          .onClick(() => {
-            // this.legendOption.setVal(
-            //   {
-            //     series: [
-            //       {
-            //         data: [
-            //           { value: 435, name: 'IOS' },
-            //           { value: 310, name: '安卓' },
-            //           { value: 234, name: '我心澎湃' },
-            //           { value: 135, name: '蓝河' },
-            //           { value: 1548, name: '鸿蒙' }
-            //         ]
-            //       }
-            //     ]
-            //   }
-            // )
-          }
-          )
+
       }
       .width("100%")
-      .height("100%")
+
+      //.height("100%")
 
     }
   }
