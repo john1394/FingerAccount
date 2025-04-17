@@ -1,11 +1,22 @@
-export  interface PieData {
+export interface CategoryListData {
+  categoryName: string,
+  categoryImage:ResourceStr,
+  percentValue: number,
+  count: number,
+  amount: number,
+  imageBackColor:ResourceColor
+}
+
+
+export interface PieData {
   value: number,
   name: string
 }
 
-export  interface CategorySumData {
+export interface CategorySumData {
   amount: number,
-  category: string
+  category: string,
+  rows:number
 }
 
 export interface SumData {

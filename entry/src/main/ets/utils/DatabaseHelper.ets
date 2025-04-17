@@ -308,13 +308,19 @@ export class DatabaseHelper {
     return result
   }
 
-  getCategorySum(begin: number, end: number, bill_type: BillTypeEnum, limit: number): CategorySumData[] {
+  getCategorySum(begin: number, end: number, bill_type: BillTypeEnum, limit?: number): CategorySumData[] {
 
     let result: CategorySumData[] = [];
     try {
-      const sql = `select sum(amount) as total ,category from bills
+        let sql:string = `select sum(amount) as total ,category,COUNT(*) AS rows from bills
                  where bill_type=? and timestamp>=? and timestamp <?
-                 group by category order by total asc limit ${limit}`
+                 group by category order by total asc`
+
+      if(limit)
+      {
+        sql+=` limit ${limit}`
+      }
+
       let params: ValueType[] = [bill_type, begin, end];
 
 
@@ -324,6 +330,7 @@ export class DatabaseHelper {
         // 获取列值
         const total = resultSet.getLong(resultSet.getColumnIndex('total'));
         const date = resultSet.getString(resultSet.getColumnIndex('category'));
+        const rows = resultSet.getLong(resultSet.getColumnIndex('rows'));
 
 
         console.log(`total: ${total}, date: ${date}`);
@@ -332,6 +339,7 @@ export class DatabaseHelper {
           {
             amount: total,
             category: date,
+            rows:rows
           }
 
         result.push(item);

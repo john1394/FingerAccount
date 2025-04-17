@@ -1,4 +1,4 @@
-import { ColumnData, PieData } from '../models/BillReportModel';
+import { CategoryListData, CategorySumData, ColumnData, PieData } from '../models/BillReportModel';
 
 import { McLineChart, Options } from '@mcui/mccharts';
 import {
@@ -18,8 +18,9 @@ import {
 import { DatabaseHelper } from '../utils/DatabaseHelper';
 import { BillTypeEnum } from '../models/RecordList';
 import { CategoryPieChart, PieDataController } from '../components/CategoryPieChart';
-import { BizConstants } from '../utils/BizConstants';
 import { CategoryTopList } from '../components/CategoryTopList';
+import CategoryMapSingleton from '../models/CategoryMapSingleton';
+import { BizConstants } from '../utils/BizConstants';
 
 const yAxisText: string = "元";
 
@@ -28,6 +29,8 @@ const yAxisText: string = "元";
 @Component
 struct BillReport {
   pieDataController: PieDataController = new PieDataController();
+  @State
+  categoryTopList: CategoryListData[] = []
   @State
   pieData: PieData[] = []
   @Prop
@@ -344,7 +347,12 @@ struct BillReport {
 
           //第6行 排行列表
           Column() {
-            CategoryTopList()
+            CategoryTopList(
+              {
+                categoryList: this.categoryTopList
+              }
+
+            )
               .backgroundColor($r("app.color.white"))// .backgroundColor(Color.Gray)
               .borderRadius(8)
           }
@@ -621,16 +629,43 @@ struct BillReport {
 
   private updatePieData(bill_type: BillTypeEnum) {
     let categorySum = DatabaseHelper.getInstance()
-      .getCategorySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), bill_type,
-        BizConstants.Category_Limit);
+      .getCategorySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), bill_type
+      );
 
     this.pieData = categorySum.map(item => ({
       value: item.amount / 100,
       name: item.category // 将 category 映射为 name
     } as PieData
-    ));
+    ))
+      .sort((a, b) => (b.value - a.value))
+      .slice(0, BizConstants.Category_TOP5_Limit);
 
     this.pieDataController.updateData(this.pieData);
+
+    const totalAmount: number = categorySum.reduce(
+      (sum: number, currentItem: CategorySumData) =>
+      (sum + currentItem.amount),
+      0
+    );
+
+    this.categoryTopList =
+      categorySum.map(item =>
+      (
+        {
+          categoryName: item.category,
+          categoryImage: $r(`app.media.${CategoryMapSingleton.getInstance()
+            .get(item.category, bill_type)?.category_image}`),
+          percentValue: totalAmount > 0 ? item.amount * 100 / totalAmount : 0,
+          count: item.rows,
+          amount: item.amount,
+          imageBackColor: bill_type === BillTypeEnum.Income ? BizConstants.SelectedIncomeCategoryIconBackColor :
+          BizConstants.SelectedOutComeCategoryIconBackColor
+
+        } as CategoryListData
+      )
+      ).sort((a, b) => (b.amount - a.amount)
+      ).slice(0, BizConstants.Category_Top10_Limit);
+
   }
 }
 

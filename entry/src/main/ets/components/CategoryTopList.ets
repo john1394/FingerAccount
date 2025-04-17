@@ -1,7 +1,20 @@
-import { RoundImage } from '../pages/RoundImage'
+import { CategoryListData } from '../models/BillReportModel';
+import { RoundImage } from '../pages/RoundImage';
 
 @Component
 export struct CategoryTopList {
+  @Prop
+  categoryList: CategoryListData[] = [
+    {
+      categoryName: "其它",
+      categoryImage: $r("app.media.ic_cat_out_qita"),
+      percentValue: 50,
+      count: 2,
+      amount: 7,
+      imageBackColor: $r("app.color.danger")
+    }
+  ]
+
   build() {
 
     Column({ space: 10 }) {
@@ -16,39 +29,38 @@ export struct CategoryTopList {
       .padding(10)
 
       ForEach(
-
-        [1, 2, 3, 4, 5]
-        , (item: number) => {
+        this.categoryList
+        , (item: CategoryListData) => {
         Row() {
 
           RoundImage(
             {
               contentWidth: 30,
-              imageUrl: $r("app.media.ic_cat_out_qita"),
-              backColor: $r("app.color.danger")
+              imageUrl: item.categoryImage,
+              backColor: item.imageBackColor
             }
           )
 
           Column() {
             Row() {
               Row({ space: 10 }) {
-                Text("理财")
+                Text(item.categoryName)
                   .fontSize(14)
-                Text("50.00%")
+                Text(item.percentValue.toFixed(2) + "%")
                   .fontSize(14)
               }
 
               Row({ space: 10 }) {
-                Text("(共1笔)")
+                Text(`(共${item.count}笔)`)
                   .fontSize(12)
-                Text("8888.00")
+                Text((item.amount / 100).toFixed(2))
                   .fontSize(14)
               }
 
             }.width("100%")
             .justifyContent(FlexAlign.SpaceBetween)
 
-            Progress({ value: 20, total: 100, type: ProgressType.Linear }).style(
+            Progress({ value: item.percentValue, total: 100, type: ProgressType.Linear }).style(
               {
                 strokeWidth: 6
               }

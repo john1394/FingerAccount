@@ -21,13 +21,14 @@ export struct CategoryPieChart {
     },
     legend: {
       show: true,
-      left: 50,
+      left: 40,
+
       top: 20,
       orient: 'horizontal',
       itemGap: 10,
       itemTextGap: 10,
-      itemWidth: 8,
-      itemHeight: 8,
+      itemWidth: 16,
+      itemHeight: 16,
       textStyle: {
         color: '#000',
         fontWeight: 'normal',
@@ -47,7 +48,7 @@ export struct CategoryPieChart {
     },
     series: [
       {
-        center: ['50%', '50%'], // 饼图中心位置
+        center: ['50%', '60%'], // 饼图中心位置
         //roseType: false,
         data: this.pieData
       ,
@@ -78,8 +79,6 @@ export struct CategoryPieChart {
 
       }
       .width("100%")
-
-      //.height("100%")
 
     }
   }
