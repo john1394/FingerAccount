@@ -1,7 +1,6 @@
 {
-  "layered-image":
-  {
-    "background" : "$media:background",
-    "foreground" : "$media:ic_edit"
+  "layered-image": {
+    "background": "$media:background",
+    "foreground": "$media:jz_logo"
   }
 }
