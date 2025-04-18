@@ -13,6 +13,7 @@ import CategoryMapSingleton from '../models/CategoryMapSingleton'
 import { RoundImage } from './RoundImage'
 import { BudgetStore } from '../utils/BudgetStore'
 import { emitter } from '@kit.BasicServicesKit'
+import { MonthPicker } from '../components/MonthPicker'
 
 
 @Preview
@@ -41,11 +42,15 @@ struct WriteRecord {
   monthBudgetInputText: string = "";
   @State
   isShowBudgetSheet: boolean = false;
+  @State
+  yearPicked: string = ""
+  @State
+  monthPicked: string = ""
 
-  loadAllData() {
+  loadMonthData(monthDate: Date) {
 
-    let dayPair = getMonthBoundaries(this.currentMonthBegin)
-
+    //let dayPair = getMonthBoundaries(this.currentMonthBegin)
+    let dayPair = getMonthBoundaries(monthDate)
     let allItems: RecordItemInfo[] =
       DatabaseHelper.getInstance().getBillRecordMonth(dayPair.begin.getTime(), dayPair.end.getTime());
     //DatabaseHelper.getInstance().getAllBillRecord();
@@ -63,6 +68,8 @@ struct WriteRecord {
         .getMonthSum(dayPair.begin.getTime(), dayPair.end.getTime(), BillTypeEnum.Outcome);
     if (outcomeSumData.length > 0) {
       this.currentMonthOutcome = outcomeSumData[0].amount
+    } else {
+      this.currentMonthOutcome = 0
     }
 
     let incomeSumData =
@@ -71,7 +78,10 @@ struct WriteRecord {
 
     if (incomeSumData.length > 0) {
       this.currentMonthIncome = incomeSumData[0].amount
+    } else {
+      this.currentMonthIncome = 0;
     }
+
 
     this.currentMonthSaved = this.currentMonthIncome - this.currentMonthOutcome;
 
@@ -81,13 +91,30 @@ struct WriteRecord {
   }
 
   aboutToAppear(): void {
-    this.loadAllData();
-    this.getBudgetFromStore()
+
     // 订阅
     emitter.on(BudgetStore.budget_key, () => {
       // this.list = StoreClass.getAllChatLastMessage()
       this.getBudgetFromStore()
     })
+
+
+    let currentMonthBegin = new Date()
+    this.loadMonthData(currentMonthBegin);
+    this.getBudgetFromStore()
+
+  }
+
+  updateMonthData(yearPicked: string, monthPicked: string) {
+
+    let yearNumber = Number(yearPicked.substring(0, yearPicked.length - 1));
+    let monthNumber = Number(monthPicked.substring(0, monthPicked.length - 1)) - 1;
+
+    if (!Number.isNaN(yearNumber) && !Number.isNaN(monthNumber)) {
+      let currentMonthBegin = new Date(yearNumber, monthNumber, 1)
+      this.loadMonthData(currentMonthBegin);
+      this.getBudgetFromStore()
+    }
 
   }
 
@@ -188,16 +215,16 @@ struct WriteRecord {
 
         Column({ space: 10 }) {
 
-
-          Row() {
-            Text("X月支出")
-              .fontSize(16)
-
-            Image($r("sys.media.ohos_ic_public_arrow_down"))
-              .width(24)
-              .height(24)
-          }.width("100%")
-          .height(40)
+          //月份选择
+          MonthPicker(
+            {
+              // yearPicked: this.yearPicked,
+              //monthPicked: this.monthPicked
+              updateMonthData: (yearPicked, monthPicked) => {
+                this.updateMonthData(yearPicked, monthPicked)
+              }
+            }
+          )
 
           //行1
           Row({ space: 10 }) {
@@ -401,7 +428,10 @@ struct WriteRecord {
 
             }
             )
-          }.alignListItem(ListItemAlign.Start)
+          }
+          .alignListItem(ListItemAlign.Start)
+          .width("100%")
+          .height("100%")
           .backgroundColor($r("app.color.white"))
           //.backgroundColor(Color.Pink)
           .borderRadius(5)
