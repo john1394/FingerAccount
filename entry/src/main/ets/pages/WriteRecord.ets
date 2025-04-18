@@ -42,10 +42,6 @@ struct WriteRecord {
   monthBudgetInputText: string = "";
   @State
   isShowBudgetSheet: boolean = false;
-  @State
-  yearPicked: string = ""
-  @State
-  monthPicked: string = ""
 
   loadMonthData(monthDate: Date) {
 

@@ -16,11 +16,7 @@ export struct MonthPicker {
   private months: string[] = []
   private line1Height = 60;
   private line2Height = 200;
-  //updateMonthData:(yearPicked: string ,monthPicked: string )=>void =(yearPicked: string ,monthPicked: string)={}
-  //updateMonthData: (isWriteAgain: boolean) => void = () => {
-  //}
-  // updateConfirm: (isWriteAgain: boolean) => void = () => {
-  // }
+
   updateMonthData: (yearPicked: string, monthPicked: string) => void = (  ) => {
   }
 

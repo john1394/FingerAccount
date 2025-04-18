@@ -103,7 +103,7 @@ export function shiftMonth(dayPair: DayPair, left: boolean): DayPair {
 
   const end = new Date(begin);
   end.setMonth(end.getMonth() + 1); // 跳到下个月
-  end.setDate(0); // 设为上个月最后一天
+  // end.setDate(0); // 设为上个月最后一天
 
   return { begin, end };
 }
@@ -112,7 +112,8 @@ export function shiftYear(dayPair: DayPair, left: boolean): DayPair {
   let deltaNumber = left ? -1 : 1;
   const beginYear = dayPair.begin.getFullYear() + deltaNumber;
   const begin = new Date(beginYear, 0, 1); // 月份从 0 开始（0=1月）
-  const end = new Date(beginYear, 11, 31); // 12月=11
+  //const end = new Date(beginYear, 11, 31); // 12月=11
+  const end = new Date(beginYear + 1, 0, 1); // 12月=11
   return { begin, end };
 }
 
@@ -155,9 +156,6 @@ export function getDateDiffInDays(dateBegin: Date, dateEnd: Date): number {
   const timeDiff = Math.abs(dateEnd.getTime() - dateBegin.getTime());
   return Math.floor(timeDiff / (1000 * 60 * 60 * 24));
 }
-
-
-
 
 
 export function formatTime(time: number) {

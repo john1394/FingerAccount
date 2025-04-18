@@ -1,10 +1,17 @@
+export enum ReportTimeRangeEnum {
+  Week = 0,
+  Month = 1,
+  Year = 2,
+  Custom = 3
+}
+
 export interface CategoryListData {
   categoryName: string,
-  categoryImage:ResourceStr,
+  categoryImage: ResourceStr,
   percentValue: number,
   count: number,
   amount: number,
-  imageBackColor:ResourceColor
+  imageBackColor: ResourceColor
 }
 
 
@@ -16,7 +23,7 @@ export interface PieData {
 export interface CategorySumData {
   amount: number,
   category: string,
-  rows:number
+  rows: number
 }
 
 export interface SumData {

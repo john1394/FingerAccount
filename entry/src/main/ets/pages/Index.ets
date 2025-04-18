@@ -1,18 +1,12 @@
 import { TabBarClass } from '../models/tab'
-import BillReport from './BillReport'
+import BillReport1 from './BillReport1'
 import My from './My'
 import WriteRecord from './WriteRecord'
-
-
 
 
 @Entry
 @Component
 struct Index {
-  aboutToAppear(): void {
-
-  }
-
   @State
   tabBarList: TabBarClass[] = [
     {
@@ -43,6 +37,10 @@ struct Index {
   @State
   currentIndex: number = 0
 
+  aboutToAppear(): void {
+
+  }
+
   @Builder
   CommonTabBar(item: TabBarClass) {
     Column() {
@@ -68,7 +66,7 @@ struct Index {
             if (item.name === "WriteRecord") {
               WriteRecord()
             } else if (item.name === "report") {
-               BillReport()
+              BillReport1()
             } else if (item.name === "my") {
               My()
             }

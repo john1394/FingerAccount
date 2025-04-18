@@ -24,8 +24,7 @@ import { BizConstants } from '../utils/BizConstants';
 
 const yAxisText: string = "元";
 
-// @Preview
-// @Entry
+
 @Component
 struct BillReport {
   pieDataController: PieDataController = new PieDataController();
@@ -301,7 +300,7 @@ struct BillReport {
       .alignItems(VerticalAlign.Center)
       .height(50)
 
-
+      //报表
       Scroll() {
         Column({ space: 10 }) {
 

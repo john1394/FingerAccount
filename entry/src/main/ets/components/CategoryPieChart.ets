@@ -63,7 +63,10 @@ export struct CategoryPieChart {
 
   aboutToAppear(): void {
     if (this.controller) {
-      this.controller.updateData = this.updateData;
+      this.controller.updateData = (value: PieData[]) => {
+        this.updateData(value)
+      }
+
     }
   }
 
