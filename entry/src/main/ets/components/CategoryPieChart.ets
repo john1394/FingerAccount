@@ -20,7 +20,7 @@ export struct CategoryPieChart {
       textStyle: { fontSize: 50 }
     },
     legend: {
-      show: true,
+      show: false,
       left: 20,
       selectAble: false,
       top: 20,
@@ -48,7 +48,7 @@ export struct CategoryPieChart {
     },
     series: [
       {
-        center: ['50%', '60%'], // 饼图中心位置
+        center: ['50%', '50%'], // 饼图中心位置
         //roseType: false,
         data: this.pieData
       ,
@@ -56,7 +56,7 @@ export struct CategoryPieChart {
         labelLine:
         {
           style:
-          { fontSize: 40 }
+          { fontSize: 50 }
         }
       }
     ]

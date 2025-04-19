@@ -99,9 +99,14 @@ export struct IncomeAndExpenditure {
 
         .alignItems(ItemAlign.Start)
 
-      }.height("100%")
+        //.backgroundColor(Color.Yellow)
+
+      }
+      .align(Alignment.Top)
+      .height("100%")
       .width('100%')
       .scrollable(ScrollDirection.Vertical)
+      //.backgroundColor(Color.Pink)
       .scrollBar(BarState.Off)
 
     }
