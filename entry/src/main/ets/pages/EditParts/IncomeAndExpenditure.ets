@@ -1,20 +1,12 @@
-import { CategoryItem, DefaultOutcomeCategoryList } from "../../models/CategoryList"
-import { RecordItemInfo } from "../../models/RecordList";
-import {
-  getIconCategoryBackcolor,
-  getIconUnselectBackColor,
-  getIncomeIconBackColor,
-  getOutcomeIconBackColor
-} from "../../utils/Util";
-import { RoundImage } from "../RoundImage"
-import { router, Router } from "@kit.ArkUI";
+import { CategoryItem } from '../../models/CategoryList';
+import { RecordItemInfo } from '../../models/RecordList';
+import { getIconCategoryBackcolor } from '../../utils/Util';
+import { RoundImage } from '../RoundImage';
 
 @Component
 export struct IncomeAndExpenditure {
   @Prop
   categoryList: CategoryItem[] = [];
-
-
   @Prop
   selectedCategoryImage: string = "";
   @Prop
@@ -26,8 +18,6 @@ export struct IncomeAndExpenditure {
   //186;
   @Prop
   currentItem: RecordItemInfo;
-
-
   updateSelectCategory = (name: string, image: string) => {
 
   }
@@ -57,10 +47,11 @@ export struct IncomeAndExpenditure {
                 ).onClick(() => {
 
                   if (item.category_name === "设置") {
-                    router.pushUrl({
-                      url: "pages/CategoryManage",
-                      params: { "a": "b" }
-                    })
+                    // router.pushUrl({
+                    //   url: "pages/CategoryManage",
+                    //   params: { "a": "b" }
+                    // })
+                    console.log("to be continued")
                   } else {
 
                     this.updateSelectCategory(item.category_name, item.category_image)
@@ -107,7 +98,6 @@ export struct IncomeAndExpenditure {
         }
 
         .alignItems(ItemAlign.Start)
-
 
       }.height("100%")
       .width('100%')

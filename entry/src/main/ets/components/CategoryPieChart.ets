@@ -13,7 +13,7 @@ export struct CategoryPieChart {
   pieData: PieData[];
   @State legendOption: Options = new Options({
     title: {
-      show: true,
+      show: false,
       text: '类别',
       left: 15,
       top: 25,
@@ -21,8 +21,8 @@ export struct CategoryPieChart {
     },
     legend: {
       show: true,
-      left: 40,
-
+      left: 20,
+      selectAble: false,
       top: 20,
       orient: 'horizontal',
       itemGap: 10,
@@ -33,7 +33,7 @@ export struct CategoryPieChart {
         color: '#000',
         fontWeight: 'normal',
         fontFamily: 'sans-serif',
-        fontSize: 45
+        fontSize: 38
       }
     },
     tooltip: {
@@ -52,10 +52,11 @@ export struct CategoryPieChart {
         //roseType: false,
         data: this.pieData
       ,
+        radius: ["", "60%"],
         labelLine:
         {
           style:
-          { fontSize: 45 }
+          { fontSize: 40 }
         }
       }
     ]

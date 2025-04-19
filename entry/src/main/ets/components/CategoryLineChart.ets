@@ -25,7 +25,7 @@ export struct CategoryLineChart {
   @State
   lineOption: Options = new Options(
     {
-      animation: false,
+      animation: true,
       series: [
         {
           name: (this.bill_type === BillTypeEnum.Outcome ? "支出金额" : "收入金额"),

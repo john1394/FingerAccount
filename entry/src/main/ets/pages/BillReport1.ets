@@ -78,6 +78,7 @@ struct BillReport {
               lineCharDataController: this.lineCharDataController
             }
           )
+          //.visibility(Visibility.None)
 
           //第五行 饼图
           Column() {
@@ -95,7 +96,8 @@ struct BillReport {
           .width("100%")
           .height(280)
           .padding(10)
-          .visibility(Visibility.Visible)
+
+          // .visibility(Visibility.None)
 
 
           //第6行 排行列表

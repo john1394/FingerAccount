@@ -35,7 +35,7 @@ struct EditAccount {
   updateSelectCategory = (name: string, image: string) => {
 
     this.currentItem.category_name = name;
-    this.currentItem.category_image = image;
+    this.currentItem.category_image = $r(image);
 
   }
 
@@ -130,7 +130,8 @@ struct EditAccount {
       this.currentItem =
         {
           id: 0,
-          category_image: DefaultOutcomeCategoryList[0].category_image,
+          category_image: $r(DefaultOutcomeCategoryList[0].category_image),
+          //DefaultOutcomeCategoryList[0].category_image,
           category_name: DefaultOutcomeCategoryList[0].category_name,
           bill_type: 0,
           amount: 0,
