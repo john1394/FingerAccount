@@ -15,11 +15,15 @@ export class LineCharDataController {
 
 @Component
 export struct CategoryLineChart {
+  @Prop
+  dayBoundary: DayPair;
+  @Prop
+  reportTimeRangeEnum: ReportTimeRangeEnum
   lineCharDataController: LineCharDataController = new LineCharDataController();
   @State
   bill_type: BillTypeEnum = BillTypeEnum.Outcome
   @State
-  yShowNumber: number[] = [1, 2, 3]
+  yShowNumber: number[] = []
   @State
   xData: string[] = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
   @State
@@ -175,6 +179,10 @@ export struct CategoryLineChart {
           this.updateData(dayBoundary, bill_type, reportTimeRangeEnum);
         }
     }
+
+    this.updateData(this.dayBoundary, this.bill_type, this.reportTimeRangeEnum)
+
+
   }
 
   build() {

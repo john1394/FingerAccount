@@ -67,8 +67,9 @@ export struct CategoryPieChart {
       this.controller.updateData = (value: PieData[]) => {
         this.updateData(value)
       }
-
     }
+
+    //this.updateData(this.pieData)
   }
 
   build() {

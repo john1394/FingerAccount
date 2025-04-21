@@ -1,7 +1,6 @@
 import { CategoryListData, CategorySumData, ColumnData, PieData, ReportTimeRangeEnum } from '../models/BillReportModel';
-
 import { Options } from '@mcui/mccharts';
-import { DayPair, formatDateYMDHan, getWeekBoundaries, } from '../utils/Util';
+import { DayPair, formatDayBoundary, getWeekBoundaries } from '../utils/Util';
 import { DatabaseHelper } from '../utils/DatabaseHelper';
 import { BillTypeEnum } from '../models/RecordList';
 import { CategoryPieChart, PieDataController } from '../components/CategoryPieChart';
@@ -10,10 +9,14 @@ import CategoryMapSingleton from '../models/CategoryMapSingleton';
 import { BizConstants } from '../utils/BizConstants';
 import { ReportTimeSelector } from '../components/ReportTimeSelector';
 import { CategoryLineChart, LineCharDataController } from '../components/CategoryLineChart';
+import { Accountant } from '../components/Accountant';
+import { systemDateTime } from '@kit.BasicServicesKit';
 
 
 @Component
 struct BillReport {
+  @Prop totalOutcome: number;
+  @Prop totalIncome: number;
   pieDataController: PieDataController = new PieDataController();
   lineCharDataController: LineCharDataController = new LineCharDataController();
   @State
@@ -40,14 +43,21 @@ struct BillReport {
   aboutToAppear(): void {
     let currentDate = new Date();
     this.dayBoundary = getWeekBoundaries(currentDate);
-    this.fromBeginDateStr = this.formatDayBoundary(this.dayBoundary);
+    this.fromBeginDateStr = formatDayBoundary(this.dayBoundary);
 
-    this.updateTimeRange(this.dayBoundary, this.isOutput)
-  }
+    let biz_type = this.isOutput ? BillTypeEnum.Outcome : BillTypeEnum.Income
+    let categorySum = DatabaseHelper.getInstance()
+      .getCategorySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(),biz_type
+      );
 
-  formatDayBoundary(boundary: DayPair) {
-    //周,月 ，年
-    return formatDateYMDHan(boundary.begin) + "-" + formatDateYMDHan(boundary.end);
+    this.pieData = categorySum.map(item => ({
+      value: item.amount / 100,
+      name: item.category // 将 category 映射为 name
+    } as PieData
+    ))
+      .sort((a, b) => (b.value - a.value))
+      .slice(0, BizConstants.Category_TOP5_Limit);
+
   }
 
   build() {
@@ -71,14 +81,35 @@ struct BillReport {
       Scroll() {
         Column({ space: 10 }) {
 
+          Accountant(
+            {
+              outcome: this.totalOutcome,
+              income: this.totalIncome,
+
+              reportTimeRangeEnum: this.reportTimeRangeEnum,
+              isOutput: this.isOutput,
+              dayBoundary: this.dayBoundary
+            }
+
+          )
+            .padding(
+              {
+                left: 10,
+                right: 10
+              }
+            )
+
+
           //折线图
           CategoryLineChart(
             {
+              reportTimeRangeEnum: this.reportTimeRangeEnum,
+              dayBoundary: this.dayBoundary,
               bill_type: BillTypeEnum.Outcome,
               lineCharDataController: this.lineCharDataController
             }
           )
-          //.visibility(Visibility.None)
+          // .visibility(Visibility.None)
 
           //第五行 饼图
           Column() {
@@ -95,9 +126,14 @@ struct BillReport {
           }
           .width("100%")
           .height(280)
-          .padding(10)
+          .padding(
+            {
+              left: 10,
+              right: 10
+            }
+          )
 
-          // .visibility(Visibility.None)
+          //.visibility(Visibility.None)
 
 
           //第6行 排行列表
@@ -134,6 +170,39 @@ struct BillReport {
 
   }
 
+  // formatDayBoundary(boundary: DayPair) {
+  //   //周,月 ，年
+  //   return formatDateYMDHan(boundary.begin) + "-" + formatDateYMDHan(boundary.end);
+  // }
+
+  private accountantCalc() {
+    const startTime = systemDateTime.getTime(true);
+
+    let outComeCategorySum = DatabaseHelper.getInstance()
+      .getCategorySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), BillTypeEnum.Outcome
+      );
+    let endTime = systemDateTime.getTime(true); // 以纳秒数返回结束时间
+
+    const totalOutcome: number = outComeCategorySum.reduce(
+      (sum: number, currentItem: CategorySumData) => (sum + currentItem.amount),
+      0
+    );
+
+    let incomeCategorySum = DatabaseHelper.getInstance()
+      .getCategorySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), BillTypeEnum.Income
+      );
+
+    const totalInCome: number = incomeCategorySum.reduce(
+      (sum: number, currentItem: CategorySumData) => (sum + currentItem.amount),
+      0
+    );
+
+    this.totalOutcome = totalOutcome;
+    this.totalIncome = totalInCome;
+
+    console.log(`mylog 执行时间：${(endTime - startTime) / 1000} 微秒`);
+  }
+
   private updateTimeRange(dayBoundary: DayPair,
     isOutput: boolean
   ) {
@@ -143,6 +212,8 @@ struct BillReport {
     let biz_type = isOutput ? BillTypeEnum.Outcome : BillTypeEnum.Income
     this.updateLineCharData(biz_type)
     this.updateCategoryData(biz_type)
+
+    this.accountantCalc();
 
   }
 

@@ -28,6 +28,27 @@ export interface DayPair {
   end: Date;
 }
 
+export async function sleepExample() {
+  console.log("开始执行");
+
+  // 使用 await 和 Promise 实现异步延迟
+  // await new Promise(resolve => setTimeout(resolve, 10));
+
+  const a = new Promise<number | void>((resolve) => {
+    setTimeout(() => {
+
+      console.log("mylog setTimeout");
+
+      resolve()
+    }, 2000)
+
+  });
+
+  await a;
+
+  console.log("mylog 10 毫秒后执行");
+}
+
 export function getDayOutcomeSum(list: RecordItemInfo[]) {
   const totalExpense: number = list.reduce(
     (sum: number, currentItem: RecordItemInfo) =>
@@ -108,6 +129,12 @@ export function shiftMonth(dayPair: DayPair, left: boolean): DayPair {
   return { begin, end };
 }
 
+export function formatDayBoundary(boundary: DayPair) {
+  //周,月 ，年
+  let endDate = new Date(boundary.end.getTime() - 1)
+  return formatDateYMDHan(boundary.begin) + "-" + formatDateYMDHan(endDate);
+}
+
 export function shiftYear(dayPair: DayPair, left: boolean): DayPair {
   let deltaNumber = left ? -1 : 1;
   const beginYear = dayPair.begin.getFullYear() + deltaNumber;
@@ -145,7 +172,7 @@ export function getWeekBoundaries(currentDateParam: Date): DayPair {
 
   // 周日是周一加 6 天
   const sunday = new Date(monday);
-  sunday.setDate(sunday.getDate() + 6);
+  sunday.setDate(sunday.getDate() + 7);
 
   return { begin: monday, end: sunday }
 }
@@ -155,6 +182,13 @@ export function getDateDiffInDays(dateBegin: Date, dateEnd: Date): number {
   // 2. 计算时间戳差并转换为天数
   const timeDiff = Math.abs(dateEnd.getTime() - dateBegin.getTime());
   return Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+}
+
+export function getMonthDiff(dateBegin: Date, dateEnd: Date): number {
+
+  // 2. 计算时间戳差并转换为天数
+  const timeDiff = Math.abs(dateEnd.getTime() - dateBegin.getTime());
+  return Math.floor(timeDiff / (1000 * 60 * 60 * 24 * 30));
 }
 
 

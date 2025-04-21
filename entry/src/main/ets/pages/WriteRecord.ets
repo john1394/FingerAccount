@@ -6,7 +6,7 @@ import {
   getMonthBoundaries,
   groupRecordItemInfoByTimestamp
 } from '../utils/Util'
-import { promptAction, router } from '@kit.ArkUI'
+import { router } from '@kit.ArkUI'
 import { DatabaseHelper } from '../utils/DatabaseHelper'
 import { BillTypeEnum, RecordItemInfo } from '../models/RecordList'
 import CategoryMapSingleton from '../models/CategoryMapSingleton'
@@ -400,11 +400,11 @@ struct WriteRecord {
                     .width("100%")
                     .onClick(() => {
 
-                      promptAction.showToast(
-                        {
-                          message: "detail"
-                        }
-                      )
+                      // promptAction.showToast(
+                      //   {
+                      //     message: "detail"
+                      //   }
+                      // )
                       router.pushUrl(
                         {
                           url: "pages/BillDetail",

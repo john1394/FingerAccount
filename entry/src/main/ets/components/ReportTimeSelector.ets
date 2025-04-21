@@ -2,7 +2,7 @@ import { ColumnData, ReportTimeRangeEnum } from '../models/BillReportModel';
 import { BizConstants } from '../utils/BizConstants';
 import {
   DayPair,
-  formatDateYMDHan,
+  formatDayBoundary,
   getMonthBoundaries,
   getWeekBoundaries,
   getYearBoundaries,
@@ -21,9 +21,8 @@ export struct ReportTimeSelector {
     new ColumnData('year', "年", false),
     new ColumnData('custom', "自定义", false),
   ];
-
   @Link
-  reportTimeRangeEnum: ReportTimeRangeEnum ;
+  reportTimeRangeEnum: ReportTimeRangeEnum;
   @State
   DateSelectBorderWidth: number = 2;
   @State
@@ -72,14 +71,14 @@ export struct ReportTimeSelector {
       this.updateTimeRange(this.reportTimeRangeEnum, this.dayBoundary, this.isOutput)
     }
 
-    this.fromBeginDateStr = this.formatDayBoundary(this.dayBoundary);
+    this.fromBeginDateStr = formatDayBoundary(this.dayBoundary);
   }
 
-  formatDayBoundary(boundary: DayPair) {
-    //周,月 ，年
-
-    return formatDateYMDHan(boundary.begin) + "-" + formatDateYMDHan(boundary.end);
-  }
+  // formatDayBoundary(boundary: DayPair) {
+  //   //周,月 ，年
+  //
+  //   return formatDateYMDHan(boundary.begin) + "-" + formatDateYMDHan(boundary.end);
+  // }
 
   updateSelectColumn(selectedItem: ColumnData) {
 
@@ -121,7 +120,7 @@ export struct ReportTimeSelector {
     }
 
     this.updateTimeRange(this.reportTimeRangeEnum, this.dayBoundary, this.isOutput)
-    this.fromBeginDateStr = this.formatDayBoundary(this.dayBoundary);
+    this.fromBeginDateStr = formatDayBoundary(this.dayBoundary);
   }
 
   aboutToAppear(): void {
