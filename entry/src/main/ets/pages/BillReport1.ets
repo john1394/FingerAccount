@@ -47,7 +47,7 @@ struct BillReport {
 
     let biz_type = this.isOutput ? BillTypeEnum.Outcome : BillTypeEnum.Income
     let categorySum = DatabaseHelper.getInstance()
-      .getCategorySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(),biz_type
+      .getCategorySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), biz_type
       );
 
     this.pieData = categorySum.map(item => ({
@@ -101,14 +101,16 @@ struct BillReport {
 
 
           //折线图
-          CategoryLineChart(
-            {
-              reportTimeRangeEnum: this.reportTimeRangeEnum,
-              dayBoundary: this.dayBoundary,
-              bill_type: BillTypeEnum.Outcome,
-              lineCharDataController: this.lineCharDataController
-            }
-          )
+          if (this.reportTimeRangeEnum !== ReportTimeRangeEnum.Custom) {
+            CategoryLineChart(
+              {
+                reportTimeRangeEnum: this.reportTimeRangeEnum,
+                dayBoundary: this.dayBoundary,
+                bill_type: BillTypeEnum.Outcome,
+                lineCharDataController: this.lineCharDataController
+              }
+            )
+          }
           // .visibility(Visibility.None)
 
           //第五行 饼图
@@ -210,6 +212,7 @@ struct BillReport {
     this.dayBoundary = dayBoundary
     this.isOutput = isOutput
     let biz_type = isOutput ? BillTypeEnum.Outcome : BillTypeEnum.Income
+
     this.updateLineCharData(biz_type)
     this.updateCategoryData(biz_type)
 

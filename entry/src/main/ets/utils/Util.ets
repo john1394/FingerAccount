@@ -9,17 +9,7 @@ export function test1() {
 
   console.log(b1)
 
-  // let dt1 = new Date(2025, 3, 30);
-  //
-  //
-  // let dt2: Date = new Date(dt1)
-  //
-  // dt2.setDate(dt2.getDate() + 8)
-  // const DOMAIN = 0x0000;
-  // let a1 = Date.now()
-  //
-  // let str1 = formatTime(a1)
-  // hilog.info(0, "str1:%s", str1)
+
 }
 
 
@@ -30,9 +20,6 @@ export interface DayPair {
 
 export async function sleepExample() {
   console.log("开始执行");
-
-  // 使用 await 和 Promise 实现异步延迟
-  // await new Promise(resolve => setTimeout(resolve, 10));
 
   const a = new Promise<number | void>((resolve) => {
     setTimeout(() => {
@@ -99,8 +86,9 @@ export function getYearBoundaries(currentDate: Date): DayPair {
   const firstDay = new Date(currentYear, 0, 1); // 月份从 0 开始（0=1月）
 
   // 年的最后一天（12月31日）
-  const lastDay = new Date(currentYear + 1, 0, 1)
+  const lastDay = new Date(currentYear, 11, 31)
   //new Date(currentYear, 11, 31); // 12月=11
+  lastDay.setHours(23, 59, 59, 999)
 
   return { begin: firstDay, end: lastDay };
 }
@@ -111,8 +99,9 @@ export function shiftWeek(dayPair: DayPair, left: boolean): DayPair {
   const begin = new Date(dayPair.begin); // 创建副本，避免修改原对象
   begin.setDate(begin.getDate() + dayNumber); // 增加 7 天
 
-  const end = new Date(dayPair.end); // 创建副本，避免修改原对象
-  end.setDate(end.getDate() + dayNumber); // 增加 7 天
+  const end = new Date(begin); // 创建副本，避免修改原对象
+  end.setDate(end.getDate() + 6); // 增加 7 天
+  end.setHours(23, 59, 59, 999)
   return { begin, end };
 }
 
@@ -124,14 +113,16 @@ export function shiftMonth(dayPair: DayPair, left: boolean): DayPair {
 
   const end = new Date(begin);
   end.setMonth(end.getMonth() + 1); // 跳到下个月
-  // end.setDate(0); // 设为上个月最后一天
+  end.setDate(0); // 设为上个月最后一天
+  end.setHours(23, 59, 59, 999)
 
   return { begin, end };
 }
 
 export function formatDayBoundary(boundary: DayPair) {
   //周,月 ，年
-  let endDate = new Date(boundary.end.getTime() - 1)
+  // let endDate = new Date(boundary.end.getTime() - 1)
+  let endDate = new Date(boundary.end.getTime())
   return formatDateYMDHan(boundary.begin) + "-" + formatDateYMDHan(endDate);
 }
 
@@ -139,8 +130,10 @@ export function shiftYear(dayPair: DayPair, left: boolean): DayPair {
   let deltaNumber = left ? -1 : 1;
   const beginYear = dayPair.begin.getFullYear() + deltaNumber;
   const begin = new Date(beginYear, 0, 1); // 月份从 0 开始（0=1月）
-  //const end = new Date(beginYear, 11, 31); // 12月=11
-  const end = new Date(beginYear + 1, 0, 1); // 12月=11
+
+  //const end = new Date(beginYear + 1, 0, 1); // 12月=11
+  const end = new Date(beginYear, 11, 31); // 12月=11
+  end.setHours(23, 59, 59, 999)
   return { begin, end };
 }
 
@@ -155,8 +148,9 @@ export function getMonthBoundaries(currentDateParam: Date): DayPair {
   // 月份最后一天：下个月的第 0 天即为本月最后一天
   const lastDay = new Date(firstDay);
   lastDay.setMonth(lastDay.getMonth() + 1); // 跳到下个月
-  // lastDay.setDate(0); // 设为上个月最后一天
-
+  lastDay.setDate(0); // 设为上个月最后一天
+  //let endDay = new Date(lastDay.getTime() - 1)
+  lastDay.setHours(23, 59, 59, 999)
   return { begin: firstDay, end: lastDay };
 }
 
@@ -172,7 +166,8 @@ export function getWeekBoundaries(currentDateParam: Date): DayPair {
 
   // 周日是周一加 6 天
   const sunday = new Date(monday);
-  sunday.setDate(sunday.getDate() + 7);
+  sunday.setDate(sunday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999)
 
   return { begin: monday, end: sunday }
 }

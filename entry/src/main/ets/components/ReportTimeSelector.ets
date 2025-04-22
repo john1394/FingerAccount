@@ -2,6 +2,7 @@ import { ColumnData, ReportTimeRangeEnum } from '../models/BillReportModel';
 import { BizConstants } from '../utils/BizConstants';
 import {
   DayPair,
+  formatDateYMDHan,
   formatDayBoundary,
   getMonthBoundaries,
   getWeekBoundaries,
@@ -74,12 +75,6 @@ export struct ReportTimeSelector {
     this.fromBeginDateStr = formatDayBoundary(this.dayBoundary);
   }
 
-  // formatDayBoundary(boundary: DayPair) {
-  //   //周,月 ，年
-  //
-  //   return formatDateYMDHan(boundary.begin) + "-" + formatDateYMDHan(boundary.end);
-  // }
-
   updateSelectColumn(selectedItem: ColumnData) {
 
     let newColumns: ColumnData[] = [];
@@ -97,26 +92,20 @@ export struct ReportTimeSelector {
 
     this.columns = newColumns;
 
-    //
     if (this.columns[0].selected) {
       this.dayBoundary = getWeekBoundaries(new Date());
-      //this.updateWeekData()
-
       this.reportTimeRangeEnum = ReportTimeRangeEnum.Week
-
 
     } else if (this.columns[1].selected) {
       this.dayBoundary = getMonthBoundaries(new Date());
-      //this.updateMonthData();
-
       this.reportTimeRangeEnum = ReportTimeRangeEnum.Month
-      // this.updateTimeRange(ReportTimeRangeEnum.Month, this.dayBoundary, this.isOutput)
+
     } else if (this.columns[2].selected) {
       this.dayBoundary = getYearBoundaries(new Date());
-      //this.updateYearData();
-
       this.reportTimeRangeEnum = ReportTimeRangeEnum.Year
-      // this.updateTimeRange(ReportTimeRangeEnum.Month, this.dayBoundary, this.isOutput)
+    } else if (this.columns[3].selected) {
+
+      this.reportTimeRangeEnum = ReportTimeRangeEnum.Custom
     }
 
     this.updateTimeRange(this.reportTimeRangeEnum, this.dayBoundary, this.isOutput)
@@ -275,45 +264,125 @@ export struct ReportTimeSelector {
 
 
       //第三行
-      Row() {
-        Column() {
-          Image($r("app.media.arrow_circle_left_48dp_000000"))
-            .width(35)
-            .height(35)
-        }.height("100%")
-        .justifyContent(FlexAlign.Center)
-        .layoutWeight(1)
-        .onClick(() => {
 
-          this.shiftDate(true);
-        })
+      if (this.reportTimeRangeEnum !== ReportTimeRangeEnum.Custom) {
+        Row() {
+          Column() {
+            Image($r("app.media.arrow_circle_left_48dp_000000"))
+              .width(35)
+              .height(35)
+          }.height("100%")
+          .justifyContent(FlexAlign.Center)
+          .layoutWeight(1)
+          .onClick(() => {
 
-
-        Column() {
-          Text(this.fromBeginDateStr)// Text("2025年03月")
-            .fontSize(15)
-
-        }.layoutWeight(5)
+            this.shiftDate(true);
+          })
 
 
-        Column() {
-          Image($r("app.media.arrow_circle_right_48dp_000000"))
-            .width(40)
-            .height(40)
-        }.height("100%")
-        .justifyContent(FlexAlign.Center)
-        .layoutWeight(1)
-        .onClick(() => {
+          Column() {
+            Text(this.fromBeginDateStr)
+              .fontSize(15)
 
-          this.shiftDate(false);
-        })
+          }.layoutWeight(5)
 
+
+          Column() {
+            Image($r("app.media.arrow_circle_right_48dp_000000"))
+              .width(40)
+              .height(40)
+          }.height("100%")
+          .justifyContent(FlexAlign.Center)
+          .layoutWeight(1)
+          .onClick(() => {
+
+            this.shiftDate(false);
+          })
+
+        }
+        .backgroundColor($r("app.color.back_color"))
+        //.backgroundColor(Color.Pink)
+        .width("100%")
+        .alignItems(VerticalAlign.Center)
+        .height(50)
+      } else {
+        //自定义日期选择
+        Row(
+          { space: 10 }
+        ) {
+
+          Row() {
+            Text(formatDateYMDHan(this.dayBoundary.begin))
+            Image($r("sys.media.ohos_ic_public_arrow_down"))
+              .width(20)
+              .height(20)
+          }.onClick(() => {
+            CalendarPickerDialog.show({
+              selected: this.dayBoundary.begin,
+              acceptButtonStyle: {
+                fontColor: '#2787d9',
+                fontSize: '16fp',
+                backgroundColor: '#f7f7f7',
+                borderRadius: 10
+              },
+              cancelButtonStyle: {
+                fontColor: Color.Red,
+                fontSize: '16fp',
+                backgroundColor: '#f7f7f7',
+                borderRadius: 10
+              },
+              onAccept: (date: Date) => {
+                // 当弹出框再次弹出时显示选中的是上一次确定的日期
+                this.dayBoundary.begin = new Date(new Date(date.getTime()).setHours(0, 0, 0, 0))
+
+                this.updateTimeRange(this.reportTimeRangeEnum, this.dayBoundary, this.isOutput)
+              }
+            })
+          })
+
+
+          Text("~")
+
+          Row() {
+            Text(formatDateYMDHan(this.dayBoundary.end))
+            Image($r("sys.media.ohos_ic_public_arrow_down"))
+              .width(20)
+              .height(20)
+          }.onClick(() => {
+            CalendarPickerDialog.show({
+              selected: this.dayBoundary.end,
+              acceptButtonStyle: {
+                fontColor: '#2787d9',
+                fontSize: '16fp',
+                backgroundColor: '#f7f7f7',
+                borderRadius: 10
+              },
+              cancelButtonStyle: {
+                fontColor: Color.Red,
+                fontSize: '16fp',
+                backgroundColor: '#f7f7f7',
+                borderRadius: 10
+              },
+              onAccept: (date: Date) => {
+                // 当弹出框再次弹出时显示选中的是上一次确定的日期
+                this.dayBoundary.end = new Date(new Date(date).setHours(23, 59, 59, 999))
+                this.updateTimeRange(this.reportTimeRangeEnum, this.dayBoundary, this.isOutput)
+              }
+            })
+          })
+
+        }.height(40)
+        .justifyContent(FlexAlign.SpaceAround)
+        .padding(
+          {
+            left: 10,
+            right: 10
+          }
+        )
+        .width("100%")
       }
-      .backgroundColor($r("app.color.back_color"))
-      //.backgroundColor(Color.Pink)
-      .width("100%")
-      .alignItems(VerticalAlign.Center)
-      .height(50)
+
+
     }.padding(
       {
         left: 10,
