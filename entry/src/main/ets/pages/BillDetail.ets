@@ -96,7 +96,7 @@ struct BillDetail {
             Row() {
               RoundImage(
                 {
-                  contentWidth: 40,
+                  contentWidth: 30,
                   imageUrl: this.currentItem.category_image,
                   backColor: this.currentItem.bill_type === 0 ? getOutcomeIconBackColor() : getIncomeIconBackColor()
 
@@ -165,6 +165,7 @@ struct BillDetail {
           Row({ space: 0 }) {
             Text("备注")
             Text(this.formatMemoText())
+              .width(150)
               .margin(
                 {
                   right: 10

@@ -1,13 +1,17 @@
+import { BizConstants } from '../../utils/BizConstants'
+
 @Component
 export struct EditMemo {
+  @Prop
+  notesText: string = ""
   dialogController: CustomDialogController | null = new CustomDialogController({
     builder: CustomDialogExample({
 
-      inputText:this.notesText,
+      inputText: this.notesText,
       cancel: () => {
         this.onCancel()
       },
-      confirm: (txt:string) => {
+      confirm: (txt: string) => {
         this.onAccept(txt)
       }
     }),
@@ -40,7 +44,6 @@ export struct EditMemo {
       offsetY: 0
     }),
   })
-
   updateMemo: (inputValue: string) => void = (inputValue: string) => {
   }
 
@@ -50,20 +53,20 @@ export struct EditMemo {
   }
 
   onCancel() {
-    console.info('Callback when the first button is clicked')
+    console.info('onCancel')
   }
 
-  onAccept(txt:string) {
-    console.info('Callback when the second button is clicked')
+  onAccept(txt: string) {
+    console.info('onAccept')
 
-    this.notesText=txt;
+    this.notesText = txt;
     //this.memoShowText=this.notesText;
     // if(txt==="")
     // {
     //   this.memoShowText="添加备注"
     // }
 
-     this.updateMemo?.(this.notesText)
+    this.updateMemo?.(this.notesText)
 
   }
 
@@ -71,20 +74,13 @@ export struct EditMemo {
     console.info('Click the callback in the blank area')
   }
 
-
-  @Prop
-  notesText:string=""
-
   //@State
+
   //memoShowText:string="添加备注"
-  getNotesShowText()
-  {
-    if(this.notesText==="")
-    {
+  getNotesShowText() {
+    if (this.notesText === "") {
       return "添加备注"
-    }
-    else
-    {
+    } else {
       return this.notesText;
     }
   }
@@ -94,6 +90,13 @@ export struct EditMemo {
 
     Column() {
       Text(this.getNotesShowText())
+        .width(200)
+        .maxLines(1)
+        .textOverflow(
+          {
+            overflow: TextOverflow.Ellipsis
+          }
+        )
         .margin(
           {
             left: 10,
@@ -101,8 +104,7 @@ export struct EditMemo {
             bottom: 10
           }
         )
-        .fontColor('#888888')
-        //.backgroundColor(Color.Pink)
+        .fontColor('#888888')//.backgroundColor(Color.Pink)
         .onClick(() => {
 
           if (this.dialogController != null) {
@@ -120,12 +122,12 @@ export struct EditMemo {
 @CustomDialog
 struct CustomDialogExample {
   controller?: CustomDialogController
+  @State inputText: string = '';
   cancel: () => void = () => {
 
   }
-  confirm: (txt:string) => void = (txt:string) => {
+  confirm: (txt: string) => void = (txt: string) => {
   }
-  @State inputText: string = '';
 
   build() {
     Column() {
@@ -133,15 +135,23 @@ struct CustomDialogExample {
       Text('添加备注')
         .fontSize(24)
         .height(70)
-      TextArea({ placeholder: '输入内容' ,text:this.inputText}
+      TextArea({ placeholder: '输入内容', text: this.inputText }
+
 
       )
         .defaultFocus(true)
-        .maxLength(100)
+        .maxLength(BizConstants.Max_Memo_char_count)
         .maxLines(5)
         .height(100)
         .id('text2')
-        .onChange(value => this.inputText = value)
+        .onChange(
+
+          value => {
+
+            this.inputText = value
+          }
+
+        )
 
 
       Row({ space: 10 }) {

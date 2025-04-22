@@ -358,8 +358,21 @@ struct WriteRecord {
                           }
                         )
 
-                        Text(item.category_name)
-                          .fontSize(16)
+                        Column() {
+                          Text(item.category_name)
+                            .fontSize(16)
+                          Text(item.notes)
+                            .textOverflow(
+                              {
+                                overflow: TextOverflow.Ellipsis
+                              }
+                            )
+                            .width(150)//  .backgroundColor(Color.Pink)
+                            .maxLines(1)
+                            .fontSize(14)
+                            .fontColor($r("app.color.text_second"))
+                        }.alignItems(HorizontalAlign.Start)
+
                       }.justifyContent(FlexAlign.Start)
                       .padding(
                         {
@@ -385,7 +398,9 @@ struct WriteRecord {
                           .fontSize(14)
 
 
-                      }.width(120)
+                      }.layoutWeight(1)
+                      //.backgroundColor(Color.Yellow)
+                      //.width(120)
                       .alignItems(HorizontalAlign.End)
 
                       .padding(
@@ -400,11 +415,6 @@ struct WriteRecord {
                     .width("100%")
                     .onClick(() => {
 
-                      // promptAction.showToast(
-                      //   {
-                      //     message: "detail"
-                      //   }
-                      // )
                       router.pushUrl(
                         {
                           url: "pages/BillDetail",

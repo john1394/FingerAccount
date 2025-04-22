@@ -198,14 +198,9 @@ struct EditAccount {
 
                   })
 
-                  // this.categoryList =this.getCategoryList();
-                  //DefaultOutcomeCategoryList
-                  //todo list长度要不为空
-                  //this.selectedCategoryName = this.getCategoryList()[0].category_name
                   this.currentItem.category_name = this.getCategoryList()[0].category_name
 
                   this.selectedImageColor = getOutcomeIconBackColor();
-                  //$r("app.color.danger")
 
                 }
                 )
@@ -337,9 +332,7 @@ struct EditAccount {
           selectedImageColor: this.selectedImageColor
         }
 
-      )//.height(250)
-        //.height(230)
-
+      )
         .layoutWeight(1)
 
       //第4行，备注
