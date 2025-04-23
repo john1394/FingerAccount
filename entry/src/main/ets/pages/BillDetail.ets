@@ -123,6 +123,11 @@ struct BillDetail {
               )
 
           }.width("100%")
+          .padding(
+            {
+              left: 10
+            }
+          )
           .justifyContent(FlexAlign.SpaceBetween)
 
           //第二行
@@ -171,7 +176,8 @@ struct BillDetail {
                   right: 10
                 }
               )
-          }.height(60)
+          }
+          //.height(60)
           .width("100%")
           .padding(
             {

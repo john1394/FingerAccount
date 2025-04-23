@@ -18,16 +18,17 @@ export interface DayPair {
   end: Date;
 }
 
-export async function sleepExample() {
+export async function sleepTest() {
   console.log("开始执行");
 
   const a = new Promise<number | void>((resolve) => {
     setTimeout(() => {
 
-      console.log("mylog setTimeout");
+      console.log("mylog", "setTimeout");
+
 
       resolve()
-    }, 2000)
+    }, 3000)
 
   });
 

@@ -14,6 +14,7 @@ import { RoundImage } from './RoundImage'
 import { BudgetStore } from '../utils/BudgetStore'
 import { emitter } from '@kit.BasicServicesKit'
 import { MonthPicker } from '../components/MonthPicker'
+import { BizConstants } from '../utils/BizConstants'
 
 
 @Preview
@@ -21,9 +22,11 @@ import { MonthPicker } from '../components/MonthPicker'
 @Component
 struct WriteRecord {
   @State
-  recordList: RecordItemInfo[] = []
+  searchText: string = ""
   @State
   groupedRecordList: Map<string, RecordItemInfo[]> = new Map();
+  @State
+  groupedRecordListBackup: Map<string, RecordItemInfo[]> = new Map();
   @State
   firstAppear: boolean = false
   @State
@@ -43,19 +46,64 @@ struct WriteRecord {
   @State
   isShowBudgetSheet: boolean = false;
 
+  searchBill(searchText: string) {
+
+    if (searchText === "") {
+      this.loadMonthData(this.currentMonthBegin);
+      this.groupedRecordList = this.groupedRecordListBackup
+      return
+    }
+
+    //this.groupedRecordList = this.groupedRecordListBackup
+
+    let map: Map<string, RecordItemInfo[]> = new Map();
+
+    this.groupedRecordListBackup.forEach((value, key) => {
+
+      value.forEach((item) => {
+
+        let valid: boolean = false
+        if (item.notes.includes(searchText)) {
+          valid = true
+        } else if (item.category_name.includes(searchText)) {
+          valid = true
+        } else {
+          let tempSearchAmount = Number(searchText)
+          if (!Number.isNaN(tempSearchAmount)) {
+            tempSearchAmount = Math.round(tempSearchAmount * 100)
+            if (item.amount >= tempSearchAmount) {
+              valid = true
+            }
+          }
+        }
+
+        if (valid) {
+          if (map.get(key) === undefined) {
+            map.set(key, [])
+          }
+          map.get(key)?.push(item)
+        }
+
+      })
+    })
+
+    //this.groupedRecordList = this.groupedRecordListBackup
+    this.groupedRecordList = map
+
+
+  }
+
   loadMonthData(monthDate: Date) {
 
-    //let dayPair = getMonthBoundaries(this.currentMonthBegin)
     let dayPair = getMonthBoundaries(monthDate)
     let allItems: RecordItemInfo[] =
       DatabaseHelper.getInstance().getBillRecordMonth(dayPair.begin.getTime(), dayPair.end.getTime());
-    //DatabaseHelper.getInstance().getAllBillRecord();
 
     allItems.forEach((item: RecordItemInfo) => {
 
       item.category_image =
         $r(CategoryMapSingleton.getInstance().get(item.category_name, item.bill_type)!.category_image)
-      //$r("app.media.ic_edit")
+
     }
     )
 
@@ -78,12 +126,8 @@ struct WriteRecord {
       this.currentMonthIncome = 0;
     }
 
-
     this.currentMonthSaved = this.currentMonthIncome - this.currentMonthOutcome;
-
     this.groupedRecordList = groupRecordItemInfoByTimestamp(allItems);
-
-
   }
 
   aboutToAppear(): void {
@@ -95,8 +139,10 @@ struct WriteRecord {
     })
 
 
-    let currentMonthBegin = new Date()
-    this.loadMonthData(currentMonthBegin);
+    //let currentMonthBegin = new Date()
+    this.currentMonthBegin = new Date()
+    this.loadMonthData(this.currentMonthBegin);
+    this.groupedRecordListBackup = this.groupedRecordList
     this.getBudgetFromStore()
 
   }
@@ -107,8 +153,9 @@ struct WriteRecord {
     let monthNumber = Number(monthPicked.substring(0, monthPicked.length - 1)) - 1;
 
     if (!Number.isNaN(yearNumber) && !Number.isNaN(monthNumber)) {
-      let currentMonthBegin = new Date(yearNumber, monthNumber, 1)
-      this.loadMonthData(currentMonthBegin);
+      this.currentMonthBegin = new Date(yearNumber, monthNumber, 1)
+      this.loadMonthData(this.currentMonthBegin);
+      this.groupedRecordListBackup = this.groupedRecordList
       this.getBudgetFromStore()
     }
 
@@ -166,26 +213,50 @@ struct WriteRecord {
   build() {
     Column() {
       Column() {
+        Text(this.searchText)
         Row() {
-          Stack({ alignContent: Alignment.End }) {
-            Text("指尖记帐")
-              .fontSize(20)
-              .fontWeight(FontWeight.Bold)
-              .fontColor($r("app.color.text_primary"))
-              .width("100%")
-              .textAlign(TextAlign.Start)
+          Text("指尖记帐")
+            .fontSize(18)
+            .fontWeight(FontWeight.Bold)
+            .fontColor($r("app.color.text_primary"))
+            .textAlign(TextAlign.Start)
+
+          Search({ value: $$this.searchText, placeholder: '输入类别/备注/金额' })
+            .searchButton('搜索')
 
 
-            Image($r("app.media.search_24dp_1F1F1F"))
-              .width(20)
-              .height(20)//.fillColor($r("app.color.white"))
-              .margin({
-                right: 30
-              })
+            .height(40)
+            .backgroundColor('#F5F5F5')
+            .placeholderColor(Color.Grey)
+            .placeholderFont({ size: 14, weight: 400 })
+            .textFont({ size: 14, weight: 400 })
+            .onSubmit((value: string) => {
 
-          }
-          .width("100%")
+              console.log("mylog", "submit", value)
+              this.searchBill(value)
 
+            })
+
+            .onWillInsert((insertVal: InsertValue) => {
+
+              if (this.searchText.length >= BizConstants.Max_Search_char_count) {
+                return false
+              } else {
+                return true
+              }
+            }
+            )
+
+            .onChange((value: string) => {
+              // this.changeValue = value
+              console.log("mylog", "change", value)
+
+              if (value === "") {
+                this.searchBill("")
+              }
+
+            })
+            .layoutWeight(1)
         }
         .padding(
           {
@@ -193,12 +264,11 @@ struct WriteRecord {
           }
         )
         .width("100%")
-        .justifyContent(FlexAlign.End)
+        .justifyContent(FlexAlign.SpaceBetween)
         .height(40)
 
       }.width("100%")
-      //.backgroundColor($r("app.color.start_window_background"))
-      //.backgroundColor("#fff")
+
       .backgroundColor($r("app.color.second_back_color"))
 
       Column()
@@ -226,11 +296,13 @@ struct WriteRecord {
           Row({ space: 10 }) {
             Row() {
 
-              Text("本月支出:")
-                .fontSize(16)
-                .fontColor($r("app.color.text_primary"))
+              // Text("本月支出:")
+              //   .fontSize(16)
+              //   .fontColor($r("app.color.text_primary"))
+
               Text("￥" + (this.currentMonthOutcome / 100).toFixed(2))
                 .fontSize(18).fontWeight(FontWeight.Bold)
+                .fontColor($r("app.color.danger"))
             }.layoutWeight(1)
 
             Row() {
@@ -511,3 +583,23 @@ struct WriteRecord {
 }
 
 export default WriteRecord
+
+
+// Stack({ alignContent: Alignment.End }) {
+//   Text("指尖记帐")
+//     .fontSize(20)
+//     .fontWeight(FontWeight.Bold)
+//     .fontColor($r("app.color.text_primary"))
+//     .width("100%")
+//     .textAlign(TextAlign.Start)
+//
+//
+//   Image($r("app.media.search_24dp_1F1F1F"))
+//     .width(20)
+//     .height(20)//.fillColor($r("app.color.white"))
+//     .margin({
+//       right: 30
+//     })
+//
+// }
+// .width("100%")

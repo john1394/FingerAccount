@@ -7,6 +7,7 @@
     "pages/CategoryManage",
     "pages/MyTestPage",
     "pages/SheetDemo",
-    "pages/test/TestDatePickerPage"
+    "pages/test/TestDatePickerPage",
+    "pages/test/SearchTestPage"
   ]
 }

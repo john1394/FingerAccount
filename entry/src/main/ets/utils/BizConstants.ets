@@ -6,4 +6,5 @@ export class BizConstants {
   static Max_Support_year = 2060
   static Min_Support_year = 2020
   static Max_Memo_char_count = 50
+  static Max_Search_char_count = 20
 }

@@ -23,16 +23,21 @@ export default class EntryAbility extends UIAbility {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onDestroy');
   }
 
-  onWindowStageCreate(windowStage: window.WindowStage): void {
+  async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
 
     BudgetStore.init(this.context)
 
+    //console.log("mylog", "begin call createKVStore")
+    //await CategoryResourceStore.getInstance().createKVStore(this.context)
+    //console.log("mylog", "end call createKVStore")
+
     windowStage.loadContent(
-      'pages/Index'
+        'pages/Index',
       //"pages/test/TestDatePickerPage"
-      , (err) => {
+      //"pages/test/SearchTestPage"
+       (err) => {
       if (err.code) {
         hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
         return;
