@@ -22,6 +22,10 @@ import { BizConstants } from '../utils/BizConstants'
 @Component
 struct WriteRecord {
   @State
+  searchTotalIncome: number = 0
+  @State
+  searchTotalOutcome: number = 0
+  @State
   searchText: string = ""
   @State
   groupedRecordList: Map<string, RecordItemInfo[]> = new Map();
@@ -54,6 +58,9 @@ struct WriteRecord {
     }
 
     this.loadMonthData(this.currentMonthBegin);
+
+    let totalOutCome = 0
+    let totalInCome = 0
     let map: Map<string, RecordItemInfo[]> = new Map();
 
     this.groupedRecordList.forEach((value, key) => {
@@ -80,12 +87,21 @@ struct WriteRecord {
             map.set(key, [])
           }
           map.get(key)?.push(item)
+
+          if (item.bill_type === BillTypeEnum.Outcome) {
+            totalOutCome += item.amount
+          } else if (item.bill_type === BillTypeEnum.Income) {
+            totalInCome = item.amount
+          }
         }
 
       })
     })
 
+
     this.groupedRecordList = map
+    this.searchTotalOutcome = totalOutCome
+    this.searchTotalIncome = totalInCome
 
 
   }
@@ -266,108 +282,132 @@ struct WriteRecord {
 
 
       //第一节
-      Column() {
 
-        Column({ space: 10 }) {
+      if (this.searchText === "") {
+        Column() {
 
-          //月份选择
-          MonthPicker(
-            {
-              // yearPicked: this.yearPicked,
-              //monthPicked: this.monthPicked
-              updateMonthData: (yearPicked, monthPicked) => {
-                this.updateMonthData(yearPicked, monthPicked)
+          Column({ space: 10 }) {
+
+            //月份选择
+            MonthPicker(
+              {
+                // yearPicked: this.yearPicked,
+                //monthPicked: this.monthPicked
+                updateMonthData: (yearPicked, monthPicked) => {
+                  this.updateMonthData(yearPicked, monthPicked)
+                }
               }
+            )
+
+            //行1
+            Row({ space: 10 }) {
+              Row() {
+
+                // Text("本月支出:")
+                //   .fontSize(16)
+                //   .fontColor($r("app.color.text_primary"))
+
+                Text("￥" + (this.currentMonthOutcome / 100).toFixed(2))
+                  .fontSize(18).fontWeight(FontWeight.Bold)
+                  .fontColor($r("app.color.danger"))
+              }.layoutWeight(1)
+
+              Row() {
+
+
+                Text("本月收入:")
+                  .fontSize(16)
+                Text((this.currentMonthIncome / 100).toFixed(2))
+                  .fontSize(14).fontWeight(FontWeight.Bold)
+                  .fontColor(Color.Green)
+
+              }.layoutWeight(1)
+
+            }
+            .width("100%")
+
+            //行2
+            Row({ space: 10 }) {
+              Row() {
+
+                Text("预算剩余:")
+                  .fontSize(16)
+                Text(this.monthBudget === 0 ? "未设置预算" : (this.monthBudgetRemain / 100).toFixed(2))
+                  .fontSize(14).fontWeight(FontWeight.Bold)
+
+
+              }.layoutWeight(1)
+              .onClick(() => {
+
+                this.isShowBudgetSheet = !this.isShowBudgetSheet
+              })
+              .bindSheet($$this.isShowBudgetSheet, this.BudgetSheetBuilder(), {
+                detents: [SheetSize.MEDIUM],
+                preferType: SheetType.CENTER,
+                title: { title: "设置预算" },
+              })
+
+
+              Row() {
+
+                Text("本月结余:")
+                  .fontSize(16)
+                Text("" + (this.currentMonthSaved / 100).toFixed(2))
+                  .fontSize(14).fontWeight(FontWeight.Bold)
+
+              }.layoutWeight(1)
+
+            }.width("100%")
+
+          }
+          .borderRadius(5)
+          .height("100%")
+          .width("100%")
+          .backgroundColor($r("app.color.white"))
+          .padding(
+            {
+              left: 10,
+              top: 10,
+              right: 10,
+              bottom: 10
             }
           )
 
-          //行1
-          Row({ space: 10 }) {
-            Row() {
-
-              // Text("本月支出:")
-              //   .fontSize(16)
-              //   .fontColor($r("app.color.text_primary"))
-
-              Text("￥" + (this.currentMonthOutcome / 100).toFixed(2))
-                .fontSize(18).fontWeight(FontWeight.Bold)
-                .fontColor($r("app.color.danger"))
-            }.layoutWeight(1)
-
-            Row() {
-
-
-              Text("本月收入:")
-                .fontSize(16)
-              Text((this.currentMonthIncome / 100).toFixed(2))
-                .fontSize(14).fontWeight(FontWeight.Bold)
-                .fontColor($r("app.color.text_second"))
-
-            }.layoutWeight(1)
-
-          }
-          .width("100%")
-
-          //行2
-          Row({ space: 10 }) {
-            Row() {
-
-              Text("预算剩余:")
-                .fontSize(16)
-              Text(this.monthBudget === 0 ? "未设置预算" : (this.monthBudgetRemain / 100).toFixed(2))
-                .fontSize(14).fontWeight(FontWeight.Bold)
-
-
-            }.layoutWeight(1)
-            .onClick(() => {
-
-              this.isShowBudgetSheet = !this.isShowBudgetSheet
-            })
-            .bindSheet($$this.isShowBudgetSheet, this.BudgetSheetBuilder(), {
-              detents: [SheetSize.MEDIUM],
-              preferType: SheetType.CENTER,
-              title: { title: "设置预算" },
-            })
-
-
-            Row() {
-
-              Text("本月结余:")
-                .fontSize(16)
-              Text("" + (this.currentMonthSaved / 100).toFixed(2))
-                .fontSize(14).fontWeight(FontWeight.Bold)
-
-            }.layoutWeight(1)
-
-          }.width("100%")
-
         }
-        .borderRadius(5)
-        .height("100%")
+        .height(140)
         .width("100%")
-        .backgroundColor($r("app.color.white"))
         .padding(
           {
             left: 10,
-            top: 10,
             right: 10,
+            top: 10,
             bottom: 10
+          }
+        )
+        .backgroundColor($r("app.color.back_color"))
+
+      } else {
+        //搜索后
+        Row({ space: 20 }) {
+          Text("总支出:" + (this.searchTotalOutcome / 100).toFixed(2))
+            .fontColor($r("app.color.danger"))
+            .fontWeight(FontWeight.Bold)
+            .fontSize(16)
+
+          Text("总收入:" + (this.searchTotalIncome / 100).toFixed(2))
+            .fontColor(Color.Green)
+            .fontWeight(FontWeight.Bold)
+            .fontSize(16)
+        }.width("100%")
+        .justifyContent(FlexAlign.Start)
+        .padding(
+          {
+            left: 40,
+            top: 10
           }
         )
 
       }
-      .height(140)
-      .width("100%")
-      .padding(
-        {
-          left: 10,
-          right: 10,
-          top: 10,
-          bottom: 10
-        }
-      )
-      .backgroundColor($r("app.color.back_color"))
-
 
       //列表
 
