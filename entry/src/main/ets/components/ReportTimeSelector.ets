@@ -38,7 +38,7 @@ export struct ReportTimeSelector {
   }
   updateYearData: () => void = () => {
   }
-  updateTimeRange: (reportTimeRangeEnum: ReportTimeRangeEnum, dayBoundary: DayPair
+  updateTimeRange: (dayBoundary: DayPair
     , isOutput: boolean
   ) => void = () => {
   }
@@ -54,22 +54,20 @@ export struct ReportTimeSelector {
 
     if (this.columns[0].selected) {
       this.dayBoundary = shiftWeek(this.dayBoundary, left);
-      //this.updateWeekData();
-      //this.reportTimeRangeEnum=ReportTimeRangeEnum.Week
-      this.updateTimeRange(this.reportTimeRangeEnum, this.dayBoundary, this.isOutput)
+
+      this.updateTimeRange(this.dayBoundary, this.isOutput)
     } else if (this.columns[1].selected) {
 
       this.dayBoundary = shiftMonth(this.dayBoundary, left);
-      //this.updateMonthData();
-      //this.reportTimeRangeEnum=ReportTimeRangeEnum.Month
-      this.updateTimeRange(this.reportTimeRangeEnum, this.dayBoundary, this.isOutput)
+
+      this.updateTimeRange(this.dayBoundary, this.isOutput)
 
     } else if (this.columns[2].selected) {
       this.dayBoundary = shiftYear(this.dayBoundary, left);
       //this.updateYearData();
 
       // this.reportTimeRangeEnum=ReportTimeRangeEnum.Year
-      this.updateTimeRange(this.reportTimeRangeEnum, this.dayBoundary, this.isOutput)
+      this.updateTimeRange(this.dayBoundary, this.isOutput)
     }
 
     this.fromBeginDateStr = formatDayBoundary(this.dayBoundary);
@@ -108,7 +106,7 @@ export struct ReportTimeSelector {
       this.reportTimeRangeEnum = ReportTimeRangeEnum.Custom
     }
 
-    this.updateTimeRange(this.reportTimeRangeEnum, this.dayBoundary, this.isOutput)
+    this.updateTimeRange(this.dayBoundary, this.isOutput)
     this.fromBeginDateStr = formatDayBoundary(this.dayBoundary);
   }
 
@@ -158,7 +156,7 @@ export struct ReportTimeSelector {
           .onClick(() => {
             this.isOutput = !this.isOutput
             //this.updateReport()
-            this.updateTimeRange(this.reportTimeRangeEnum, this.dayBoundary, this.isOutput)
+            this.updateTimeRange(this.dayBoundary, this.isOutput)
           })
 
 
@@ -194,8 +192,8 @@ export struct ReportTimeSelector {
           .layoutWeight(1)
           .onClick(() => {
             this.isOutput = !this.isOutput
-            //this.updateReport()
-            this.updateTimeRange(this.reportTimeRangeEnum, this.dayBoundary, this.isOutput)
+
+            this.updateTimeRange(this.dayBoundary, this.isOutput)
           })
 
         }
@@ -244,10 +242,8 @@ export struct ReportTimeSelector {
             .justifyContent(FlexAlign.Center)
             .onClick(() => {
 
-              animateTo({ duration: 300 }, () => {
-                this.updateSelectColumn(item);
 
-              })
+              this.updateSelectColumn(item);
 
 
             })
@@ -341,7 +337,7 @@ export struct ReportTimeSelector {
                 // 当弹出框再次弹出时显示选中的是上一次确定的日期
                 this.dayBoundary.begin = new Date(new Date(date.getTime()).setHours(0, 0, 0, 0))
 
-                this.updateTimeRange(this.reportTimeRangeEnum, this.dayBoundary, this.isOutput)
+                this.updateTimeRange(this.dayBoundary, this.isOutput)
               }
             })
           })
@@ -372,7 +368,7 @@ export struct ReportTimeSelector {
               onAccept: (date: Date) => {
                 // 当弹出框再次弹出时显示选中的是上一次确定的日期
                 this.dayBoundary.end = new Date(new Date(date).setHours(23, 59, 59, 999))
-                this.updateTimeRange(this.reportTimeRangeEnum, this.dayBoundary, this.isOutput)
+                this.updateTimeRange(this.dayBoundary, this.isOutput)
               }
             })
           })
