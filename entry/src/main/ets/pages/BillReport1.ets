@@ -68,10 +68,13 @@ struct BillReport {
         {
           reportTimeRangeEnum: this.reportTimeRangeEnum,
 
-          updateTimeRange: (reportTimeRangeEnum: ReportTimeRangeEnum, dayBoundary: DayPair,
+          updateTimeRange: ( dayBoundary: DayPair,
             isOutput: boolean
           ) => {
+            const startTime = systemDateTime.getTime(true);
             this.updateTimeRange(dayBoundary, isOutput)
+
+            console.log(`mylog updateTimeRange 执行时间：${(systemDateTime.getTime(true) - startTime) / 1000} 微秒`);
           }
         }
       )
@@ -172,18 +175,13 @@ struct BillReport {
 
   }
 
-  // formatDayBoundary(boundary: DayPair) {
-  //   //周,月 ，年
-  //   return formatDateYMDHan(boundary.begin) + "-" + formatDateYMDHan(boundary.end);
-  // }
-
   private accountantCalc() {
     const startTime = systemDateTime.getTime(true);
 
     let outComeCategorySum = DatabaseHelper.getInstance()
       .getCategorySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), BillTypeEnum.Outcome
       );
-    let endTime = systemDateTime.getTime(true); // 以纳秒数返回结束时间
+    let endTime = systemDateTime.getTime(true);
 
     const totalOutcome: number = outComeCategorySum.reduce(
       (sum: number, currentItem: CategorySumData) => (sum + currentItem.amount),
