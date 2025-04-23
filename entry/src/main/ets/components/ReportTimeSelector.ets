@@ -243,7 +243,13 @@ export struct ReportTimeSelector {
             .alignItems(HorizontalAlign.Center)
             .justifyContent(FlexAlign.Center)
             .onClick(() => {
-              this.updateSelectColumn(item);
+
+              animateTo({ duration: 300 }, () => {
+                this.updateSelectColumn(item);
+
+              })
+
+
             })
 
           })

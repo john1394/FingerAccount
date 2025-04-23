@@ -50,15 +50,13 @@ struct WriteRecord {
 
     if (searchText === "") {
       this.loadMonthData(this.currentMonthBegin);
-      this.groupedRecordList = this.groupedRecordListBackup
       return
     }
 
-    //this.groupedRecordList = this.groupedRecordListBackup
-
+    this.loadMonthData(this.currentMonthBegin);
     let map: Map<string, RecordItemInfo[]> = new Map();
 
-    this.groupedRecordListBackup.forEach((value, key) => {
+    this.groupedRecordList.forEach((value, key) => {
 
       value.forEach((item) => {
 
@@ -87,7 +85,6 @@ struct WriteRecord {
       })
     })
 
-    //this.groupedRecordList = this.groupedRecordListBackup
     this.groupedRecordList = map
 
 
@@ -134,15 +131,12 @@ struct WriteRecord {
 
     // 订阅
     emitter.on(BudgetStore.budget_key, () => {
-      // this.list = StoreClass.getAllChatLastMessage()
       this.getBudgetFromStore()
     })
 
-
-    //let currentMonthBegin = new Date()
     this.currentMonthBegin = new Date()
     this.loadMonthData(this.currentMonthBegin);
-    this.groupedRecordListBackup = this.groupedRecordList
+
     this.getBudgetFromStore()
 
   }
@@ -155,7 +149,6 @@ struct WriteRecord {
     if (!Number.isNaN(yearNumber) && !Number.isNaN(monthNumber)) {
       this.currentMonthBegin = new Date(yearNumber, monthNumber, 1)
       this.loadMonthData(this.currentMonthBegin);
-      this.groupedRecordListBackup = this.groupedRecordList
       this.getBudgetFromStore()
     }
 
@@ -213,27 +206,22 @@ struct WriteRecord {
   build() {
     Column() {
       Column() {
-        Text(this.searchText)
-        Row() {
+
+        Row({ space: 10 }) {
           Text("指尖记帐")
             .fontSize(18)
             .fontWeight(FontWeight.Bold)
             .fontColor($r("app.color.text_primary"))
             .textAlign(TextAlign.Start)
 
-          Search({ value: $$this.searchText, placeholder: '输入类别/备注/金额' })
-            .searchButton('搜索')
-
-
-            .height(40)
-            .backgroundColor('#F5F5F5')
-            .placeholderColor(Color.Grey)
+          Search({ value: $$this.searchText, placeholder: '输入类别/备注/金额' })//.searchButton('搜索')
+            .height(40)//.backgroundColor('#F5F5F5')//.placeholderColor(Color.Grey)
             .placeholderFont({ size: 14, weight: 400 })
             .textFont({ size: 14, weight: 400 })
             .onSubmit((value: string) => {
 
               console.log("mylog", "submit", value)
-              this.searchBill(value)
+              //this.searchBill(value)
 
             })
 
@@ -248,19 +236,17 @@ struct WriteRecord {
             )
 
             .onChange((value: string) => {
-              // this.changeValue = value
-              console.log("mylog", "change", value)
 
-              if (value === "") {
-                this.searchBill("")
-              }
+              console.log("mylog", "change", value)
+              this.searchBill(this.searchText)
 
             })
             .layoutWeight(1)
         }
         .padding(
           {
-            left: 20
+            left: 10,
+            right: 10
           }
         )
         .width("100%")
@@ -268,12 +254,15 @@ struct WriteRecord {
         .height(40)
 
       }.width("100%")
-
-      .backgroundColor($r("app.color.second_back_color"))
-
-      Column()
-        .height(10)
-        .width("100%")
+      .padding(
+        {
+          left: 10,
+          right: 10,
+          top: 10,
+          bottom: 10
+        }
+      )
+      .backgroundColor($r("app.color.back_color"))
 
 
       //第一节
@@ -583,23 +572,3 @@ struct WriteRecord {
 }
 
 export default WriteRecord
-
-
-// Stack({ alignContent: Alignment.End }) {
-//   Text("指尖记帐")
-//     .fontSize(20)
-//     .fontWeight(FontWeight.Bold)
-//     .fontColor($r("app.color.text_primary"))
-//     .width("100%")
-//     .textAlign(TextAlign.Start)
-//
-//
-//   Image($r("app.media.search_24dp_1F1F1F"))
-//     .width(20)
-//     .height(20)//.fillColor($r("app.color.white"))
-//     .margin({
-//       right: 30
-//     })
-//
-// }
-// .width("100%")

@@ -9,6 +9,12 @@ export function test1() {
 
   console.log(b1)
 
+  let arr1: string[] = []
+
+  let arr2 = arr1
+  let arr3 = [...arr1]
+  arr1.push("1")
+
 
 }
 
