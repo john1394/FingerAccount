@@ -66,13 +66,7 @@ struct BillDetail {
             router.back()
 
           })
-          .zIndex(2)
-          .margin(
-            {
-              left: 10,
-              right: 10
-            }
-          )
+
 
         Text("详情") {
         }.fontSize(20)
@@ -83,20 +77,15 @@ struct BillDetail {
       .backgroundColor($r("app.color.white"))
 
       Column() {
-      }.height(5)
 
-      Column() {
+        Column({ space: 10 }) {
 
-
-        //列表
-
-        Column() {
-
+          //第一行
           Row({ space: 10 }) {
             Row() {
               RoundImage(
                 {
-                  contentWidth: 30,
+                  contentWidth: 24,
                   imageUrl: this.currentItem.category_image,
                   backColor: this.currentItem.bill_type === 0 ? getOutcomeIconBackColor() : getIncomeIconBackColor()
 
@@ -110,78 +99,70 @@ struct BillDetail {
 
               Text(this.currentItem.category_name)
             }
-            //.width("100%")
-            .height(60)
-
-            //.backgroundColor(Color.Pink)
 
             Text(this.formatBillAmount())
-              .margin(
-                {
-                  right: 10
-                }
-              )
+
 
           }.width("100%")
           .padding(
             {
-              left: 10
+              left: 10,
+              right: 10,
+              top: 10,
+              bottom: 10
             }
           )
           .justifyContent(FlexAlign.SpaceBetween)
 
           //第二行
-          Row({ space: 0 }) {
+          Row({ space: 10 }) {
             Text("收支类型")
             Text(this.formatBillTypeName())
-              .margin(
-                {
-                  right: 10
-                }
-              )
-          }.height(60)
-          .width("100%")
-          .padding(
-            {
-              left: 10
-            }
-          )
-          .justifyContent(FlexAlign.SpaceBetween)
-
-          //第三行
-          Row({ space: 0 }) {
-            Text("日期")
-            Text(formatDateYMDHan(new Date(this.currentItem.timestamp)))
-              .margin(
-                {
-                  right: 10
-                }
-              )
-          }.height(60)
-          .width("100%")
-          .padding(
-            {
-              left: 10
-            }
-          )
-          .justifyContent(FlexAlign.SpaceBetween)
-
-          //第四行
-          Row({ space: 0 }) {
-            Text("备注")
-            Text(this.formatMemoText())
-              .width(150)
-              .margin(
-                {
-                  right: 10
-                }
-              )
           }
           //.height(60)
           .width("100%")
           .padding(
             {
-              left: 10
+              left: 10,
+              right: 10,
+              top: 10,
+              bottom: 10
+            }
+          )
+          .justifyContent(FlexAlign.SpaceBetween)
+
+          //第三行
+          Row({ space: 10 }) {
+            Text("日期")
+            Text(formatDateYMDHan(new Date(this.currentItem.timestamp)))
+              .textAlign(TextAlign.End)
+          }
+          .width("100%")
+          .padding(
+            {
+              left: 10,
+              right: 10,
+              top: 10,
+              bottom: 10
+            }
+          )
+          .justifyContent(FlexAlign.SpaceBetween)
+
+          //第四行
+          Row({ space: 10 }) {
+            Text("备注")
+            Text(this.formatMemoText())
+              .width(150)
+              .textAlign(TextAlign.End)
+          }
+          .width("100%")
+          .padding(
+            {
+              left: 10,
+              right: 10,
+              top: 10,
+              bottom: 10
+
             }
           )
           .justifyContent(FlexAlign.SpaceBetween)
@@ -192,7 +173,9 @@ struct BillDetail {
         .padding(
           {
             left: 10,
-            right: 10
+            right: 10,
+            top: 10,
+            bottom: 10
           }
         )
 
@@ -200,7 +183,10 @@ struct BillDetail {
       .padding(
         {
           left: 10,
-          right: 10
+          right: 10,
+          top: 10,
+          bottom: 10
+
         }
       )
 
