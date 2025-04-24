@@ -5,8 +5,7 @@ import { DayPair, getDateDiffInDays, getMonthDiff } from '../utils/Util';
 export struct Accountant {
   @Prop outcome: number;
   @Prop income: number;
-  //@Prop remain: number;
-  //@Prop average: number;
+
   @Prop
   reportTimeRangeEnum: ReportTimeRangeEnum
   @Prop
@@ -15,8 +14,6 @@ export struct Accountant {
   dayBoundary: DayPair;
 
   getAverageValue(): string {
-
-    //let remain = this.income - this.outcome
 
     let count = 0
 

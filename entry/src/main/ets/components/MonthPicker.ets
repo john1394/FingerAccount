@@ -6,18 +6,17 @@ export struct MonthPicker {
   selectYearIndex: number = 0;
   @State
   selectMonthIndex: number = 0;
-
   @State
-  yearPicked: string="";
-
+  yearPicked: string = "";
   @State
-  monthPicked: string="";
+  monthPicked: string = ""
+  @Prop
+  currentMonthBegin: Date;
   private years: string[] = []
   private months: string[] = []
   private line1Height = 60;
   private line2Height = 200;
-
-  updateMonthData: (yearPicked: string, monthPicked: string) => void = (  ) => {
+  updateMonthData: (yearPicked: string, monthPicked: string) => void = () => {
   }
 
   aboutToAppear(): void {
@@ -33,14 +32,14 @@ export struct MonthPicker {
       this.months.push(i.toString() + "月")
     }
 
-    let current = new Date()
+    //let current = new Date()
 
-    let yearIndex = this.years.findIndex(item => item.includes(current.getFullYear().toString()))
+    let yearIndex = this.years.findIndex(item => item.includes(this.currentMonthBegin.getFullYear().toString()))
     if (yearIndex != -1) {
       this.selectYearIndex = yearIndex;
     }
 
-    let monthIndex = this.months.findIndex(item => item.includes((current.getMonth() + 1).toString()))
+    let monthIndex = this.months.findIndex(item => item.includes((this.currentMonthBegin.getMonth() + 1).toString()))
     if (monthIndex != -1) {
       this.selectMonthIndex = monthIndex;
     }

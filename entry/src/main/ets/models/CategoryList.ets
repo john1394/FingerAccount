@@ -12,10 +12,6 @@ export interface CategoryItem {
 }
 
 
-// function getDefaultCategoryMap(): CategoryItem[] {
-//   return DatabaseHelper.getInstance().getCategoryData();
-// }
-
 function getDefaultIncomeCategoryList() {
   let items: CategoryItem[] = [];
 

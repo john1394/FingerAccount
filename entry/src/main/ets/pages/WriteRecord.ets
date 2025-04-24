@@ -91,7 +91,7 @@ struct WriteRecord {
           if (item.bill_type === BillTypeEnum.Outcome) {
             totalOutCome += item.amount
           } else if (item.bill_type === BillTypeEnum.Income) {
-            totalInCome = item.amount
+            totalInCome += item.amount
           }
         }
 
@@ -230,8 +230,12 @@ struct WriteRecord {
             .fontColor($r("app.color.text_primary"))
             .textAlign(TextAlign.Start)
 
-          Search({ value: $$this.searchText, placeholder: '输入类别/备注/金额' })//.searchButton('搜索')
+          Search({
+            value: $$this.searchText, placeholder: '输入类别/备注/金额',
+          })
+            .enableKeyboardOnFocus(false)
             .height(40)//.backgroundColor('#F5F5F5')//.placeholderColor(Color.Grey)
+
             .placeholderFont({ size: 14, weight: 400 })
             .textFont({ size: 14, weight: 400 })
             .onSubmit((value: string) => {
@@ -255,6 +259,11 @@ struct WriteRecord {
 
               console.log("mylog", "change", value)
               this.searchBill(this.searchText)
+
+              if (value === "") {
+
+                this.getUIContext().getFocusController().clearFocus()
+              }
 
             })
             .layoutWeight(1)
@@ -291,8 +300,7 @@ struct WriteRecord {
             //月份选择
             MonthPicker(
               {
-                // yearPicked: this.yearPicked,
-                //monthPicked: this.monthPicked
+                currentMonthBegin: this.currentMonthBegin,
                 updateMonthData: (yearPicked, monthPicked) => {
                   this.updateMonthData(yearPicked, monthPicked)
                 }

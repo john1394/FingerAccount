@@ -21,12 +21,6 @@ struct Index {
       title: '报表',
       selectIcon: $r('app.media.ic_gallery_discover_filled')
     },
-    // {
-    //   icon: $r('app.media.ic_gallery_discover'),
-    //   name: 'bill',
-    //   title: '帐单',
-    //   selectIcon: $r('app.media.ic_gallery_discover_filled')
-    // },
     {
       icon: $r('app.media.ic_public_contacts'),
       name: 'my',

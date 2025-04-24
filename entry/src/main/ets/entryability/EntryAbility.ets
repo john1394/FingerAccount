@@ -1,6 +1,6 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { window } from '@kit.ArkUI';
+import { KeyboardAvoidMode, window } from '@kit.ArkUI';
 import { test1 } from '../utils/Util';
 import { DatabaseHelper } from '../utils/DatabaseHelper';
 import { BudgetStore } from '../utils/BudgetStore';
@@ -34,16 +34,18 @@ export default class EntryAbility extends UIAbility {
     //console.log("mylog", "end call createKVStore")
 
     windowStage.loadContent(
-        'pages/Index',
+      'pages/Index',
       //"pages/test/TestDatePickerPage"
       //"pages/test/SearchTestPage"
-       (err) => {
-      if (err.code) {
-        hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
-        return;
-      }
-      hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
-    });
+      (err) => {
+        if (err.code) {
+          hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
+          return;
+        }
+
+        windowStage.getMainWindowSync().getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.RESIZE)
+        hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
+      });
   }
 
   onWindowStageDestroy(): void {
