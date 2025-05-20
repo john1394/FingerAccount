@@ -142,7 +142,7 @@ struct WriteRecord {
     this.currentMonthSaved = this.currentMonthIncome - this.currentMonthOutcome;
     this.groupedRecordList = groupRecordItemInfoByTimestamp(allItems);
   }
-
+  
   aboutToAppear(): void {
 
     // 订阅

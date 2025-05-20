@@ -11,6 +11,7 @@ import { ReportTimeSelector } from '../components/ReportTimeSelector';
 import { CategoryLineChart, LineCharDataController } from '../components/CategoryLineChart';
 import { Accountant } from '../components/Accountant';
 import { systemDateTime } from '@kit.BasicServicesKit';
+import { taskpool } from '@kit.ArkTS';
 
 
 @Component
@@ -39,8 +40,13 @@ struct BillReport {
     new ColumnData('year', "年", false),
     new ColumnData('custom', "自定义", false),
   ];
+  @State
+  isLoading: boolean = false;
+
+  // timeoutId: number = -1
 
   aboutToAppear(): void {
+    //this.isLoading = true
     let currentDate = new Date();
     this.dayBoundary = getWeekBoundaries(currentDate);
     this.fromBeginDateStr = formatDayBoundary(this.dayBoundary);
@@ -60,6 +66,11 @@ struct BillReport {
 
   }
 
+  aboutToDisappear(): void {
+
+    //clearTimeout(this.timeoutId)
+  }
+
   build() {
 
     Column() {
@@ -68,18 +79,31 @@ struct BillReport {
         {
           reportTimeRangeEnum: this.reportTimeRangeEnum,
 
-          updateTimeRange: ( dayBoundary: DayPair,
+          updateTimeRange: (dayBoundary: DayPair,
             isOutput: boolean
           ) => {
+
             const startTime = systemDateTime.getTime(true);
             this.updateTimeRange(dayBoundary, isOutput)
 
-            console.log(`mylog updateTimeRange 执行时间：${(systemDateTime.getTime(true) - startTime) / 1000} 微秒`);
+
+            console.log(`mylog updateTimeRange 执行时间 cost：${(systemDateTime.getTime(true) - startTime) /
+              1000} 微秒`);
           }
+        , isLoading: this.isLoading
         }
       )
       //.backgroundColor(Color.Orange)
 
+      if (this.isLoading) {
+        Row({ space: 10 }) {
+          LoadingProgress().width(30).height(30)
+          Text("拼命计算中...")
+            .fontSize(12)
+            .fontColor($r("app.color.text_second"))
+        }
+
+      }
       //报表
       Scroll() {
         Column({ space: 10 }) {
@@ -175,7 +199,7 @@ struct BillReport {
 
   }
 
-  private accountantCalc() {
+  private async accountantCalc() {
     const startTime = systemDateTime.getTime(true);
 
     let outComeCategorySum = DatabaseHelper.getInstance()
@@ -188,9 +212,14 @@ struct BillReport {
       0
     );
 
-    let incomeCategorySum = DatabaseHelper.getInstance()
-      .getCategorySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), BillTypeEnum.Income
-      );
+    // let incomeCategorySum = DatabaseHelper.getInstance()
+    //   .getCategorySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), BillTypeEnum.Income
+    //   );
+
+    let incomeCategorySum =
+      await taskpool.execute(new taskpool.Task(getCategorySumAsync, this.dayBoundary.begin.getTime(),
+        this.dayBoundary.end.getTime(), BillTypeEnum.Income)) as CategorySumData[]
+
 
     const totalInCome: number = incomeCategorySum.reduce(
       (sum: number, currentItem: CategorySumData) => (sum + currentItem.amount),
@@ -203,7 +232,35 @@ struct BillReport {
     console.log(`mylog 执行时间：${(endTime - startTime) / 1000} 微秒`);
   }
 
-  private updateTimeRange(dayBoundary: DayPair,
+  // private test1() {
+  //   async () => {
+  //
+  //   };
+  // }
+
+  // private async updateTimeRangeaaa(dayBoundary: DayPair,
+  //   isOutput: boolean
+  // ) {
+  //   await new Promise<void>(resolve => {
+  //   });
+  //
+  //
+  // }
+
+  // private updateTimeRange(dayBoundary: DayPair,
+  //   isOutput: boolean
+  // ) {
+  //
+  //   // setTimeout(() => {
+  //   //
+  //   //   this.updateTimeRangeInner(dayBoundary, isOutput)
+  //   //   this.isLoading = false
+  //   // }, 300)
+  //   this.updateTimeRangeInner(dayBoundary, isOutput)
+  //   //this.isLoading = false
+  // }
+
+  private async updateTimeRange(dayBoundary: DayPair,
     isOutput: boolean
   ) {
 
@@ -214,8 +271,9 @@ struct BillReport {
     this.updateLineCharData(biz_type)
     this.updateCategoryData(biz_type)
 
-    this.accountantCalc();
+    await this.accountantCalc();
 
+    this.isLoading = false
   }
 
   private updateLineCharData(bill_type: BillTypeEnum) {
@@ -263,6 +321,45 @@ struct BillReport {
       ).slice(0, BizConstants.Category_Top10_Limit);
 
   }
+}
+
+@Concurrent
+async function getCategorySumAsync(begin: number, end: number, bill_type: BillTypeEnum) {
+  // let pro=  await new Promise<string>((resolve) => {
+  //   setTimeout(() => {
+  //
+  //     return resolve("result text" );
+  //   }, 2000);
+  // });
+
+  let pro = await new Promise<CategorySumData[]>((resolve) => {
+    // setTimeout(() => {
+    //
+    //   let incomeCategorySum = DatabaseHelper.getInstance()
+    //     .getCategorySum(begin, end, bill_type
+    //     );
+    //
+    //   resolve(incomeCategorySum)
+    //
+    // }, 2000);
+
+    let incomeCategorySum = DatabaseHelper.getInstance()
+      .getCategorySum(begin, end, bill_type
+      );
+    resolve(incomeCategorySum)
+  });
+
+  return pro
+
+  setTimeout(() => {
+    let incomeCategorySum = DatabaseHelper.getInstance()
+      .getCategorySum(begin, end, bill_type
+      );
+
+    return incomeCategorySum
+  }, 3000);
+
+
 }
 
 export default BillReport

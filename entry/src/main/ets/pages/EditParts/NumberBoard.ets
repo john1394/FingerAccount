@@ -1,6 +1,7 @@
 import { promptAction } from '@kit.ArkUI';
+import { BizConstants } from '../../utils/BizConstants';
 
-const MaxNumber: number = 100000000;
+//const MaxNumber: number = 100000000;
 
 @Component
 export struct NumberBoard {
@@ -166,7 +167,7 @@ export struct NumberBoard {
     let targetNumber: number = Number(targetValue)
 
     //每天不超过1个小目标
-    if (targetNumber > MaxNumber) {
+    if (targetNumber > BizConstants.MaxNumber) {
 
       return
     }

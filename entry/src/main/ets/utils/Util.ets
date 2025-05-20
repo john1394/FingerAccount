@@ -2,6 +2,7 @@ import { BillTypeEnum, RecordItemInfo } from '../models/RecordList';
 
 export function test1() {
 
+let o1:Record<string,string>={"a":"b"}
 
   let a2 = 22.00;
 

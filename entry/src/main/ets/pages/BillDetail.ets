@@ -9,8 +9,9 @@ import { formatDateYMDHan, formatFen, getIncomeIconBackColor, getOutcomeIconBack
 @Component
 struct BillDetail {
   @State showDialog: boolean = false // 控制对话框显示
-  @Prop
-  currentItem: RecordItemInfo;
+  //@Prop
+  @State
+  currentItem: RecordItemInfo = {} as RecordItemInfo;
 
   aboutToAppear(): void {
 

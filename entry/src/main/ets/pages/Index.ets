@@ -1,5 +1,5 @@
 import { TabBarClass } from '../models/tab'
-import BillReport1 from './BillReport1'
+import BillReport from './BillReport'
 import My from './My'
 import WriteRecord from './WriteRecord'
 
@@ -60,7 +60,7 @@ struct Index {
             if (item.name === "WriteRecord") {
               WriteRecord()
             } else if (item.name === "report") {
-              BillReport1()
+              BillReport()
             } else if (item.name === "my") {
               My()
             }

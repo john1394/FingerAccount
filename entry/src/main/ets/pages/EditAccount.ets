@@ -18,20 +18,23 @@ import {
   trimEndZero
 } from '../utils/Util'
 import { BillTypeEnum, RecordItemInfo } from '../models/RecordList'
+import { BizConstants } from '../utils/BizConstants'
 
 @Entry
 @Component
 struct EditAccount {
   @State
   categoryList: CategoryItem[] = [];
-  @Prop
-  selectedImageColor: ResourceColor;
+  //@Prop
+  @State
+  selectedImageColor: ResourceColor = BizConstants.SelectedOutComeCategoryIconBackColor;
   @State
   inputAmountStr: string = "0"
   @State
   selectedDate: Date = new Date;
-  @Prop
-  currentItem: RecordItemInfo;
+  //@Prop
+  @State
+  currentItem: RecordItemInfo = {} as RecordItemInfo;
   updateSelectCategory = (name: string, image: string) => {
 
     this.currentItem.category_name = name;

@@ -30,6 +30,8 @@ export struct ReportTimeSelector {
   fromBeginDateStr: string = "";
   @Prop
   dayBoundary: DayPair;
+  @Link
+  isLoading: boolean;
   updateReport: () => void = () => {
   }
   updateWeekData: () => void = () => {
@@ -51,6 +53,8 @@ export struct ReportTimeSelector {
       console.log("not support time range")
       return
     }
+
+    this.isLoading = true
 
     if (this.columns[0].selected) {
       this.dayBoundary = shiftWeek(this.dayBoundary, left);
@@ -75,6 +79,7 @@ export struct ReportTimeSelector {
 
   updateSelectColumn(selectedItem: ColumnData) {
 
+    this.isLoading = true
     let newColumns: ColumnData[] = [];
 
     this.columns.forEach((item) => {
@@ -155,7 +160,8 @@ export struct ReportTimeSelector {
           .layoutWeight(1)
           .onClick(() => {
             this.isOutput = !this.isOutput
-            //this.updateReport()
+
+            this.isLoading = true
             this.updateTimeRange(this.dayBoundary, this.isOutput)
           })
 
@@ -192,7 +198,7 @@ export struct ReportTimeSelector {
           .layoutWeight(1)
           .onClick(() => {
             this.isOutput = !this.isOutput
-
+            this.isLoading = true
             this.updateTimeRange(this.dayBoundary, this.isOutput)
           })
 
@@ -263,6 +269,8 @@ export struct ReportTimeSelector {
         }
       ).width("100%")
       .height(60)
+
+      //.enabled(this.isSelectEnabled)
 
 
       //第三行
@@ -336,7 +344,7 @@ export struct ReportTimeSelector {
               onAccept: (date: Date) => {
                 // 当弹出框再次弹出时显示选中的是上一次确定的日期
                 this.dayBoundary.begin = new Date(new Date(date.getTime()).setHours(0, 0, 0, 0))
-
+                this.isLoading = true
                 this.updateTimeRange(this.dayBoundary, this.isOutput)
               }
             })
@@ -366,6 +374,8 @@ export struct ReportTimeSelector {
                 borderRadius: 10
               },
               onAccept: (date: Date) => {
+
+                this.isLoading = true
                 // 当弹出框再次弹出时显示选中的是上一次确定的日期
                 this.dayBoundary.end = new Date(new Date(date).setHours(23, 59, 59, 999))
                 this.updateTimeRange(this.dayBoundary, this.isOutput)
