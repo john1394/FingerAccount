@@ -155,23 +155,30 @@ struct BillReport {
 
           //折线图
           if (this.reportTimeRangeEnum !== ReportTimeRangeEnum.Custom) {
-            CategoryLineChart(
+
+            Column() {
+              CategoryLineChart(
+                {
+
+                  lineChartData: this.lineChartData,
+                  lineCharDataController: this.lineCharDataController
+                }
+
+              )
+            }.width("100%")
+
+            .padding(
               {
-                // reportTimeRangeEnum: this.reportTimeRangeEnum,
-                // dayBoundary: this.dayBoundary,
-                // bill_type: BillTypeEnum.Outcome,
-                lineChartData: this.lineChartData,
-                lineCharDataController: this.lineCharDataController
+                left: 10,
+                right: 10
               }
             )
+
           }
-          // .visibility(Visibility.None)
 
           //第五行 饼图
           Column() {
-            // Text("类别饼图")
-            //   .backgroundColor($r("app.color.white"))
-            //   .width("100%")
+
             CategoryPieChart
             (
               {
@@ -182,18 +189,15 @@ struct BillReport {
               .backgroundColor($r("app.color.white"))// .height(280)
               .borderRadius(8)
               .padding(10)
-              .height(280)
+            // .height(280)
           }
           .width("100%")
-          //.height(280)
           .padding(
             {
               left: 10,
               right: 10
             }
           )
-
-          //.visibility(Visibility.None)
 
 
           //第6行 排行列表
@@ -211,13 +215,9 @@ struct BillReport {
           .padding(10)
 
         }.width("100%")
-
         .padding(10)
 
-        //.backgroundColor(Color.Pink)
-
       }
-      // .backgroundColor(Color.Pink)
       .scrollable(ScrollDirection.Vertical)
       .scrollBar(BarState.Off)
       .width("100%")

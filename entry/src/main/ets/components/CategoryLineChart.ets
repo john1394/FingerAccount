@@ -75,11 +75,27 @@ export struct CategoryLineChart {
   build() {
     //第四行 折线图
     Column() {
+      Row({ space: 5 }) {
+        Image($r("app.media.category_pie"))
+          .width(24)
+          .aspectRatio(1)
+        Text("折线图")
+          .fontSize(14)
+          .fontWeight(FontWeight.Bold)
+      }.width("100%")
+      .padding(
+        {
+          left: 10,
+          top: 5
+
+        }
+      )
+
+      // .backgroundColor($r("app.color.white"))
+
       McLineChart({
         options: this.lineOption
       })
-        .borderRadius(8)
-        .backgroundColor($r("app.color.white"))
         .padding(
           {
             left: 10,
@@ -88,9 +104,12 @@ export struct CategoryLineChart {
             top: 10
           }
         )
-    }
-    .height(240)
-    .padding(10)
+        .height(240)
+        .borderRadius(8)
+
+    }.width("100%")
+    .backgroundColor($r("app.color.white"))
+    .borderRadius(8)
 
   }
 

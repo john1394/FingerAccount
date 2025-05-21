@@ -9,6 +9,8 @@ export class PieDataController {
 @Component
 export struct CategoryPieChart {
   controller: PieDataController = new PieDataController();
+  @State
+  isPieVisible: boolean = true
   @Link
   pieData: PieData[];
   @State legendOption: Options = new Options({
@@ -91,9 +93,12 @@ export struct CategoryPieChart {
             .fontWeight(FontWeight.Bold)
         }.width("100%")
 
+
         McPieChart({
           options: this.legendOption
         })
+          .height(280)
+          .visibility(this.isPieVisible ? Visibility.Visible : Visibility.None)
 
 
       }
@@ -103,6 +108,12 @@ export struct CategoryPieChart {
   }
 
   private updateData = (value: PieData[]) => {
+    if (value.length === 0) {
+      this.isPieVisible = false
+    } else {
+      this.isPieVisible = true
+    }
+
     this.legendOption.setVal(
       {
         series: [
