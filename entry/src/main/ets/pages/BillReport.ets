@@ -15,6 +15,7 @@ import {
   formatDayBoundary,
   getDateDiffInDays,
   getWeekBoundaries,
+  mockLongTime,
   roundAmountFen2Yuan
 } from '../utils/Util';
 import { DatabaseHelper } from '../utils/DatabaseHelper';
@@ -335,20 +336,7 @@ struct BillReport {
         xData: xData,
         interval: interval
       }
-    //ui
-    // this.lineOption.setVal({
-    //
-    //   series: [
-    //     {
-    //       name: yTitle,
-    //       data: yShowNumber
-    //     }
-    //   ],
-    //   xAxis:
-    //   {
-    //     data: xData
-    //   }
-    // })
+
   }
 
   private async accountantCalc() {
@@ -368,7 +356,7 @@ struct BillReport {
     //totalInCome;
     console.log(`mylog 执行时间：${(systemDateTime.getTime(true) - startTime) / 1000} 微秒`);
 
-    //await mockLongTime(1)
+
   }
 
   private async updateTimeRange(dayBoundary: DayPair,
@@ -395,6 +383,7 @@ struct BillReport {
     //排行榜
     this.updateTopListData(categorySum, bill_type)
 
+    await mockLongTime(300)
 
     this.isLoading = false
   }

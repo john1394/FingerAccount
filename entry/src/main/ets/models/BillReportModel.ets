@@ -6,10 +6,10 @@ export enum ReportTimeRangeEnum {
 }
 
 export interface LineChartData {
-  yTitle:string,
-  yShowNumber:number[] ,
+  yTitle: string,
+  yShowNumber: number[],
   xData: string[],
-  interval:number
+  interval: number
 
 }
 
@@ -52,6 +52,7 @@ export class ColumnData {
   selectedBackColor: ResourceColor = Color.Black
   unSelectedFontColor: ResourceColor = Color.Black
   unSelectedBackColor: ResourceColor = $r("app.color.back_color")
+  selectedDisabledBackColor: ResourceColor = Color.Gray
   selected: boolean = false;
 
   constructor(uid: string, txt: string, selected: boolean) {
@@ -69,9 +70,17 @@ export class ColumnData {
   }
 
 
-  getBackColor(): ResourceColor {
+  getBackColor(isLoading:boolean): ResourceColor {
     if (this.selected) {
-      return this.selectedBackColor;
+      if(!isLoading)
+      {
+        return this.selectedBackColor;
+      }
+      else
+      {
+        return this.selectedDisabledBackColor
+      }
+
     } else {
       return this.unSelectedBackColor;
     }

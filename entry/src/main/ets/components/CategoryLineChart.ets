@@ -33,9 +33,8 @@ export struct CategoryLineChart {
       animation: true,
       series: [
         {
-          //todo name
+
           name: this.lineChartData.yTitle,
-          //(this.bill_type === BillTypeEnum.Outcome ? "支出金额" : "收入金额"),
           label:
           {
             fontSize: 36,
@@ -73,7 +72,6 @@ export struct CategoryLineChart {
 
   }
 
-
   build() {
     //第四行 折线图
     Column() {
@@ -102,7 +100,7 @@ export struct CategoryLineChart {
     this.lineOption.setVal(
 
       {
-        animation: true,
+        animation: false,
         series: [
           {
 

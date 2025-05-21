@@ -132,6 +132,7 @@ export struct ReportTimeSelector {
             Text("支出")
               .fontSize(18)
               .fontWeight(FontWeight.Bold)
+              .fontColor(this.isLoading ? Color.Gray : Color.Black)
               .margin(
                 {
                   top: 10
@@ -150,7 +151,7 @@ export struct ReportTimeSelector {
                 bottom: 5
               }
             )
-            .backgroundColor(this.isOutput ? Color.Black : Color.Transparent)
+            .backgroundColor(this.isOutput ? (this.isLoading ? Color.Gray : Color.Black) : Color.Transparent)
           }
           .height("100%")
           .alignItems(HorizontalAlign.Center)
@@ -164,12 +165,14 @@ export struct ReportTimeSelector {
             this.isLoading = true
             this.updateTimeRange(this.dayBoundary, this.isOutput)
           })
+          .enabled(!this.isLoading)
 
 
           Column() {
             Text("收入")
               .fontSize(18)
               .fontWeight(FontWeight.Bold)
+              .fontColor(this.isLoading ? Color.Gray : Color.Black)
               .margin(
                 {
                   top: 10
@@ -188,7 +191,7 @@ export struct ReportTimeSelector {
                 bottom: 5
               }
             )
-            .backgroundColor(!this.isOutput ? Color.Black : Color.Transparent)
+            .backgroundColor(!this.isOutput ? (this.isLoading ? Color.Gray : Color.Black) : Color.Transparent)
           }
           .height("100%")
           .alignItems(HorizontalAlign.Center)
@@ -201,6 +204,7 @@ export struct ReportTimeSelector {
             this.isLoading = true
             this.updateTimeRange(this.dayBoundary, this.isOutput)
           })
+          .enabled(!this.isLoading)
 
         }
         .width("150vp")
@@ -226,7 +230,8 @@ export struct ReportTimeSelector {
                 .fontSize(18)
                 .fontWeight(FontWeight.Normal)
             }
-            .backgroundColor(item.getBackColor())
+            .backgroundColor(item.getBackColor(this.isLoading))
+
             .width("100%")
             .height("100%")
             .borderWidth(
@@ -253,6 +258,7 @@ export struct ReportTimeSelector {
 
 
             })
+            .enabled(!this.isLoading)
 
           })
 
@@ -270,24 +276,27 @@ export struct ReportTimeSelector {
       ).width("100%")
       .height(60)
 
-      //.enabled(this.isSelectEnabled)
-
 
       //第三行
 
       if (this.reportTimeRangeEnum !== ReportTimeRangeEnum.Custom) {
         Row() {
           Column() {
-            Image($r("app.media.arrow_circle_left_48dp_000000"))
-              .width(35)
-              .height(35)
-          }.height("100%")
+            Image(this.isLoading ? $r("app.media.arrow_left_circle_disable") : $r("app.media.arrow_left_circle"))
+              .width(30)
+              .height(30)
+
+
+          }
+          .height("100%")
           .justifyContent(FlexAlign.Center)
           .layoutWeight(1)
           .onClick(() => {
 
             this.shiftDate(true);
           })
+
+          //.enabled(false)
 
 
           Column() {
@@ -298,9 +307,9 @@ export struct ReportTimeSelector {
 
 
           Column() {
-            Image($r("app.media.arrow_circle_right_48dp_000000"))
-              .width(40)
-              .height(40)
+            Image(this.isLoading ? $r("app.media.arrow_right_circle_disable") : $r("app.media.arrow_right_circle"))
+              .width(30)
+              .height(30)
           }.height("100%")
           .justifyContent(FlexAlign.Center)
           .layoutWeight(1)
@@ -321,11 +330,13 @@ export struct ReportTimeSelector {
           { space: 10 }
         ) {
 
-          Row() {
+          Row({ space: 3 }) {
             Text(formatDateYMDHan(this.dayBoundary.begin))
-            Image($r("sys.media.ohos_ic_public_arrow_down"))
-              .width(20)
-              .height(20)
+              .fontColor(this.isLoading ? $r("app.color.text_second") : $r("app.color.text_primary"))
+            Image(this.isLoading ? $r("app.media.arrowtriangle_down_fill_disable") :
+            $r("app.media.arrowtriangle_down_fill"))
+              .width(16)
+              .height(16)
           }.onClick(() => {
             CalendarPickerDialog.show({
               selected: this.dayBoundary.begin,
@@ -353,11 +364,14 @@ export struct ReportTimeSelector {
 
           Text("~")
 
-          Row() {
+          Row({ space: 3 }) {
             Text(formatDateYMDHan(this.dayBoundary.end))
-            Image($r("sys.media.ohos_ic_public_arrow_down"))
-              .width(20)
-              .height(20)
+              .fontColor(this.isLoading ? $r("app.color.text_second") : $r("app.color.text_primary"))
+            //Image($r("sys.media.ohos_ic_public_arrow_down"))
+            Image(this.isLoading ? $r("app.media.arrowtriangle_down_fill_disable") :
+            $r("app.media.arrowtriangle_down_fill"))
+              .width(16)
+              .height(16)
           }.onClick(() => {
             CalendarPickerDialog.show({
               selected: this.dayBoundary.end,

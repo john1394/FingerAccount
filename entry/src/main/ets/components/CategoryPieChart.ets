@@ -13,7 +13,7 @@ export struct CategoryPieChart {
   pieData: PieData[];
   @State legendOption: Options = new Options({
 
-    animation: true,
+    animation: false,
     // title: {
     //   show: false,
     //   text: '类别',
