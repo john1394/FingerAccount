@@ -5,6 +5,14 @@ export enum ReportTimeRangeEnum {
   Custom = 3
 }
 
+export interface LineChartData {
+  yTitle:string,
+  yShowNumber:number[] ,
+  xData: string[],
+  interval:number
+
+}
+
 export interface CategoryListData {
   categoryName: string,
   categoryImage: ResourceStr,

@@ -1,6 +1,22 @@
-import { CategoryListData, CategorySumData, ColumnData, PieData, ReportTimeRangeEnum } from '../models/BillReportModel';
+import {
+  CategoryListData,
+  CategorySumData,
+  ColumnData,
+  LineChartData,
+  PieData,
+  ReportTimeRangeEnum,
+  SumData
+} from '../models/BillReportModel';
 import { Options } from '@mcui/mccharts';
-import { DayPair, formatDayBoundary, getWeekBoundaries } from '../utils/Util';
+import {
+  DayPair,
+  formatDateYM1,
+  formatDateYMD1,
+  formatDayBoundary,
+  getDateDiffInDays,
+  getWeekBoundaries,
+  roundAmountFen2Yuan
+} from '../utils/Util';
 import { DatabaseHelper } from '../utils/DatabaseHelper';
 import { BillTypeEnum } from '../models/RecordList';
 import { CategoryPieChart, PieDataController } from '../components/CategoryPieChart';
@@ -16,6 +32,15 @@ import { taskpool } from '@kit.ArkTS';
 
 @Component
 struct BillReport {
+  @State
+  lineChartData: LineChartData = {
+
+    yTitle: "支出金额",
+    yShowNumber: [],
+    xData: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+    interval: 5
+
+  } as LineChartData;
   @Prop totalOutcome: number;
   @Prop totalIncome: number;
   pieDataController: PieDataController = new PieDataController();
@@ -131,9 +156,10 @@ struct BillReport {
           if (this.reportTimeRangeEnum !== ReportTimeRangeEnum.Custom) {
             CategoryLineChart(
               {
-                reportTimeRangeEnum: this.reportTimeRangeEnum,
-                dayBoundary: this.dayBoundary,
-                bill_type: BillTypeEnum.Outcome,
+                // reportTimeRangeEnum: this.reportTimeRangeEnum,
+                // dayBoundary: this.dayBoundary,
+                // bill_type: BillTypeEnum.Outcome,
+                lineChartData: this.lineChartData,
                 lineCharDataController: this.lineCharDataController
               }
             )
@@ -199,6 +225,132 @@ struct BillReport {
 
   }
 
+  public updateLineChartData(dayBoundary: DayPair, bill_type: BillTypeEnum, reportTimeRangeEnum: ReportTimeRangeEnum) {
+
+    let interval: number = 5
+
+    let sumData: SumData[] = []
+    let map: Map<string, number> = new Map<string, number>();
+
+    let xData: string[] = []
+    let yData: number[] = [];
+
+    if (reportTimeRangeEnum === ReportTimeRangeEnum.Week) {
+
+      interval = 0
+      sumData = DatabaseHelper.getInstance()
+        .getDaySum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type);
+      sumData.map(u => {
+        map.set(u.timeBase, u.amount);
+      });
+
+      for (let i = 0; i < 7; i++) {
+        yData.push(0);
+      }
+
+      for (let i = 0; i < 7; i++) {
+        let dateItem: Date = new Date(dayBoundary.begin);
+        dateItem.setDate(dateItem.getDate() + i);
+
+        let dateStr = formatDateYMD1(dateItem);
+        if (map.has(dateStr)) {
+          yData[i] = map.get(dateStr) ?? 0;
+        }
+      }
+
+      xData = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+
+    } else if (reportTimeRangeEnum === ReportTimeRangeEnum.Month) {
+      interval = 5
+
+      sumData = DatabaseHelper.getInstance()
+        .getDaySum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type);
+      sumData.map(u => {
+        map.set(u.timeBase, u.amount);
+      });
+
+      let dayCount: number = getDateDiffInDays(new Date(dayBoundary.begin.getTime())
+        , new Date(dayBoundary.end.getTime()))
+
+      for (let i = 0; i < dayCount; i++) {
+        xData.push(i.toString());
+      }
+
+      for (let i = 0; i < dayCount; i++) {
+        yData.push(0);
+      }
+
+      for (let i = 0; i < dayCount; i++) {
+        let dateItem: Date = new Date(dayBoundary.begin);
+        dateItem.setDate(dateItem.getDate() + i);
+
+        let dateStr = formatDateYMD1(dateItem);
+        if (map.has(dateStr)) {
+          yData[i] = map.get(dateStr) ?? 0;
+        }
+      }
+
+    } else if (reportTimeRangeEnum === ReportTimeRangeEnum.Year) {
+      interval = 1
+
+      sumData =
+        DatabaseHelper.getInstance()
+          .getMonthSum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type);
+      sumData.map(u => {
+        map.set(u.timeBase, u.amount);
+      });
+
+      let monthCount: number = 12
+      for (let i = 0; i < monthCount; i++) {
+        xData.push((i + 1).toString() + "月");
+      }
+
+      for (let i = 0; i < monthCount; i++) {
+        yData.push(0);
+      }
+
+      for (let i = 0; i < monthCount; i++) {
+        let dateItem: Date = new Date(dayBoundary.begin);
+        dateItem.setMonth(dateItem.getMonth() + i);
+
+        let dateStr = formatDateYM1(dateItem);
+        if (map.has(dateStr)) {
+          yData[i] = map.get(dateStr) ?? 0;
+        }
+      }
+    }
+
+    let yShowNumber: number[] = []
+    yData.forEach((item) => {
+      yShowNumber.push(roundAmountFen2Yuan(item));
+    })
+
+
+    let yTitle = bill_type === BillTypeEnum.Outcome ? "支出金额" : "收入金额";
+
+    this.lineChartData =
+      {
+        yTitle: yTitle,
+        yShowNumber: yShowNumber,
+        xData: xData,
+        interval: interval
+      }
+    //ui
+    // this.lineOption.setVal({
+    //
+    //   series: [
+    //     {
+    //       name: yTitle,
+    //       data: yShowNumber
+    //     }
+    //   ],
+    //   xAxis:
+    //   {
+    //     data: xData
+    //   }
+    // })
+  }
+
   private async accountantCalc() {
     const startTime = systemDateTime.getTime(true);
 
@@ -234,11 +386,11 @@ struct BillReport {
     await this.accountantCalc();
 
     //折线图
-    this.updateLineCharData(bill_type)
+    this.updateLineChartData(this.dayBoundary, bill_type, this.reportTimeRangeEnum)
+    this.lineCharDataController.updateData(this.lineChartData);
 
     //饼图
-    this.updateCategoryData(categorySum, bill_type)
-    this.pieDataController.updateData(this.pieData);
+    this.updateCategoryData(categorySum)
 
     //排行榜
     this.updateTopListData(categorySum, bill_type)
@@ -274,12 +426,7 @@ struct BillReport {
       ).slice(0, BizConstants.Category_Top10_Limit);
   }
 
-  private updateLineCharData(bill_type: BillTypeEnum) {
-
-    this.lineCharDataController.updateData(this.dayBoundary, bill_type, this.reportTimeRangeEnum);
-  }
-
-  private updateCategoryData(categorySum: CategorySumData[], bill_type: BillTypeEnum) {
+  private updateCategoryData(categorySum: CategorySumData[]) {
 
     this.pieData = categorySum.map(item => ({
       value: item.amount / 100,
@@ -289,6 +436,7 @@ struct BillReport {
       .sort((a, b) => (b.value - a.value))
       .slice(0, BizConstants.Category_TOP5_Limit);
 
+    this.pieDataController.updateData(this.pieData);
   }
 }
 

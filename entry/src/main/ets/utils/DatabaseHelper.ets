@@ -96,7 +96,6 @@ const SQL_index1 = "CREATE INDEX idx_bills_timestamp ON bills(timestamp); " +
 export class DatabaseHelper {
   private static instance: DatabaseHelper = new DatabaseHelper();
   private rdbStore: relationalStore.RdbStore | null = null;
-  private initPromise: Promise<void> | null = null; // 用于确保初始化只执行一次
 
   private constructor() {
   }
