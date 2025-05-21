@@ -2,7 +2,7 @@ import { BillTypeEnum, RecordItemInfo } from '../models/RecordList';
 
 export function test1() {
 
-let o1:Record<string,string>={"a":"b"}
+  let o1: Record<string, string> = { "a": "b" }
 
   let a2 = 22.00;
 
@@ -24,6 +24,29 @@ export interface DayPair {
   begin: Date;
   end: Date;
 }
+
+export async function mockLongTime(ms: number): Promise<string> {
+  let pro = await new Promise<string>((resolve) => {
+    setTimeout(() => {
+
+
+      return resolve("result text");
+    }, ms);
+  });
+
+  return pro
+}
+
+export class DayPairImp implements DayPair {
+  begin: Date;
+  end: Date;
+
+  constructor(begin: Date, end: Date) {
+    this.begin = begin;
+    this.end = end;
+  }
+}
+
 
 export async function sleepTest() {
   console.log("开始执行");

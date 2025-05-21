@@ -2,19 +2,20 @@ import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.Ab
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { KeyboardAvoidMode, window } from '@kit.ArkUI';
 import { test1 } from '../utils/Util';
-import { DatabaseHelper } from '../utils/DatabaseHelper';
 import { BudgetStore } from '../utils/BudgetStore';
+import { DatabaseHelper } from '../utils/DatabaseHelper';
 
 const DOMAIN = 0x0000;
 
 export default class EntryAbility extends UIAbility {
-  onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+  async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
     this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
 
     test1();
 
-    DatabaseHelper.getInstance().initDatabase(this.context)
+    // const appContext = this.context.getApplicationContext();
+    await DatabaseHelper.getInstance().initDatabase(this.context)
 
 
   }

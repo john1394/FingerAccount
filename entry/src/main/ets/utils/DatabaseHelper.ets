@@ -93,17 +93,20 @@ const SQL_index1 = "CREATE INDEX idx_bills_timestamp ON bills(timestamp); " +
   "CREATE INDEX idx_bills_category ON bills(category);  " +
   "CREATE INDEX idx_aggregations_date ON aggregations(date_key);"
 
-
 export class DatabaseHelper {
-  private static instance: DatabaseHelper;
+  private static instance: DatabaseHelper = new DatabaseHelper();
   private rdbStore: relationalStore.RdbStore | null = null;
   private initPromise: Promise<void> | null = null; // 用于确保初始化只执行一次
+
+  private constructor() {
+  }
 
   // 确保单例模式线程安全
   public static getInstance(): DatabaseHelper {
     if (!DatabaseHelper.instance) {
       DatabaseHelper.instance = new DatabaseHelper();
     }
+
     return DatabaseHelper.instance;
   }
 
@@ -576,77 +579,57 @@ export class DatabaseHelper {
       return; // 已初始化，直接返回
     }
 
-    if (!this.initPromise) {
+    const STORE_CONFIG: relationalStore.StoreConfig = {
+      name: db_file_name,
+      securityLevel: relationalStore.SecurityLevel.S1,
+      encrypt: false,
+      customDir: db_file_dir,
+      isReadOnly: false,
+    };
 
-      this.initPromise = (async () => {
-        const STORE_CONFIG: relationalStore.StoreConfig = {
-          name: db_file_name,
-          securityLevel: relationalStore.SecurityLevel.S1,
-          encrypt: false,
-          customDir: db_file_dir,
-          isReadOnly: false,
-        };
+    try {
 
-        try {
-          const store = await this.getRdbStorePromise(context, STORE_CONFIG);
+      const store = await relationalStore.getRdbStore(context, STORE_CONFIG)
 
-          // 处理数据库版本和表结构
-          if (store.version === 0) {
-            // 初始版本，创建表结构
+      // 处理数据库版本和表结构
+      if (store.version === 0) {
+        // 初始版本，创建表结构
 
-            let lines = init_category_data_sql.split(";");
+        let lines = init_category_data_sql.split(";");
 
-            lines = lines.filter(line => line.trim() != ""
-            )
-            store.executeSync(SQL_CREATE_TABLE);
-            store.executeSync(SQL2);
-            store.executeSync(SQL_index1);
-            //初始化数据
-            store.executeSync(init_category_table_sql);
+        lines = lines.filter(line => line.trim() != ""
+        )
+        store.executeSync(SQL_CREATE_TABLE);
+        store.executeSync(SQL2);
+        store.executeSync(SQL_index1);
+        //初始化数据
+        store.executeSync(init_category_table_sql);
 
 
-            lines.forEach((line) => {
+        lines.forEach((line) => {
 
-              console.log(line);
-              store.executeSync(line);
-            })
+          console.log(line);
+          store.executeSync(line);
+        })
 
 
-            store.version = 1;
-          }
+        store.version = 1;
+      }
 
-          // 示例版本升级逻辑，根据需求调整
-          if (store.version === 1) {
-            // 升级到版本2
-            // store.executeSql('ALTER TABLE EMPLOYEE ADD COLUMN AGE INTEGER');
-            // store.version = 2;
-          }
+      // 示例版本升级逻辑，根据需求调整
+      if (store.version === 1) {
+        // 升级到版本2
+        // store.executeSql('ALTER TABLE EMPLOYEE ADD COLUMN AGE INTEGER');
+        // store.version = 2;
+      }
 
-          // 设置当前数据库实例
-          this.rdbStore = store;
-        } catch (error) {
-          console.error('初始化数据库失败:', error);
-          // throw  new Error(error)
+      // 设置当前数据库实例
+      this.rdbStore = store;
+    } catch (error) {
+      console.error('初始化数据库失败:', error);
+      // throw  new Error(error)
 
-        }
-      })
-      ()
-      ;
     }
 
-    await this.initPromise;
-  }
-
-  private async getRdbStorePromise(context: Context,
-    config: relationalStore.StoreConfig): Promise<relationalStore.RdbStore> {
-    return new Promise((resolve, reject) => {
-      relationalStore.getRdbStore(context, config, (err, store) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(store);
-        }
-      });
-    });
   }
 }

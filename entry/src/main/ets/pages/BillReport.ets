@@ -202,63 +202,22 @@ struct BillReport {
   private async accountantCalc() {
     const startTime = systemDateTime.getTime(true);
 
-    let outComeCategorySum = DatabaseHelper.getInstance()
-      .getCategorySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), BillTypeEnum.Outcome
-      );
-    let endTime = systemDateTime.getTime(true);
+    let dayPair: DayPair =
+      {
+        begin: this.dayBoundary.begin,
+        end: this.dayBoundary.end
+      }
 
-    const totalOutcome: number = outComeCategorySum.reduce(
-      (sum: number, currentItem: CategorySumData) => (sum + currentItem.amount),
-      0
-    );
+    let total =
+      await taskpool.execute(new taskpool.Task(accountantCalcAsync, dayPair, getContext(this))) as number[]
+    this.totalOutcome = total[0]
+    //totalOutcome;
+    this.totalIncome = total[1]
+    //totalInCome;
+    console.log(`mylog 执行时间：${(systemDateTime.getTime(true) - startTime) / 1000} 微秒`);
 
-    // let incomeCategorySum = DatabaseHelper.getInstance()
-    //   .getCategorySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), BillTypeEnum.Income
-    //   );
-
-    let incomeCategorySum =
-      await taskpool.execute(new taskpool.Task(getCategorySumAsync, this.dayBoundary.begin.getTime(),
-        this.dayBoundary.end.getTime(), BillTypeEnum.Income)) as CategorySumData[]
-
-
-    const totalInCome: number = incomeCategorySum.reduce(
-      (sum: number, currentItem: CategorySumData) => (sum + currentItem.amount),
-      0
-    );
-
-    this.totalOutcome = totalOutcome;
-    this.totalIncome = totalInCome;
-
-    console.log(`mylog 执行时间：${(endTime - startTime) / 1000} 微秒`);
+    //await mockLongTime(1)
   }
-
-  // private test1() {
-  //   async () => {
-  //
-  //   };
-  // }
-
-  // private async updateTimeRangeaaa(dayBoundary: DayPair,
-  //   isOutput: boolean
-  // ) {
-  //   await new Promise<void>(resolve => {
-  //   });
-  //
-  //
-  // }
-
-  // private updateTimeRange(dayBoundary: DayPair,
-  //   isOutput: boolean
-  // ) {
-  //
-  //   // setTimeout(() => {
-  //   //
-  //   //   this.updateTimeRangeInner(dayBoundary, isOutput)
-  //   //   this.isLoading = false
-  //   // }, 300)
-  //   this.updateTimeRangeInner(dayBoundary, isOutput)
-  //   //this.isLoading = false
-  // }
 
   private async updateTimeRange(dayBoundary: DayPair,
     isOutput: boolean
@@ -266,35 +225,29 @@ struct BillReport {
 
     this.dayBoundary = dayBoundary
     this.isOutput = isOutput
-    let biz_type = isOutput ? BillTypeEnum.Outcome : BillTypeEnum.Income
-
-    this.updateLineCharData(biz_type)
-    this.updateCategoryData(biz_type)
-
-    await this.accountantCalc();
-
-    this.isLoading = false
-  }
-
-  private updateLineCharData(bill_type: BillTypeEnum) {
-
-    this.lineCharDataController.updateData(this.dayBoundary, bill_type, this.reportTimeRangeEnum);
-  }
-
-  private updateCategoryData(bill_type: BillTypeEnum) {
+    let bill_type = isOutput ? BillTypeEnum.Outcome : BillTypeEnum.Income
     let categorySum = DatabaseHelper.getInstance()
       .getCategorySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), bill_type
       );
 
-    this.pieData = categorySum.map(item => ({
-      value: item.amount / 100,
-      name: item.category // 将 category 映射为 name
-    } as PieData
-    ))
-      .sort((a, b) => (b.value - a.value))
-      .slice(0, BizConstants.Category_TOP5_Limit);
+    //收支统计
+    await this.accountantCalc();
 
+    //折线图
+    this.updateLineCharData(bill_type)
+
+    //饼图
+    this.updateCategoryData(categorySum, bill_type)
     this.pieDataController.updateData(this.pieData);
+
+    //排行榜
+    this.updateTopListData(categorySum, bill_type)
+
+
+    this.isLoading = false
+  }
+
+  private updateTopListData(categorySum: CategorySumData[], bill_type: BillTypeEnum) {
 
     const totalAmount: number = categorySum.reduce(
       (sum: number, currentItem: CategorySumData) =>
@@ -319,45 +272,71 @@ struct BillReport {
       )
       ).sort((a, b) => (b.amount - a.amount)
       ).slice(0, BizConstants.Category_Top10_Limit);
+  }
+
+  private updateLineCharData(bill_type: BillTypeEnum) {
+
+    this.lineCharDataController.updateData(this.dayBoundary, bill_type, this.reportTimeRangeEnum);
+  }
+
+  private updateCategoryData(categorySum: CategorySumData[], bill_type: BillTypeEnum) {
+
+    this.pieData = categorySum.map(item => ({
+      value: item.amount / 100,
+      name: item.category // 将 category 映射为 name
+    } as PieData
+    ))
+      .sort((a, b) => (b.value - a.value))
+      .slice(0, BizConstants.Category_TOP5_Limit);
 
   }
 }
 
+
 @Concurrent
-async function getCategorySumAsync(begin: number, end: number, bill_type: BillTypeEnum) {
-  // let pro=  await new Promise<string>((resolve) => {
-  //   setTimeout(() => {
-  //
-  //     return resolve("result text" );
-  //   }, 2000);
-  // });
+async function accountantCalcAsync(dayBoundary: DayPair, context: Context): Promise<number[]> {
 
-  let pro = await new Promise<CategorySumData[]>((resolve) => {
-    // setTimeout(() => {
-    //
-    //   let incomeCategorySum = DatabaseHelper.getInstance()
-    //     .getCategorySum(begin, end, bill_type
-    //     );
-    //
-    //   resolve(incomeCategorySum)
-    //
-    // }, 2000);
+  await DatabaseHelper.getInstance().initDatabase(context)
+  let outComeCategorySum = DatabaseHelper.getInstance()
+    .getCategorySum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), BillTypeEnum.Outcome
+    );
 
-    let incomeCategorySum = DatabaseHelper.getInstance()
-      .getCategorySum(begin, end, bill_type
-      );
-    resolve(incomeCategorySum)
-  });
+  const totalOutcome: number = outComeCategorySum.reduce(
+    (sum: number, currentItem: CategorySumData) => (sum + currentItem.amount),
+    0
+  );
 
-  return pro
+  let incomeCategorySum = DatabaseHelper.getInstance()
+    .getCategorySum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), BillTypeEnum.Income
+    );
 
-  setTimeout(() => {
-    let incomeCategorySum = DatabaseHelper.getInstance()
-      .getCategorySum(begin, end, bill_type
-      );
+  const totalInCome: number = incomeCategorySum.reduce(
+    (sum: number, currentItem: CategorySumData) => (sum + currentItem.amount),
+    0
+  );
 
-    return incomeCategorySum
-  }, 3000);
+  let result: number[] = [];
+
+  result.push(totalOutcome)
+  result.push(totalInCome)
+
+
+  return result
+
+
+}
+
+
+@Concurrent
+function getCategorySumAsync1(dayBoundary: DayPair): number[] {
+
+
+  let result: number[] = [];
+
+  // result.push(totalOutcome)
+  //result.push(totalInCome)
+
+  return result
 
 
 }
