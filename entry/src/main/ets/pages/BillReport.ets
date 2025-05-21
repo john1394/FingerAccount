@@ -169,6 +169,9 @@ struct BillReport {
 
           //第五行 饼图
           Column() {
+            // Text("类别饼图")
+            //   .backgroundColor($r("app.color.white"))
+            //   .width("100%")
             CategoryPieChart
             (
               {
@@ -179,9 +182,10 @@ struct BillReport {
               .backgroundColor($r("app.color.white"))// .height(280)
               .borderRadius(8)
               .padding(10)
+              .height(280)
           }
           .width("100%")
-          .height(280)
+          //.height(280)
           .padding(
             {
               left: 10,

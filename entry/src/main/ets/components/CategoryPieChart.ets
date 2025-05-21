@@ -16,7 +16,7 @@ export struct CategoryPieChart {
     animation: false,
     // title: {
     //   show: false,
-    //   text: '类别',
+    //   text: '类别饼图',
     //   left: 15,
     //   top: 25,
     //   textStyle: { fontSize: 50 }
@@ -82,6 +82,15 @@ export struct CategoryPieChart {
 
 
       Column() {
+        Row({ space: 5 }) {
+          Image($r("app.media.category_pie"))
+            .width(24)
+            .aspectRatio(1)
+          Text("类别饼图")
+            .fontSize(14)
+            .fontWeight(FontWeight.Bold)
+        }.width("100%")
+
         McPieChart({
           options: this.legendOption
         })

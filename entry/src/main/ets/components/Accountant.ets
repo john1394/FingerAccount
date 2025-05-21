@@ -67,6 +67,8 @@ export struct Accountant {
           .width(24)
           .aspectRatio(1)
         Text("收支统计")
+          .fontSize(14)
+          .fontWeight(FontWeight.Bold)
       }.width("100%")
 
       Row() {
