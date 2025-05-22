@@ -41,7 +41,9 @@ export struct CategoryPieChart {
     //     fontSize: 38
     //   }
     // },
-
+    legend: {
+      show: false
+    },
 
     tooltip: {
       borderColor: '#f72659f5',

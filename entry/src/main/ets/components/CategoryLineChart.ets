@@ -43,7 +43,9 @@ export struct CategoryLineChart {
         }
       ],
       yAxis: {
-        name: yAxisText
+        name: yAxisText,
+        nameTextStyle:
+        { fontSize: 36 }
       },
       xAxis:
       {
@@ -76,7 +78,7 @@ export struct CategoryLineChart {
     //第四行 折线图
     Column() {
       Row({ space: 5 }) {
-        Image($r("app.media.category_pie"))
+        Image($r("app.media.route_plan"))
           .width(24)
           .aspectRatio(1)
         Text("折线图")
@@ -120,6 +122,11 @@ export struct CategoryLineChart {
 
       {
         animation: false,
+        legend:
+        {
+          show: false
+        },
+
         series: [
           {
 
@@ -133,7 +140,12 @@ export struct CategoryLineChart {
           }
         ],
         yAxis: {
-          name: yAxisText
+          name: yAxisText,
+          axisLabel:
+          {
+
+            fontSize: 36
+          }
         },
         xAxis:
         {

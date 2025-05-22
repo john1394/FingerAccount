@@ -1,6 +1,7 @@
 import {
+  AccountantData,
+  BillReportData,
   CategoryListData,
-  CategorySumData,
   ColumnData,
   LineChartData,
   PieData,
@@ -15,20 +16,19 @@ import {
   formatDayBoundary,
   getDateDiffInDays,
   getWeekBoundaries,
-  mockLongTime,
   roundAmountFen2Yuan
 } from '../utils/Util';
 import { DatabaseHelper } from '../utils/DatabaseHelper';
 import { BillTypeEnum } from '../models/RecordList';
 import { CategoryPieChart, PieDataController } from '../components/CategoryPieChart';
 import { CategoryTopList } from '../components/CategoryTopList';
-import CategoryMapSingleton from '../models/CategoryMapSingleton';
 import { BizConstants } from '../utils/BizConstants';
 import { ReportTimeSelector } from '../components/ReportTimeSelector';
 import { CategoryLineChart, LineCharDataController } from '../components/CategoryLineChart';
 import { Accountant } from '../components/Accountant';
 import { systemDateTime } from '@kit.BasicServicesKit';
 import { taskpool } from '@kit.ArkTS';
+import { getAccountantData, getCategoryData, getLineChartData, getTopListData } from '../utils/BillReportBiz';
 
 
 @Component
@@ -39,7 +39,7 @@ struct BillReport {
     yTitle: "支出金额",
     yShowNumber: [],
     xData: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
-    interval: 5
+    interval: 0
 
   } as LineChartData;
   @Prop totalOutcome: number;
@@ -69,10 +69,8 @@ struct BillReport {
   @State
   isLoading: boolean = false;
 
-  // timeoutId: number = -1
-
   aboutToAppear(): void {
-    //this.isLoading = true
+
     let currentDate = new Date();
     this.dayBoundary = getWeekBoundaries(currentDate);
     this.fromBeginDateStr = formatDayBoundary(this.dayBoundary);
@@ -94,7 +92,6 @@ struct BillReport {
 
   aboutToDisappear(): void {
 
-    //clearTimeout(this.timeoutId)
   }
 
   build() {
@@ -109,12 +106,11 @@ struct BillReport {
             isOutput: boolean
           ) => {
 
-            const startTime = systemDateTime.getTime(true);
             this.updateTimeRange(dayBoundary, isOutput)
 
 
-            console.log(`mylog updateTimeRange 执行时间 cost：${(systemDateTime.getTime(true) - startTime) /
-              1000} 微秒`);
+            // console.log(`mylog updateTimeRange 执行时间 cost：${(systemDateTime.getTime(true) - startTime) /
+            //   1000} 微秒`);
           }
         , isLoading: this.isLoading
         }
@@ -151,6 +147,21 @@ struct BillReport {
                 right: 10
               }
             )
+
+
+          //第6行 排行列表
+          Column() {
+            CategoryTopList(
+              {
+                categoryList: this.categoryTopList
+              }
+
+            )
+              .backgroundColor($r("app.color.white"))// .backgroundColor(Color.Gray)
+              .borderRadius(8)
+          }
+          .width("100%")
+          .padding(10)
 
 
           //折线图
@@ -198,21 +209,6 @@ struct BillReport {
               right: 10
             }
           )
-
-
-          //第6行 排行列表
-          Column() {
-            CategoryTopList(
-              {
-                categoryList: this.categoryTopList
-              }
-
-            )
-              .backgroundColor($r("app.color.white"))// .backgroundColor(Color.Gray)
-              .borderRadius(8)
-          }
-          .width("100%")
-          .padding(10)
 
         }.width("100%")
         .padding(10)
@@ -343,141 +339,74 @@ struct BillReport {
 
   }
 
-  private async accountantCalc() {
-    const startTime = systemDateTime.getTime(true);
+  private async updateTimeRange(dayBoundary: DayPair,
+    isOutput: boolean
+  ) {
+    const startTime = systemDateTime.getTime(false);
+    this.dayBoundary = dayBoundary
+    this.isOutput = isOutput
+    let bill_type = isOutput ? BillTypeEnum.Outcome : BillTypeEnum.Income
+
+    let reportTimeRangeEnum = this.reportTimeRangeEnum
 
     let dayPair: DayPair =
       {
         begin: this.dayBoundary.begin,
         end: this.dayBoundary.end
       }
-
+    let context: Context = getContext(this)
     let total =
-      await taskpool.execute(new taskpool.Task(accountantCalcAsync, dayPair, getContext(this))) as number[]
-    this.totalOutcome = total[0]
-    //totalOutcome;
-    this.totalIncome = total[1]
-    //totalInCome;
-    console.log(`mylog 执行时间：${(systemDateTime.getTime(true) - startTime) / 1000} 微秒`);
-
-
-  }
-
-  private async updateTimeRange(dayBoundary: DayPair,
-    isOutput: boolean
-  ) {
-
-    this.dayBoundary = dayBoundary
-    this.isOutput = isOutput
-    let bill_type = isOutput ? BillTypeEnum.Outcome : BillTypeEnum.Income
-    let categorySum = DatabaseHelper.getInstance()
-      .getCategorySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), bill_type
-      );
-
+      await taskpool.execute(new taskpool.Task(getReportDataTaskPool, dayPair, bill_type, reportTimeRangeEnum,
+        context)) as BillReportData
     //收支统计
-    await this.accountantCalc();
-
+    this.totalOutcome = total.accountantData.outcome
+    this.totalIncome = total.accountantData.income
     //折线图
-    this.updateLineChartData(this.dayBoundary, bill_type, this.reportTimeRangeEnum)
-    this.lineCharDataController.updateData(this.lineChartData);
 
+    this.lineCharDataController.updateData(total.lineChartData);
     //饼图
-    this.updateCategoryData(categorySum)
-
+    // this.pieDataController.updateData(total.pieData);
     //排行榜
-    this.updateTopListData(categorySum, bill_type)
 
-    await mockLongTime(300)
+    this.categoryTopList = total.categoryListData
+
+    let duration = systemDateTime.getTime(false) - startTime
+    let mockSleepMs = 250
+    let sleepMs = 200 - duration
+    console.log(`mylog duration  cost：${duration} ms,sleepMs:${sleepMs}}`);
+    if (duration > 20) {
+
+      // await mockLongTime(mockSleepMs)
+    }
+
 
     this.isLoading = false
   }
-
-  private updateTopListData(categorySum: CategorySumData[], bill_type: BillTypeEnum) {
-
-    const totalAmount: number = categorySum.reduce(
-      (sum: number, currentItem: CategorySumData) =>
-      (sum + currentItem.amount),
-      0
-    );
-
-    this.categoryTopList =
-      categorySum.map(item =>
-      (
-        {
-          categoryName: item.category,
-          categoryImage: $r(`app.media.${CategoryMapSingleton.getInstance()
-            .get(item.category, bill_type)?.category_image}`),
-          percentValue: totalAmount > 0 ? item.amount * 100 / totalAmount : 0,
-          count: item.rows,
-          amount: item.amount,
-          imageBackColor: bill_type === BillTypeEnum.Income ? BizConstants.SelectedIncomeCategoryIconBackColor :
-          BizConstants.SelectedOutComeCategoryIconBackColor
-
-        } as CategoryListData
-      )
-      ).sort((a, b) => (b.amount - a.amount)
-      ).slice(0, BizConstants.Category_Top10_Limit);
-  }
-
-  private updateCategoryData(categorySum: CategorySumData[]) {
-
-    this.pieData = categorySum.map(item => ({
-      value: item.amount / 100,
-      name: item.category // 将 category 映射为 name
-    } as PieData
-    ))
-      .sort((a, b) => (b.value - a.value))
-      .slice(0, BizConstants.Category_TOP5_Limit);
-
-    this.pieDataController.updateData(this.pieData);
-  }
 }
 
 
 @Concurrent
-async function accountantCalcAsync(dayBoundary: DayPair, context: Context): Promise<number[]> {
-
+async function getReportDataTaskPool(dayBoundary: DayPair,
+  bill_type: BillTypeEnum, reportTimeRangeEnum: ReportTimeRangeEnum,
+  context: Context): Promise<BillReportData> {
   await DatabaseHelper.getInstance().initDatabase(context)
-  let outComeCategorySum = DatabaseHelper.getInstance()
-    .getCategorySum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), BillTypeEnum.Outcome
+  let categorySum = DatabaseHelper.getInstance()
+    .getCategorySum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type
     );
 
-  const totalOutcome: number = outComeCategorySum.reduce(
-    (sum: number, currentItem: CategorySumData) => (sum + currentItem.amount),
-    0
-  );
+  let accountantData: AccountantData = getAccountantData(dayBoundary, context)
+  let lineChartData: LineChartData = getLineChartData(dayBoundary, bill_type, reportTimeRangeEnum)
+  let pieData: PieData[] = getCategoryData(categorySum)
 
-  let incomeCategorySum = DatabaseHelper.getInstance()
-    .getCategorySum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), BillTypeEnum.Income
-    );
+  //console.log("mylog get1")
 
-  const totalInCome: number = incomeCategorySum.reduce(
-    (sum: number, currentItem: CategorySumData) => (sum + currentItem.amount),
-    0
-  );
+  let categoryListData: CategoryListData[] = getTopListData(categorySum, bill_type)
 
-  let result: number[] = [];
+  let billReportData: BillReportData =
+    new BillReportData(accountantData, lineChartData, pieData, categoryListData)
 
-  result.push(totalOutcome)
-  result.push(totalInCome)
-
-
-  return result
-
-
-}
-
-
-@Concurrent
-function getCategorySumAsync1(dayBoundary: DayPair): number[] {
-
-
-  let result: number[] = [];
-
-  // result.push(totalOutcome)
-  //result.push(totalInCome)
-
-  return result
+  //console.log("mylog get2")
+  return billReportData
 
 
 }

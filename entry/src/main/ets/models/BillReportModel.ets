@@ -22,6 +22,28 @@ export interface CategoryListData {
   imageBackColor: ResourceColor
 }
 
+export class BillReportData {
+  accountantData: AccountantData
+  lineChartData: LineChartData
+  pieData: PieData[]
+  categoryListData: CategoryListData[]
+
+  constructor(accountantData: AccountantData,
+    lineChartData: LineChartData,
+    pieData: PieData[],
+    categoryListData: CategoryListData[]
+  ) {
+    this.accountantData = accountantData;
+    this.lineChartData = lineChartData;
+    this.pieData = pieData;
+    this.categoryListData = categoryListData;
+  }
+}
+
+export interface AccountantData {
+  outcome: number,
+  income: number,
+}
 
 export interface PieData {
   value: number,
@@ -70,14 +92,11 @@ export class ColumnData {
   }
 
 
-  getBackColor(isLoading:boolean): ResourceColor {
+  getBackColor(isLoading: boolean): ResourceColor {
     if (this.selected) {
-      if(!isLoading)
-      {
+      if (!isLoading) {
         return this.selectedBackColor;
-      }
-      else
-      {
+      } else {
         return this.selectedDisabledBackColor
       }
 

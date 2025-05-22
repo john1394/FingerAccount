@@ -414,3 +414,7 @@ export function getDateAtMidnight(date: Date) {
   return result;
 }
 
+
+export async function test3() {
+
+}
