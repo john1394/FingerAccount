@@ -365,7 +365,7 @@ struct BillReport {
 
     this.lineCharDataController.updateData(total.lineChartData);
     //饼图
-    // this.pieDataController.updateData(total.pieData);
+    this.pieDataController.updateData(total.pieData);
     //排行榜
 
     this.categoryTopList = total.categoryListData
