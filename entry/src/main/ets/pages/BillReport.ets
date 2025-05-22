@@ -164,29 +164,6 @@ struct BillReport {
           .padding(10)
 
 
-          //折线图
-          if (this.reportTimeRangeEnum !== ReportTimeRangeEnum.Custom) {
-
-            Column() {
-              CategoryLineChart(
-                {
-
-                  lineChartData: this.lineChartData,
-                  lineCharDataController: this.lineCharDataController
-                }
-
-              )
-            }.width("100%")
-
-            .padding(
-              {
-                left: 10,
-                right: 10
-              }
-            )
-
-          }
-
           //第五行 饼图
           Column() {
 
@@ -209,6 +186,26 @@ struct BillReport {
               right: 10
             }
           )
+
+
+          //折线图
+          if (this.reportTimeRangeEnum !== ReportTimeRangeEnum.Custom) {
+            Column() {
+              CategoryLineChart(
+                {
+                  lineChartData: this.lineChartData,
+                  lineCharDataController: this.lineCharDataController
+                }
+              )
+            }.width("100%")
+            .padding(
+              {
+                left: 10,
+                right: 10
+              }
+            ).visibility(Visibility.None)
+          }
+
 
         }.width("100%")
         .padding(10)
@@ -342,6 +339,7 @@ struct BillReport {
   private async updateTimeRange(dayBoundary: DayPair,
     isOutput: boolean
   ) {
+
     const startTime = systemDateTime.getTime(false);
     this.dayBoundary = dayBoundary
     this.isOutput = isOutput
@@ -362,8 +360,8 @@ struct BillReport {
     this.totalOutcome = total.accountantData.outcome
     this.totalIncome = total.accountantData.income
     //折线图
-
-    this.lineCharDataController.updateData(total.lineChartData);
+    let dbDuration = systemDateTime.getTime(false) - startTime
+    //  this.lineCharDataController.updateData(total.lineChartData);
     //饼图
     this.pieDataController.updateData(total.pieData);
     //排行榜
@@ -371,10 +369,10 @@ struct BillReport {
     this.categoryTopList = total.categoryListData
 
     let duration = systemDateTime.getTime(false) - startTime
-    let mockSleepMs = 250
-    let sleepMs = 200 - duration
-    console.log(`mylog duration  cost：${duration} ms,sleepMs:${sleepMs}}`);
-    if (duration > 20) {
+    //  let mockSleepMs = 250
+    // let sleepMs = 200 - duration
+    console.log(`mylog duration  cost：${duration} ms,dbDuration:${dbDuration}`);
+    if (dbDuration > 20) {
 
       // await mockLongTime(mockSleepMs)
     }
