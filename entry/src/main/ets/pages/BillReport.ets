@@ -1,8 +1,8 @@
 import {
   AccountantData,
-  BillReportData,
   CategoryListData,
   ColumnData,
+  IBillReportData,
   LineChartData,
   PieData,
   ReportTimeRangeEnum,
@@ -355,7 +355,7 @@ struct BillReport {
     let context: Context = getContext(this)
     let total =
       await taskpool.execute(new taskpool.Task(getReportDataTaskPool, dayPair, bill_type, reportTimeRangeEnum,
-        context)) as BillReportData
+        context)) as IBillReportData
     //收支统计
     this.totalOutcome = total.accountantData.outcome
     this.totalIncome = total.accountantData.income
@@ -386,7 +386,7 @@ struct BillReport {
 @Concurrent
 async function getReportDataTaskPool(dayBoundary: DayPair,
   bill_type: BillTypeEnum, reportTimeRangeEnum: ReportTimeRangeEnum,
-  context: Context): Promise<BillReportData> {
+  context: Context): Promise<IBillReportData> {
   await DatabaseHelper.getInstance().initDatabase(context)
   let categorySum = DatabaseHelper.getInstance()
     .getCategorySum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type
@@ -396,14 +396,15 @@ async function getReportDataTaskPool(dayBoundary: DayPair,
   let lineChartData: LineChartData = getLineChartData(dayBoundary, bill_type, reportTimeRangeEnum)
   let pieData: PieData[] = getCategoryData(categorySum)
 
-  //console.log("mylog get1")
-
   let categoryListData: CategoryListData[] = getTopListData(categorySum, bill_type)
 
-  let billReportData: BillReportData =
-    new BillReportData(accountantData, lineChartData, pieData, categoryListData)
+  let billReportData: IBillReportData = {
+    accountantData: accountantData,
+    lineChartData: lineChartData,
+    pieData: pieData,
+    categoryListData: categoryListData
+  }
 
-  //console.log("mylog get2")
   return billReportData
 
 

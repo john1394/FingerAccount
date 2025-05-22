@@ -22,6 +22,15 @@ export interface CategoryListData {
   imageBackColor: ResourceColor
 }
 
+export interface  IBillReportData {
+  accountantData: AccountantData,
+  lineChartData: LineChartData,
+  pieData: PieData[],
+  categoryListData: CategoryListData[]
+
+
+}
+
 export class BillReportData {
   accountantData: AccountantData
   lineChartData: LineChartData
