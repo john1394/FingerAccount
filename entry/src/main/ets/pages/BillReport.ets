@@ -33,8 +33,7 @@ import {
   getBarReportData,
   getCategoryData,
   getLineChartData,
-  getTopListData,
-  mockBarData
+  getTopListData
 } from '../utils/BillReportBiz';
 import { router } from '@kit.ArkUI';
 
@@ -181,7 +180,7 @@ struct BillReport {
               }
             )
 
-          //排行列表
+          //排行榜
           Column() {
             CategoryTopList(
               {
@@ -193,7 +192,12 @@ struct BillReport {
               .borderRadius(8)
           }
           .width("100%")
-          .padding(10)
+          .padding(
+            {
+              left: 10,
+              right: 10
+            }
+          )
           .visibility(Visibility.Visible)
 
 
@@ -229,7 +233,7 @@ struct BillReport {
                 Image($r("app.media.route_plan"))
                   .width(24)
                   .aspectRatio(1)
-                Text("更多图形")
+                Text("更多图表")
                   .fontSize(14)
                   .fontWeight(FontWeight.Bold)
               }
@@ -237,8 +241,9 @@ struct BillReport {
               .padding(
                 {
                   left: 10,
-                  top: 5
-
+                  right: 10,
+                  top: 10,
+                  bottom: 10
                 }
               )
               .onClick(
@@ -264,12 +269,16 @@ struct BillReport {
         }.width("100%")
         .padding(10)
 
+        //
+
       }
       .scrollable(ScrollDirection.Vertical)
       .scrollBar(BarState.Off)
       .width("100%")
       //非常重要,解决了scroll不适应的问题!!!
       .layoutWeight(1)
+      //.backgroundColor(Color.Pink)
+      .align(Alignment.Top)
 
     }
     .width("100%")
@@ -417,12 +426,13 @@ struct BillReport {
 
     let dbDuration = systemDateTime.getTime(false) - startTime
 
-    //更多图形
+    //更多图表
     this.barDefOption =
       getBarReportData(total.lineChartData)
 
     this.categoryTopList = total.categoryListData
 
+    this.pieDataController.updateData(total.pieData)
     let duration = systemDateTime.getTime(false) - startTime
 
     console.log(`mylog duration  cost：${duration} ms,dbDuration:${dbDuration}`);
