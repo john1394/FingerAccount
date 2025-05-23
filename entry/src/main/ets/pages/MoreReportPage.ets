@@ -7,9 +7,27 @@ import { TimeBarChart } from '../components/TimeBarChart';
 struct MoreReportPage {
   @State message: string = 'Hello World';
   @State
-  barDefOption: Options = {} as Options
+  barDefOption: Options = new Options({
+    title: {
+      show: true,
+      text: '数据',
+      right: 20,
+      top: 30
+    },
+    xAxis: {
+      data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+    },
+    yAxis: {
+      name: '元'
+    },
+    series: [
+      {
+        data: [11, 11, 15, 13, 12, 130, 10]
+      }
+    ]
+  })
   @State
-  isVisible: boolean = false
+  isVisible: boolean = true
 
   aboutToAppear(): void {
 
@@ -54,7 +72,8 @@ struct MoreReportPage {
               isVisible: this.isVisible
             }
           )
-        }.visibility(this.isVisible ? Visibility.Visible : Visibility.None)
+        }
+        .visibility(this.isVisible ? Visibility.Visible : Visibility.None)
 
       }.width("100%")
       .padding(10)
