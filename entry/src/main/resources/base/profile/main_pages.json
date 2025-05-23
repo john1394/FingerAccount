@@ -8,6 +8,7 @@
     "pages/MyTestPage",
     "pages/SheetDemo",
     "pages/test/TestDatePickerPage",
-    "pages/test/SearchTestPage"
+    "pages/test/SearchTestPage",
+    "pages/MoreReportPage"
   ]
 }

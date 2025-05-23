@@ -1,18 +1,22 @@
-import { AccountantData,
+import {
+  AccountantData,
   CategoryListData,
   CategorySumData,
   LineChartData,
   PieData,
-  ReportTimeRangeEnum, SumData } from '../models/BillReportModel';
+  ReportTimeRangeEnum,
+  SumData
+} from '../models/BillReportModel';
 import CategoryMapSingleton from '../models/CategoryMapSingleton';
 import { BillTypeEnum } from '../models/RecordList';
 import { BizConstants } from './BizConstants';
 import { DatabaseHelper } from './DatabaseHelper';
 import { DayPair, formatDateYM1, formatDateYMD1, getDateDiffInDays, roundAmountFen2Yuan } from './Util';
+import { Options } from '@mcui/mccharts';
 
 export function getAccountantData(dayBoundary: DayPair, context: Context): AccountantData {
 
-  DatabaseHelper.getInstance().initDatabase(context)
+  //DatabaseHelper.getInstance().initDatabase(context)
   let outComeCategorySum = DatabaseHelper.getInstance()
     .getCategorySum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), BillTypeEnum.Outcome
     );
@@ -47,9 +51,8 @@ export function getAccountantData(dayBoundary: DayPair, context: Context): Accou
 
 }
 
- export  function  getLineChartData(dayBoundary: DayPair, bill_type: BillTypeEnum, reportTimeRangeEnum: ReportTimeRangeEnum)
- :LineChartData
- {
+export function getLineChartData(dayBoundary: DayPair, bill_type: BillTypeEnum,
+  reportTimeRangeEnum: ReportTimeRangeEnum): LineChartData {
   let interval: number = 5
 
   let sumData: SumData[] = []
@@ -96,7 +99,7 @@ export function getAccountantData(dayBoundary: DayPair, context: Context): Accou
       , new Date(dayBoundary.end.getTime()))
 
     for (let i = 0; i < dayCount; i++) {
-      xData.push(i.toString());
+      xData.push((i + 1).toString());
     }
 
     for (let i = 0; i < dayCount; i++) {
@@ -151,7 +154,7 @@ export function getAccountantData(dayBoundary: DayPair, context: Context): Accou
 
   let yTitle = bill_type === BillTypeEnum.Outcome ? "支出金额" : "收入金额";
 
-   let lineChartData:LineChartData =
+  let lineChartData: LineChartData =
     {
       yTitle: yTitle,
       yShowNumber: yShowNumber,
@@ -159,15 +162,13 @@ export function getAccountantData(dayBoundary: DayPair, context: Context): Accou
       interval: interval
     }
 
-    return lineChartData
+  return lineChartData
 }
 
 
-export  function getCategoryData(categorySum: CategorySumData[])
-:PieData[]
-{
+export function getCategoryData(categorySum: CategorySumData[]): PieData[] {
 
-  let pieData:PieData[]  = categorySum.map(item => ({
+  let pieData: PieData[] = categorySum.map(item => ({
     value: item.amount / 100,
     name: item.category // 将 category 映射为 name
   } as PieData
@@ -179,9 +180,7 @@ export  function getCategoryData(categorySum: CategorySumData[])
 }
 
 
-export  function getTopListData(categorySum: CategorySumData[], bill_type: BillTypeEnum)
-:CategoryListData[]
-{
+export function getTopListData(categorySum: CategorySumData[], bill_type: BillTypeEnum): CategoryListData[] {
 
   const totalAmount: number = categorySum.reduce(
     (sum: number, currentItem: CategorySumData) =>
@@ -189,7 +188,7 @@ export  function getTopListData(categorySum: CategorySumData[], bill_type: BillT
     0
   );
 
-   let  categoryTopList =
+  let categoryTopList =
     categorySum.map(item =>
     (
       {
@@ -207,7 +206,105 @@ export  function getTopListData(categorySum: CategorySumData[], bill_type: BillT
     ).sort((a, b) => (b.amount - a.amount)
     ).slice(0, BizConstants.Category_Top10_Limit);
 
-   return categoryTopList
+  return categoryTopList
 }
 
+
+export function mockBarData() {
+
+  let countRange = [7, 30, 12]
+
+  let xCount = countRange[Math.floor(Math.random() * countRange.length)]
+  let yNumbers: number[] = []
+
+  for (let i = 0; i < xCount; i++) {
+    yNumbers.push(Math.floor(Math.random() * 100))
+  }
+
+  let xValues: string[] = []
+
+  for (let i = 0; i < xCount; i++) {
+
+    let xValue = ""
+    if (xCount === 7) {
+      xValue = "周"
+    }
+
+    xValues.push(xValue + i.toString())
+  }
+
+  let defOption: Options = new Options({
+    animation: false,
+    legend:
+    {
+      show: false
+    },
+    // title: {
+    //   show: true,
+    //   text: '更新数据',
+    //   right: 20,
+    //   top: 30
+    // },
+    xAxis: {
+      data: xValues,
+      axisLabel:
+      { fontSize: 36 }
+    },
+    yAxis: {
+      name: '元',
+      nameTextStyle:
+      {
+        fontSize: 36
+      },
+      axisLabel:
+      { fontSize: 36 }
+    },
+    series: [
+      {
+        // name: '最高气温',
+        data: yNumbers,
+        label:
+        { fontSize: 36 }
+      }
+    ]
+  })
+
+  return defOption
+}
+
+
+export function getBarReportData(linetCharData: LineChartData) {
+
+  let defOption: Options = new Options({
+    animation: true,
+    legend:
+    {
+      show: false
+    },
+
+    xAxis: {
+      data: linetCharData.xData,
+      axisLabel:
+      { fontSize: 36 }
+    },
+    yAxis: {
+      name: '元',
+      nameTextStyle:
+      {
+        fontSize: 36
+      },
+      axisLabel:
+      { fontSize: 36 }
+    },
+    series: [
+      {
+        data: linetCharData.yShowNumber,
+        label:
+        { fontSize: 36 }
+      }
+    ]
+  })
+
+  return defOption
+}
 

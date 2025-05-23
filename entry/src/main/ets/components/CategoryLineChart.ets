@@ -2,6 +2,7 @@ import { McLineChart, Options } from '@mcui/mccharts';
 import { LineChartData, ReportTimeRangeEnum } from '../models/BillReportModel';
 import { BillTypeEnum } from '../models/RecordList';
 import { DayPair } from '../utils/Util';
+import { systemDateTime } from '@kit.BasicServicesKit';
 
 const yAxisText: string = "元";
 
@@ -30,7 +31,12 @@ export struct CategoryLineChart {
   @State
   lineOption: Options = new Options(
     {
-      animation: true,
+      animation: false,
+      legend:
+      {
+        show: false
+      },
+
       series: [
         {
 
@@ -45,7 +51,13 @@ export struct CategoryLineChart {
       yAxis: {
         name: yAxisText,
         nameTextStyle:
-        { fontSize: 36 }
+        { fontSize: 36 },
+
+        axisLabel:
+        {
+
+          fontSize: 36
+        }
       },
       xAxis:
       {
@@ -117,35 +129,17 @@ export struct CategoryLineChart {
 
   private updateData = (lineChartData: LineChartData) => {
 
-
     this.lineOption.setVal(
 
       {
-        animation: false,
-        legend:
-        {
-          show: false
-        },
-
         series: [
           {
-
             name: lineChartData.yTitle,
-
-            label:
-            {
-              fontSize: 36,
-            },
             data: lineChartData.yShowNumber
           }
         ],
         yAxis: {
-          name: yAxisText,
-          axisLabel:
-          {
-
-            fontSize: 36
-          }
+          name: yAxisText
         },
         xAxis:
         {
@@ -153,12 +147,12 @@ export struct CategoryLineChart {
         , axisLabel:
         {
           interval: lineChartData.interval
-        , fontSize: 36
         }
         }
-
       }
 
     )
+
+
   }
 }

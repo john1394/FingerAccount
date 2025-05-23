@@ -79,7 +79,11 @@ export struct ReportTimeSelector {
 
   updateSelectColumn(selectedItem: ColumnData) {
 
-    this.isLoading = true
+    // animateTo({ duration: 300 }, () => {
+    //   this.isLoading = true
+    // })
+
+
     let newColumns: ColumnData[] = [];
 
     this.columns.forEach((item) => {

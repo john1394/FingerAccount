@@ -15,7 +15,7 @@ export struct CategoryPieChart {
   pieData: PieData[];
   @State legendOption: Options = new Options({
 
-    animation: false,
+    animation: true,
     // title: {
     //   show: false,
     //   text: '类别饼图',
@@ -90,7 +90,7 @@ export struct CategoryPieChart {
           Image($r("app.media.category_pie"))
             .width(24)
             .aspectRatio(1)
-          Text("类别饼图")
+          Text("类别占比")
             .fontSize(14)
             .fontWeight(FontWeight.Bold)
         }.width("100%")

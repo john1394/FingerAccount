@@ -24,15 +24,44 @@ import { CategoryPieChart, PieDataController } from '../components/CategoryPieCh
 import { CategoryTopList } from '../components/CategoryTopList';
 import { BizConstants } from '../utils/BizConstants';
 import { ReportTimeSelector } from '../components/ReportTimeSelector';
-import { CategoryLineChart, LineCharDataController } from '../components/CategoryLineChart';
+import { LineCharDataController } from '../components/CategoryLineChart';
 import { Accountant } from '../components/Accountant';
 import { systemDateTime } from '@kit.BasicServicesKit';
 import { taskpool } from '@kit.ArkTS';
-import { getAccountantData, getCategoryData, getLineChartData, getTopListData } from '../utils/BillReportBiz';
+import {
+  getAccountantData,
+  getBarReportData,
+  getCategoryData,
+  getLineChartData,
+  getTopListData,
+  mockBarData
+} from '../utils/BillReportBiz';
+import { router } from '@kit.ArkUI';
 
 
 @Component
 struct BillReport {
+  @State
+  barDefOption: Options = new Options({
+    title: {
+      show: true,
+      text: '更新数据',
+      right: 20,
+      top: 30
+    },
+    xAxis: {
+      data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+    },
+    yAxis: {
+      name: '温度'
+    },
+    series: [
+      {
+        name: '最高气温',
+        data: [11, 11, 15, 13, 12, 130, 10]
+      }
+    ]
+  })
   @State
   lineChartData: LineChartData = {
 
@@ -68,6 +97,7 @@ struct BillReport {
   ];
   @State
   isLoading: boolean = false;
+  scroller: Scroller = new Scroller();
 
   aboutToAppear(): void {
 
@@ -127,9 +157,12 @@ struct BillReport {
 
       }
       //报表
-      Scroll() {
+      Scroll(
+        this.scroller
+      ) {
         Column({ space: 10 }) {
 
+          //收支统计
           Accountant(
             {
               outcome: this.totalOutcome,
@@ -148,8 +181,7 @@ struct BillReport {
               }
             )
 
-
-          //第6行 排行列表
+          //排行列表
           Column() {
             CategoryTopList(
               {
@@ -162,9 +194,10 @@ struct BillReport {
           }
           .width("100%")
           .padding(10)
+          .visibility(Visibility.Visible)
 
 
-          //第五行 饼图
+          //类别饼图
           Column() {
 
             CategoryPieChart
@@ -185,25 +218,46 @@ struct BillReport {
               left: 10,
               right: 10
             }
-          )
+          ).visibility(Visibility.Visible)
 
 
           //折线图
           if (this.reportTimeRangeEnum !== ReportTimeRangeEnum.Custom) {
+
             Column() {
-              CategoryLineChart(
+              Row({ space: 5 }) {
+                Image($r("app.media.route_plan"))
+                  .width(24)
+                  .aspectRatio(1)
+                Text("更多图形")
+                  .fontSize(14)
+                  .fontWeight(FontWeight.Bold)
+              }
+              .width("100%")
+              .padding(
                 {
-                  lineChartData: this.lineChartData,
-                  lineCharDataController: this.lineCharDataController
+                  left: 10,
+                  top: 5
+
                 }
               )
-            }.width("100%")
+              .onClick(
+                () => {
+                  router.pushUrl({
+                    url: "pages/MoreReportPage",
+                    params: this.barDefOption
+                  })
+                }
+              )
+              .backgroundColor($r("app.color.white"))
+              .borderRadius(8)
+            }
             .padding(
               {
                 left: 10,
                 right: 10
-              }
-            ).visibility(Visibility.None)
+              })
+
           }
 
 
@@ -340,6 +394,7 @@ struct BillReport {
     isOutput: boolean
   ) {
 
+
     const startTime = systemDateTime.getTime(false);
     this.dayBoundary = dayBoundary
     this.isOutput = isOutput
@@ -359,26 +414,26 @@ struct BillReport {
     //收支统计
     this.totalOutcome = total.accountantData.outcome
     this.totalIncome = total.accountantData.income
-    //折线图
+
     let dbDuration = systemDateTime.getTime(false) - startTime
-    //  this.lineCharDataController.updateData(total.lineChartData);
-    //饼图
-    this.pieDataController.updateData(total.pieData);
-    //排行榜
+
+    //更多图形
+    this.barDefOption =
+      getBarReportData(total.lineChartData)
 
     this.categoryTopList = total.categoryListData
 
     let duration = systemDateTime.getTime(false) - startTime
-    //  let mockSleepMs = 250
-    // let sleepMs = 200 - duration
+
     console.log(`mylog duration  cost：${duration} ms,dbDuration:${dbDuration}`);
     if (dbDuration > 20) {
 
       // await mockLongTime(mockSleepMs)
     }
 
-
     this.isLoading = false
+
+    this.scroller.scrollEdge(Edge.Top);
   }
 }
 
@@ -387,6 +442,8 @@ struct BillReport {
 async function getReportDataTaskPool(dayBoundary: DayPair,
   bill_type: BillTypeEnum, reportTimeRangeEnum: ReportTimeRangeEnum,
   context: Context): Promise<IBillReportData> {
+
+  const startTime = systemDateTime.getTime(false);
   await DatabaseHelper.getInstance().initDatabase(context)
   let categorySum = DatabaseHelper.getInstance()
     .getCategorySum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type
@@ -404,7 +461,8 @@ async function getReportDataTaskPool(dayBoundary: DayPair,
     pieData: pieData,
     categoryListData: categoryListData
   }
-
+  const functionDuration = systemDateTime.getTime(false) - startTime
+  console.log(`mylog getReportDataTaskPool cost ,functionDuration:${functionDuration}`);
   return billReportData
 
 
