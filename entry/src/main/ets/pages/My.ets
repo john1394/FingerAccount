@@ -1,3 +1,5 @@
+import { router } from '@kit.ArkUI'
+
 @Preview
 @Component
 struct My {
@@ -10,6 +12,13 @@ struct My {
         .width(16)
         .height(16)
     }
+    .onClick(
+      () => {
+        if (rightClick) {
+          rightClick()
+        }
+      }
+    )
     .width('100%')
     .padding({
       left: 20,
@@ -54,11 +63,37 @@ struct My {
 
       Row().height(10)
       this.getRenderItem("关于")
-      Row().height(10)
+      Divider().strokeWidth(0.5)
+        .width("90%")
+        .color($r("app.color.text_second"))
+      //Row().height(10)
       this.getRenderItem("用户协议")
-      this.getRenderItem("隐私项")
 
-      Row().height(10)
+      Divider().strokeWidth(0.5)
+        .width("90%")
+        .color($r("app.color.text_second"))
+
+      this.getRenderItem("隐私项",
+        () => {
+          router.pushUrl({
+            url: "pages/PrivacyPage",
+            params: {}
+          })
+        }
+      )
+
+
+      Divider().strokeWidth(0.5)
+        .width("90%")
+        .color($r("app.color.text_second"))
+
+
+      this.getRenderItem("备份/恢复")
+
+      Divider().strokeWidth(0.5)
+        .width("90%")
+        .color($r("app.color.text_second"))
+      //Row().height(10)
       this.getRenderItem("设置")
     }
     .width('100%')

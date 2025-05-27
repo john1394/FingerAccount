@@ -84,39 +84,3 @@ struct MoreReportPage {
     .width('100%')
   }
 }
-
-// Column() {
-//   CategoryLineChart(
-//     {
-//       lineChartData: this.lineChartData,
-//       lineCharDataController: this.lineCharDataController
-//     }
-//   )
-// }.width("100%")
-// .padding(
-//   {
-//     left: 10,
-//     right: 10
-//   }
-// )
-// .visibility(Visibility.None)
-
-
-//柱状图
-// if (this.reportTimeRangeEnum !== ReportTimeRangeEnum.Custom) {
-//   Column() {
-//     TimeBarChart(
-//       {
-//         defOption: this.barDefOption
-//       }
-//     )
-//
-//   }.width("100%")
-//   .padding(
-//     {
-//       left: 10,
-//       right: 10
-//     }
-//   )
-//
-// }
