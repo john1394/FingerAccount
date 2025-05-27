@@ -1,11 +1,10 @@
+import { BackHeader } from '../components/RenderItem'
 import web_webview from '@ohos.web.webview';
-import { BackHeader } from '../components/RenderItem';
 import { router } from '@kit.ArkUI';
 
 @Entry
 @Component
-struct PrivacyPage {
-
+struct UserAgreementPage {
 
   build() {
     Column() {
@@ -21,7 +20,7 @@ struct PrivacyPage {
 
       Column() {
         Web({
-          src: $rawfile('doc/privacy.html'), // 指定 HTML 文件路径
+          src: $rawfile('doc/user_agreement.html'), // 指定 HTML 文件路径
           controller: new web_webview.WebviewController()
         })
           .width('100%')// 设置宽度

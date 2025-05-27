@@ -62,12 +62,28 @@ struct My {
       .backgroundColor($r("app.color.white"))
 
       Row().height(10)
-      this.getRenderItem("关于")
+      this.getRenderItem("关于",
+        () => {
+          router.pushUrl({
+            url: "pages/AboutPage",
+            params: {}
+          })
+        }
+      )
+
+
       Divider().strokeWidth(0.5)
         .width("90%")
         .color($r("app.color.text_second"))
       //Row().height(10)
-      this.getRenderItem("用户协议")
+      this.getRenderItem("用户协议",
+        () => {
+          router.pushUrl({
+            url: "pages/UserAgreementPage",
+            params: {}
+          })
+        }
+      )
 
       Divider().strokeWidth(0.5)
         .width("90%")

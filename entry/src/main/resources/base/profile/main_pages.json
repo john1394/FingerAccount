@@ -10,6 +10,8 @@
     "pages/test/TestDatePickerPage",
     "pages/test/SearchTestPage",
     "pages/MoreReportPage",
-    "pages/PrivacyPage"
+    "pages/PrivacyPage",
+    "pages/UserAgreementPage",
+    "pages/AboutPage"
   ]
 }
