@@ -11,7 +11,10 @@
     {
       "name": "EntryAbility_label",
       "value": "指尖记帐"
+    },
+    {
+      "name": "EntryAbility_write_file_reason",
+      "value": "读公共目录,用于备份恢复"
     }
-
   ]
 }

@@ -12,6 +12,7 @@
     "pages/MoreReportPage",
     "pages/PrivacyPage",
     "pages/UserAgreementPage",
-    "pages/AboutPage"
+    "pages/AboutPage",
+    "pages/BackupRestorePage"
   ]
 }

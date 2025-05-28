@@ -104,7 +104,15 @@ struct My {
         .color($r("app.color.text_second"))
 
 
-      this.getRenderItem("备份/恢复")
+      this.getRenderItem("备份/恢复",
+        () => {
+          router.pushUrl({
+            url: "pages/BackupRestorePage",
+            params: {}
+          })
+        }
+
+      )
 
       Divider().strokeWidth(0.5)
         .width("90%")

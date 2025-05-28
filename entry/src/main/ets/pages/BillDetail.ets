@@ -255,7 +255,7 @@ struct BillDetail {
                       DatabaseHelper.getInstance().deleteBill(this.currentItem.id)
 
                       router.pushUrl({
-                        url: "pages/WriteRecord",
+                        url: "pages/Index",
                         params: {}
                       })
                     }

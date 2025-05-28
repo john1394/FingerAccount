@@ -11,7 +11,10 @@
     {
       "name": "EntryAbility_label",
       "value": "finger cost"
+    },
+    {
+      "name": "EntryAbility_write_file_reason",
+      "value": "read write file"
     }
-
   ]
 }

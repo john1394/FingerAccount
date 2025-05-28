@@ -2,11 +2,12 @@ import { relationalStore, ValueType, } from '@kit.ArkData';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { CategorySumData, SumData } from '../models/BillReportModel';
 import { CategoryItem } from '../models/CategoryList';
-import { BillTypeEnum, RecordItemInfo } from '../models/RecordList';
+import { BillDbRecord, BillTypeEnum, RecordItemInfo } from '../models/RecordList';
+import { fileIo } from '@kit.CoreFileKit';
 
 
 const db_file_name = "bill.db"
-const db_file_dir = "customDir/subCustomDir"
+const db_file_dir = "dbdir"
 
 
 const init_category_table_sql = `
@@ -184,34 +185,43 @@ export class DatabaseHelper {
     });
   }
 
-  async test3() {
-    for (let index = 0; index < 100; index++) {
-      console.log("mystep 2 index:" + index)
+
+  backupAllRecord() {
+
+  }
+
+  backupx(context: Context) {
+    let path = "/data/storage/el2/database/Backup1.db"
+    //let path = "/storage/media/100/local/files/Docs/Documents/Backup1.db"
+    if (this.rdbStore) {
+
+      (this.rdbStore as relationalStore.RdbStore).backup(path, (err: BusinessError) => {
+        if (err) {
+          console.error(`Failed to backup RdbStore. Code:${err.code}, message:${err.message}`);
+          return;
+        }
+        console.info(`Succeeded in backing up RdbStore.`);
+      })
     }
   }
 
-  test2() {
+  restorex(context: Context) {
+    let path = "/data/storage/el2/database/Backup1.db"
+    //let backup = context.databaseDir + '/entry/rdb/Backup.db';
+    //let backup = "/data/storage/el2/database/Backup1.db"
+    // let path = "/storage/media/100/local/files/Backup1.db"
+    if (!fileIo.access(path)) {
+      console.info("no backup file");
+    } else {
+      // console.log("has file")
 
-    console.log("mystep 1")
-    let result = this.test3()
+      (this.rdbStore as relationalStore.RdbStore).restore(path);
+      // let stat = fileIo.statSync(path)
+      // let i = 3
+    }
 
-    console.log("mystep 3")
 
-    result.then(
-      () => {
-        console.log("mystep 5")
-      }
-    )
-
-    // this.promiseTest1()
-    //   .then((result) => {
-    //     console.log(result); // 成功时输出结果
-    //   })
-    //   .catch((error: Error) => {
-    //     console.error(error.message); // 失败时处理错误
-    //   });
   }
-
 
   insertTest() {
     this.rdbStore?.executeSync("insert into bills(amount) values('1')");
@@ -221,6 +231,25 @@ export class DatabaseHelper {
     try {
 
       let sql: string = "insert into bills(amount,category,bill_type,timestamp,notes,extra_fields) values(?,?,?,?,?,?)"
+      // 执行插入操作
+      const insertId = this.rdbStore?.executeSync(sql, params)
+      console.log(`Inserted row ID: ${insertId}`);
+      return insertId;
+    } catch (err) {
+      const error = err as BusinessError;
+      console.error(`Insert failed, code: ${error.code}, message: ${error.message}`);
+      return -1;
+    }
+  }
+
+  insertOneBill(record: BillDbRecord) {
+    try {
+
+      let params: ValueType[] =
+        [record.id, record.amount, record.category, record.bill_type, record.timestamp, record.notes,
+          record.extra_fields]
+      let sql: string =
+        "insert into bills(id,amount,category,bill_type,timestamp,notes,extra_fields) values(?, ?,?,?,?,?,?)"
       // 执行插入操作
       const insertId = this.rdbStore?.executeSync(sql, params)
       console.log(`Inserted row ID: ${insertId}`);
@@ -440,12 +469,19 @@ export class DatabaseHelper {
     return result
   }
 
+  insertAllBillRecord(parsedObj: BillDbRecord[]) {
+
+    parsedObj.forEach(element => {
+      this.insertOneBill(element)
+    });
+  }
+
   getAllBillRecord() {
-    let result: RecordItemInfo[] = []
+    let result: BillDbRecord[] = []
     try {
       // 1. 执行 SQL 查询
       const sql = 'SELECT * FROM bills order by timestamp desc';
-      const resultSet = this.rdbStore?.querySqlSync(sql); // 或使用 executeSql（需处理结果集）
+      const resultSet = this.rdbStore?.querySqlSync(sql); // 或使用 executeinSql（需处理结果集）
 
       while (resultSet?.goToNextRow()) {
         // 获取列索引
@@ -468,15 +504,15 @@ export class DatabaseHelper {
 
         console.log(`ID: ${idValue}, Amount: ${amount}, Category: ${category}, bill_type:${bill_type}}, Timestamp: ${timestamp}, Notes: ${notes}, Extra Fields: ${extraFields}`);
 
-        let item: RecordItemInfo =
+        let item: BillDbRecord =
           {
             id: idValue,
-            category_image: '',
-            category_name: category,
+            category: category,
             bill_type: bill_type,
             amount: amount,
             timestamp: timestamp,
-            notes: notes
+            notes: notes,
+            extra_fields: extraFields
           }
 
         result.push(item);
@@ -577,6 +613,10 @@ export class DatabaseHelper {
     if (this.rdbStore) {
       return; // 已初始化，直接返回
     }
+
+    // let filesDir = context.filesDir;
+    // let dbDir = context.databaseDir
+
 
     const STORE_CONFIG: relationalStore.StoreConfig = {
       name: db_file_name,

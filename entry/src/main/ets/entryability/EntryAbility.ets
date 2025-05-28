@@ -1,4 +1,4 @@
-import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
+import { abilityAccessCtrl, AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { KeyboardAvoidMode, window } from '@kit.ArkUI';
 import { test1 } from '../utils/Util';
@@ -12,7 +12,24 @@ export default class EntryAbility extends UIAbility {
     this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
 
-    test1();
+    //test1();
+
+    //DatabaseHelper.getInstance().restore(this.context)
+    // 获取创建程序控制管理器
+    //const manager = abilityAccessCtrl.createAtManager()
+
+    //await manager.requestPermissionsFromUser(this.context, ["ohos.permission.READ_WRITE_DOCUMENTS_DIRECTORY"]);
+    //
+    // // 申请录音(麦克风)权限 --- 进入应用的时候
+    // await manager.requestPermissionsFromUser(this.context, [
+    //   "ohos.permission.MICROPHONE"
+    // ])
+
+
+    // // 申请录音(麦克风)权限 --- 进入应用的时候
+    // let pro = await manager.requestPermissionsFromUser(this.context, [
+    //   "ohos.permission.READ_WRITE_DOCUMENTS_DIRECTORY"
+    // ])
 
     // const appContext = this.context.getApplicationContext();
     await DatabaseHelper.getInstance().initDatabase(this.context)

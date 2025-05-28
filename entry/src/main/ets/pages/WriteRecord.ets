@@ -142,7 +142,7 @@ struct WriteRecord {
     this.currentMonthSaved = this.currentMonthIncome - this.currentMonthOutcome;
     this.groupedRecordList = groupRecordItemInfoByTimestamp(allItems);
   }
-  
+
   aboutToAppear(): void {
 
     // 订阅
@@ -150,10 +150,17 @@ struct WriteRecord {
       this.getBudgetFromStore()
     })
 
+    emitter.on(BizConstants.Month_reload_data_key, () => {
+      this.loadMonthData(this.currentMonthBegin)
+    }
+    )
+
     this.currentMonthBegin = new Date()
     this.loadMonthData(this.currentMonthBegin);
 
     this.getBudgetFromStore()
+
+
 
   }
 

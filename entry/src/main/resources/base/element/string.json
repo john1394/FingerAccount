@@ -11,6 +11,14 @@
     {
       "name": "EntryAbility_label",
       "value": "label"
+    },
+    {
+      "name": "EntryAbility_write_file_reason",
+      "value": "read write file"
+    },
+    {
+      "name": "MICROPHONE_REASON",
+      "value": "microphone"
     }
   ]
 }
