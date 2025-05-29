@@ -114,11 +114,11 @@ struct My {
 
       )
 
-      Divider().strokeWidth(0.5)
-        .width("90%")
-        .color($r("app.color.text_second"))
+      // Divider().strokeWidth(0.5)
+      //   .width("90%")
+      //   .color($r("app.color.text_second"))
       //Row().height(10)
-      this.getRenderItem("设置")
+      // this.getRenderItem("设置")
     }
     .width('100%')
     .height('100%')

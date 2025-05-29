@@ -114,23 +114,29 @@ export struct MonthPicker {
   build() {
 
     Row({ space: 5 }) {
-      Text(`${this.yearPicked}${this.monthPicked}支出`)
-        .fontSize(16)
-        .onClick(() => {
-          this.isShowSheet = !this.isShowSheet
-        })
-        .bindSheet($$this.isShowSheet, this.SheetBuilder(), {
-          detents: [this.line1Height + this.line2Height],
-          preferType: SheetType.BOTTOM,
-          dragBar: false
-        ,
-          showClose: false
-        })
 
-      Image($r("app.media.fill_arrow_down"))
-        .width(20)
-        .height(20)
+      Row() {
+        Text(`${this.yearPicked}${this.monthPicked}支出`)
+          .fontSize(16)
+
+          .bindSheet($$this.isShowSheet, this.SheetBuilder(), {
+            detents: [this.line1Height + this.line2Height],
+            preferType: SheetType.BOTTOM,
+            dragBar: false
+          ,
+            showClose: false
+          })
+
+        Image($r("app.media.fill_arrow_down"))
+          .width(20)
+          .height(20)
+      }
+      .onClick(() => {
+        this.isShowSheet = !this.isShowSheet
+      })
+
     }.width("100%")
+
     .height(40)
   }
 }

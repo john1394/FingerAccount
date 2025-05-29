@@ -19,7 +19,7 @@ import dayjs from 'dayjs';
 async function mockInsertBills(context: Context): Promise<number> {
   await DatabaseHelper.getInstance().initDatabase(context)
   CategoryMapSingleton.getInstance().initializeMap()
-  let billRecords: BillDbRecord[] = mockBillRecords(2025, 1, 12, 1, 5000, 1)
+  let billRecords: BillDbRecord[] = mockBillRecords(2025, 10, 12, 3, 5000, 1)
 
   for (let billRecord of billRecords) {
     DatabaseHelper.getInstance().insertOneBill(billRecord)
@@ -231,7 +231,7 @@ struct BackupRestorePage {
 
               this.isProcessing = false
             })
-            .visibility(Visibility.None)
+            .visibility(Visibility.Visible)
 
 
         }
