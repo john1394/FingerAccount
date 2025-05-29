@@ -26,7 +26,7 @@ import { BizConstants } from '../utils/BizConstants';
 import { ReportTimeSelector } from '../components/ReportTimeSelector';
 import { LineCharDataController } from '../components/CategoryLineChart';
 import { Accountant } from '../components/Accountant';
-import { systemDateTime } from '@kit.BasicServicesKit';
+import { emitter, systemDateTime } from '@kit.BasicServicesKit';
 import { taskpool } from '@kit.ArkTS';
 import {
   getAccountantData,
@@ -117,6 +117,11 @@ struct BillReport {
       .sort((a, b) => (b.value - a.value))
       .slice(0, BizConstants.Category_TOP5_Limit);
 
+    emitter.on(BizConstants.Report_reload_data_key, () => {
+      this.updateTimeRange(this.dayBoundary,this.isOutput)
+    }
+    )
+
   }
 
   aboutToDisappear(): void {
@@ -155,6 +160,7 @@ struct BillReport {
         }
 
       }
+
       //报表
       Scroll(
         this.scroller

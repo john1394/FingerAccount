@@ -114,8 +114,14 @@ struct WriteRecord {
 
     allItems.forEach((item: RecordItemInfo) => {
 
-      item.category_image =
-        $r(CategoryMapSingleton.getInstance().get(item.category_name, item.bill_type)!.category_image)
+      try {
+        item.category_image =
+          $r(CategoryMapSingleton.getInstance().get(item.category_name, item.bill_type)!.category_image)
+      } catch (e) {
+
+        console.log("mylog", e)
+      }
+
 
     }
     )
@@ -159,7 +165,6 @@ struct WriteRecord {
     this.loadMonthData(this.currentMonthBegin);
 
     this.getBudgetFromStore()
-
 
 
   }

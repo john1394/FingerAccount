@@ -8,6 +8,6 @@ export class BizConstants {
   static Max_Memo_char_count = 50
   static Max_Search_char_count = 20
   static MaxNumber = 100000000;
-
-  static Month_reload_data_key="Month_reload_data_key"
+  static Month_reload_data_key = "Month_reload_data_key"
+  static Report_reload_data_key = "Report_reload_data_key"
 }

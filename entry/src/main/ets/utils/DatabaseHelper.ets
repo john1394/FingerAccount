@@ -256,7 +256,7 @@ export class DatabaseHelper {
       return insertId;
     } catch (err) {
       const error = err as BusinessError;
-      console.error(`Insert failed, code: ${error.code}, message: ${error.message}`);
+      console.error("mylog", `Insert failed, code: ${error.code}, message: ${error.message}`);
       return -1;
     }
   }
@@ -522,7 +522,7 @@ export class DatabaseHelper {
 
 
     } catch (error) {
-      console.error(`Failed to execute SQL: ${error.message}`);
+      console.error("mylog", `Failed to execute SQL: ${error.message}`);
 
     }
 
@@ -614,10 +614,6 @@ export class DatabaseHelper {
       return; // 已初始化，直接返回
     }
 
-    // let filesDir = context.filesDir;
-    // let dbDir = context.databaseDir
-
-
     const STORE_CONFIG: relationalStore.StoreConfig = {
       name: db_file_name,
       securityLevel: relationalStore.SecurityLevel.S1,
@@ -664,6 +660,7 @@ export class DatabaseHelper {
 
       // 设置当前数据库实例
       this.rdbStore = store;
+      console.log("mylog", "设置当前数据库实例成功")
     } catch (error) {
       console.error('初始化数据库失败:', error);
       // throw  new Error(error)

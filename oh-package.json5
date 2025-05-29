@@ -1,11 +1,12 @@
 {
-  "modelVersion": "5.0.1",
+  "modelVersion": "5.0.5",
   "description": "Please describe the basic information.",
   "dependencies": {
     "@ohos/axios": "^2.2.4",
     "@mcui/mccharts": "^2.8.7",
     "@wuyan/hm_chart": "^2.0.4",
-    "@ohos/mpchart": "^3.0.22"
+    "@ohos/mpchart": "^3.0.22",
+    "dayjs": "^1.11.13"
   },
   "devDependencies": {
     "@ohos/hypium": "1.0.21",

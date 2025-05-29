@@ -1,9 +1,9 @@
-import { abilityAccessCtrl, AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
+import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { KeyboardAvoidMode, window } from '@kit.ArkUI';
-import { test1 } from '../utils/Util';
 import { BudgetStore } from '../utils/BudgetStore';
 import { DatabaseHelper } from '../utils/DatabaseHelper';
+import CategoryMapSingleton from '../models/CategoryMapSingleton';
 
 const DOMAIN = 0x0000;
 
@@ -33,7 +33,7 @@ export default class EntryAbility extends UIAbility {
 
     // const appContext = this.context.getApplicationContext();
     await DatabaseHelper.getInstance().initDatabase(this.context)
-
+    CategoryMapSingleton.getInstance().initializeMap()
 
   }
 

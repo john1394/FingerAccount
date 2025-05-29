@@ -4,7 +4,7 @@ import { BillTypeEnum } from './RecordList';
 
 export default class CategoryMapSingleton {
   // 私有静态实例
-  private static instance: CategoryMapSingleton;
+  private static instance: CategoryMapSingleton = new CategoryMapSingleton();
   // Map 存储键值对
   private outComeMap: Map<string, CategoryItem>;
   private inComeMap: Map<string, CategoryItem>;
@@ -13,14 +13,13 @@ export default class CategoryMapSingleton {
   private constructor() {
     this.outComeMap = new Map<string, CategoryItem>();
     this.inComeMap = new Map<string, CategoryItem>();
-    this.initializeMap();
+    //this.initializeMap();
+    console.log("mylog", "initializeMap成功")
   }
 
   // 静态方法获取单例实例
   public static getInstance(): CategoryMapSingleton {
-    if (!CategoryMapSingleton.instance) {
-      CategoryMapSingleton.instance = new CategoryMapSingleton();
-    }
+
     return CategoryMapSingleton.instance;
   }
 
@@ -55,8 +54,10 @@ export default class CategoryMapSingleton {
   }
 
   // 初始化 Map
-  private initializeMap(): void {
+  public  initializeMap(): void {
 
+    this.outComeMap.clear()
+    this.inComeMap.clear()
     let allData = DatabaseHelper.getInstance().getCategoryData()
 
     allData.forEach(item => {

@@ -1,4 +1,7 @@
-import { BillTypeEnum, RecordItemInfo } from '../models/RecordList';
+import dayjs from 'dayjs';
+import { CategoryItem } from '../models/CategoryList';
+import CategoryMapSingleton from '../models/CategoryMapSingleton';
+import { BillDbRecord, BillTypeEnum, RecordItemInfo } from '../models/RecordList';
 
 export function test1() {
 
@@ -19,6 +22,92 @@ export function test1() {
 
 }
 
+export function mockBillRecords(startYear: number = 2025, yearCount: number = 10, monthCount: number = 12
+  , dayCount: number = 3, maxAmount: number = 10000, id: number = 1
+) {
+
+  let result: BillDbRecord[] = []
+
+  for (let i = 0; i < yearCount; i++) {
+    let year = startYear + i
+    for (let j = 0; j < monthCount; j++) {
+      let month = j
+
+      let dt = new Date(year, month, 1)
+      // 获取当前月份的天数
+      let jsDate = dayjs(dt.getTime())
+      const daysInCurrentMonth = jsDate.daysInMonth();
+
+      for (let m = 0; m < daysInCurrentMonth; m++) {
+
+        let day = m + 1
+
+        let hourStep = 24 / dayCount
+        for (let n = 0; n < dayCount; n++) {
+          let hour = n * hourStep
+
+          let opDate = new Date(year, month, day, hour)
+
+          let timestamp = opDate.getTime()
+          let bill_type = Math.floor(Math.random() * 2)
+          let amount = Math.floor(Math.random() * maxAmount)
+          let notes = "notes" + Math.random().toFixed(2)
+
+          let category = "其它"
+          let outCats: CategoryItem[] = [];
+
+          for (const value of CategoryMapSingleton.getInstance().getOutComeMap().values()) {
+            outCats.push(value);
+          }
+
+          let inCats: CategoryItem[] = [];
+
+          for (const value of CategoryMapSingleton.getInstance().getInComeMap().values()) {
+            inCats.push(value);
+          }
+
+          if (bill_type === 0) {
+            category = outCats[Math.floor(Math.random() * outCats.length)].category_name
+          } else {
+            category = inCats[Math.floor(Math.random() * inCats.length)].category_name
+          }
+
+
+          let record: BillDbRecord =
+            {
+              // 用户id
+              id: id,
+              // 类型名称
+              category: category,
+              //收支类型 0 为支出 ,1 为收入
+              bill_type: bill_type,
+
+              //金额
+              amount: amount,
+              //记帐时间
+              timestamp: timestamp,
+
+              //备注
+              notes: notes,
+
+              //扩展列
+              extra_fields: ""
+            }
+
+          result.push(record)
+
+          ++id
+
+        }
+      }
+
+    }
+  }
+
+
+  return result
+
+}
 
 export interface DayPair {
   begin: Date;
