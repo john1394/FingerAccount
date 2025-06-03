@@ -110,7 +110,8 @@ struct WriteRecord {
 
     let dayPair = getMonthBoundaries(monthDate)
     let allItems: RecordItemInfo[] =
-      DatabaseHelper.getInstance().getBillRecordMonth(dayPair.begin.getTime(), dayPair.end.getTime());
+      DatabaseHelper.getInstance()
+        .getBillRecordMonth(BizConstants.Default_bill_book_id, dayPair.begin.getTime(), dayPair.end.getTime());
 
     allItems.forEach((item: RecordItemInfo) => {
 
@@ -128,7 +129,8 @@ struct WriteRecord {
 
     let outcomeSumData =
       DatabaseHelper.getInstance()
-        .getMonthSum(dayPair.begin.getTime(), dayPair.end.getTime(), BillTypeEnum.Outcome);
+        .getMonthSum(BizConstants.Default_bill_book_id, dayPair.begin.getTime(), dayPair.end.getTime(),
+          BillTypeEnum.Outcome);
     if (outcomeSumData.length > 0) {
       this.currentMonthOutcome = outcomeSumData[0].amount
     } else {
@@ -137,7 +139,8 @@ struct WriteRecord {
 
     let incomeSumData =
       DatabaseHelper.getInstance()
-        .getMonthSum(dayPair.begin.getTime(), dayPair.end.getTime(), BillTypeEnum.Income);
+        .getMonthSum(BizConstants.Default_bill_book_id, dayPair.begin.getTime(), dayPair.end.getTime(),
+          BillTypeEnum.Income);
 
     if (incomeSumData.length > 0) {
       this.currentMonthIncome = incomeSumData[0].amount
@@ -236,7 +239,7 @@ struct WriteRecord {
       Column() {
 
         Row({ space: 10 }) {
-          Text("指尖记帐")
+          Text("基本帐本")
             .fontSize(18)
             .fontWeight(FontWeight.Bold)
             .fontColor($r("app.color.text_primary"))
@@ -309,23 +312,26 @@ struct WriteRecord {
 
           Column({ space: 10 }) {
 
-            //月份选择
-            MonthPicker(
-              {
-                currentMonthBegin: this.currentMonthBegin,
-                updateMonthData: (yearPicked, monthPicked) => {
-                  this.updateMonthData(yearPicked, monthPicked)
+
+            Row({
+              space: 0
+            }) {
+
+              //月份选择
+              MonthPicker(
+                {
+                  currentMonthBegin: this.currentMonthBegin,
+                  updateMonthData: (yearPicked, monthPicked) => {
+                    this.updateMonthData(yearPicked, monthPicked)
+                  }
                 }
-              }
-            )
+              )
+            }
+
 
             //行1
             Row({ space: 10 }) {
               Row() {
-
-                // Text("本月支出:")
-                //   .fontSize(16)
-                //   .fontColor($r("app.color.text_primary"))
 
                 Text("￥" + (this.currentMonthOutcome / 100).toFixed(2))
                   .fontSize(18).fontWeight(FontWeight.Bold)

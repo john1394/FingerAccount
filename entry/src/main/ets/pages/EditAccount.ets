@@ -93,7 +93,8 @@ struct EditAccount {
     // 入库，id存在则更新，不存在则插入
     if (this.currentItem.id === 0) {
       let params: ValueType[] =
-        [fenMoney, this.currentItem.category_name, bill_type, timestamp, this.currentItem.notes, extra]
+        [BizConstants.Default_bill_book_id, fenMoney, this.currentItem.category_name, bill_type, timestamp,
+          this.currentItem.notes, extra]
 
       DatabaseHelper.getInstance().insertBill(params)
     } else {
@@ -133,6 +134,7 @@ struct EditAccount {
       this.currentItem =
         {
           id: 0,
+          bill_book_id: BizConstants.Default_bill_book_id,
           category_image: $r(DefaultOutcomeCategoryList[0].category_image),
           //DefaultOutcomeCategoryList[0].category_image,
           category_name: DefaultOutcomeCategoryList[0].category_name,

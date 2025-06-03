@@ -16,9 +16,9 @@ import { Options } from '@mcui/mccharts';
 
 export function getAccountantData(dayBoundary: DayPair, context: Context): AccountantData {
 
-  //DatabaseHelper.getInstance().initDatabase(context)
+
   let outComeCategorySum = DatabaseHelper.getInstance()
-    .getCategorySum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), BillTypeEnum.Outcome
+    .getCategorySum(BizConstants.Default_bill_book_id, dayBoundary.begin.getTime(), dayBoundary.end.getTime(), BillTypeEnum.Outcome
     );
 
   const totalOutcome: number = outComeCategorySum.reduce(
@@ -27,7 +27,7 @@ export function getAccountantData(dayBoundary: DayPair, context: Context): Accou
   );
 
   let incomeCategorySum = DatabaseHelper.getInstance()
-    .getCategorySum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), BillTypeEnum.Income
+    .getCategorySum(BizConstants.Default_bill_book_id, dayBoundary.begin.getTime(), dayBoundary.end.getTime(), BillTypeEnum.Income
     );
 
   const totalInCome: number = incomeCategorySum.reduce(
@@ -65,7 +65,7 @@ export function getLineChartData(dayBoundary: DayPair, bill_type: BillTypeEnum,
 
     interval = 0
     sumData = DatabaseHelper.getInstance()
-      .getDaySum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type);
+      .getDaySum(BizConstants.Default_bill_book_id, dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type);
     sumData.map(u => {
       map.set(u.timeBase, u.amount);
     });
@@ -90,7 +90,7 @@ export function getLineChartData(dayBoundary: DayPair, bill_type: BillTypeEnum,
     interval = 5
 
     sumData = DatabaseHelper.getInstance()
-      .getDaySum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type);
+      .getDaySum(BizConstants.Default_bill_book_id, dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type);
     sumData.map(u => {
       map.set(u.timeBase, u.amount);
     });
@@ -121,7 +121,7 @@ export function getLineChartData(dayBoundary: DayPair, bill_type: BillTypeEnum,
 
     sumData =
       DatabaseHelper.getInstance()
-        .getMonthSum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type);
+        .getMonthSum(BizConstants.Default_bill_book_id, dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type);
     sumData.map(u => {
       map.set(u.timeBase, u.amount);
     });

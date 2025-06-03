@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import { CategoryItem } from '../models/CategoryList';
 import CategoryMapSingleton from '../models/CategoryMapSingleton';
 import { BillDbRecord, BillTypeEnum, RecordItemInfo } from '../models/RecordList';
+import { BizConstants } from './BizConstants';
 
 export function test1() {
 
@@ -77,6 +78,7 @@ export function mockBillRecords(startYear: number = 2025, yearCount: number = 10
             {
               // 用户id
               id: id,
+              bill_book_id: BizConstants.Default_bill_book_id,
               // 类型名称
               category: category,
               //收支类型 0 为支出 ,1 为收入

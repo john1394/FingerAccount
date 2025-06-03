@@ -3,11 +3,24 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { CategorySumData, SumData } from '../models/BillReportModel';
 import { CategoryItem } from '../models/CategoryList';
 import { BillDbRecord, BillTypeEnum, RecordItemInfo } from '../models/RecordList';
-import { fileIo } from '@kit.CoreFileKit';
+import { BizConstants } from './BizConstants';
 
 
 const db_file_name = "bill.db"
 const db_file_dir = "dbdir"
+
+
+const init_bill_book_table_sql = `
+CREATE TABLE IF NOT EXISTS bill_book (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+name TEXT,
+timestamp INTEGER
+);
+`;
+
+const init_bill_book_data_sql = `
+insert into bill_book(id,name,timestamp) values('1','基本帐本',CAST(strftime('%s', 'now') AS INTEGER) * 1000);
+`
 
 
 const init_category_table_sql = `
@@ -72,14 +85,15 @@ insert into category(category_name,image_url,bill_type,timestamp) values('意外
 //insert into category(category_name,image_url,bill_type,timestamp) values('设置','ic_cat_in_setting','1' ,CAST(strftime('%s', 'now') AS INTEGER) * 1000);
 
 const SQL_CREATE_TABLE =
-  'CREATE TABLE IF NOT EXISTS bills (\n' +
-    '    id INTEGER PRIMARY KEY AUTOINCREMENT,\n' +
-    '    amount INTEGER,\n' +
-    '    category TEXT,\n' +
-    '    bill_type INTEGER,\n' +
-    '    timestamp INTEGER,\n' +
-    '    notes TEXT,\n' +
-    '    extra_fields TEXT\n' +
+  'CREATE TABLE IF NOT EXISTS bills (' +
+    '    id INTEGER PRIMARY KEY AUTOINCREMENT,' +
+    '    bill_book_id INTEGER ,' +
+    '    amount INTEGER,' +
+    '    category TEXT,' +
+    '    bill_type INTEGER,' +
+    '    timestamp INTEGER,' +
+    '    notes TEXT,' +
+    '    extra_fields TEXT' +
     '  )';
 
 // const SQL2 = "CREATE TABLE IF NOT EXISTS aggregations (\n" +
@@ -90,8 +104,8 @@ const SQL_CREATE_TABLE =
 //   "      PRIMARY KEY (type, date_key)\n" +
 //   "      )"
 
-const SQL_index1 = "CREATE INDEX idx_bills_timestamp ON bills(timestamp); " +
-  "CREATE INDEX idx_bills_category ON bills(category);  "
+const SQL_index1 = "CREATE INDEX idx_bills_timestamp ON bills(bill_book_id,timestamp); " +
+  "CREATE INDEX idx_bills_category ON bills(bill_book_id,category);  "
 
 //+ "CREATE INDEX idx_aggregations_date ON aggregations(date_key);"
 
@@ -112,126 +126,11 @@ export class DatabaseHelper {
   }
 
 
-  testGetTableData(tableName: string) {
-    try {
-      const predicates = new relationalStore.RdbPredicates(tableName);
-      const resultSet = this.rdbStore?.querySync(predicates);
-
-      let jsonData: Array<Map<string, string>> = [];
-      while (resultSet?.goToNextRow()) {
-        let row = new Map<string, string>();
-
-        for (let i = 0; i < resultSet.columnNames.length; i++) {
-          const columnName = resultSet.columnNames[i];
-          const value = resultSet.getString(resultSet.getColumnIndex(columnName));
-          row[columnName] = value; // 使用方括号语法动态设置属性
-        }
-
-        jsonData.push(row);
-      }
-
-      resultSet?.close();
-
-      const deepJson = JSON.stringify(jsonData);
-
-      return jsonData;
-    } catch (error) {
-      console.error('查询表数据时出错:', error);
-      return null;
-    }
-  }
-
-  promiseTest1(): Promise<string> {
-    return new Promise((resolve, reject) => {
-      // 模拟异步操作（如网络请求、文件读写）
-      setTimeout(() => {
-        const success = false; // 假设操作成功
-        if (success) {
-          resolve("Data fetched successfully!");
-        } else {
-          throw new Error("my error")
-          reject("Error: Failed to fetch data.");
-        }
-      }, 5000);
-    });
-  }
-
-  promiseTest2(): Promise<void> {
-    let result: Promise<void> = new Promise(async (resolve) => {
-
-      console.log("mystep 2")
-      setTimeout(() => {
-        const success = true; // 假设操作成功
-        if (success) {
-          console.log(" mystep 4");
-          resolve()
-        } else {
-          //throw new Error("my error")
-
-        }
-      }, 5000);
-
-    })
-
-    return result
-
-  }
-
-  async doAsyncTask(): Promise<void> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        console.log("Async task completed");
-        resolve(); // 无返回值，仅表示完成
-      }, 5000);
-    });
-  }
-
-
-  backupAllRecord() {
-
-  }
-
-  backupx(context: Context) {
-    let path = "/data/storage/el2/database/Backup1.db"
-    //let path = "/storage/media/100/local/files/Docs/Documents/Backup1.db"
-    if (this.rdbStore) {
-
-      (this.rdbStore as relationalStore.RdbStore).backup(path, (err: BusinessError) => {
-        if (err) {
-          console.error(`Failed to backup RdbStore. Code:${err.code}, message:${err.message}`);
-          return;
-        }
-        console.info(`Succeeded in backing up RdbStore.`);
-      })
-    }
-  }
-
-  restorex(context: Context) {
-    let path = "/data/storage/el2/database/Backup1.db"
-    //let backup = context.databaseDir + '/entry/rdb/Backup.db';
-    //let backup = "/data/storage/el2/database/Backup1.db"
-    // let path = "/storage/media/100/local/files/Backup1.db"
-    if (!fileIo.access(path)) {
-      console.info("no backup file");
-    } else {
-      // console.log("has file")
-
-      (this.rdbStore as relationalStore.RdbStore).restore(path);
-      // let stat = fileIo.statSync(path)
-      // let i = 3
-    }
-
-
-  }
-
-  insertTest() {
-    this.rdbStore?.executeSync("insert into bills(amount) values('1')");
-  }
-
   insertBill(params: ValueType[]) {
     try {
 
-      let sql: string = "insert into bills(amount,category,bill_type,timestamp,notes,extra_fields) values(?,?,?,?,?,?)"
+      let sql: string =
+        "insert into bills(bill_book_id, amount,category,bill_type,timestamp,notes,extra_fields) values(?,?,?,?,?,?,?)"
       // 执行插入操作
       const insertId = this.rdbStore?.executeSync(sql, params)
       console.log(`Inserted row ID: ${insertId}`);
@@ -247,10 +146,11 @@ export class DatabaseHelper {
     try {
 
       let params: ValueType[] =
-        [record.id, record.amount, record.category, record.bill_type, record.timestamp, record.notes,
+        [BizConstants.Default_bill_book_id, record.id, record.amount, record.category, record.bill_type,
+          record.timestamp, record.notes,
           record.extra_fields]
       let sql: string =
-        "insert into bills(id,amount,category,bill_type,timestamp,notes,extra_fields) values(?, ?,?,?,?,?,?)"
+        "insert into bills(bill_book_id, id,amount,category,bill_type,timestamp,notes,extra_fields) values(?,?, ?,?,?,?,?,?)"
       // 执行插入操作
       const insertId = this.rdbStore?.executeSync(sql, params)
       console.log(`Inserted row ID: ${insertId}`);
@@ -343,19 +243,21 @@ export class DatabaseHelper {
     return result
   }
 
-  getCategorySum(begin: number, end: number, bill_type: BillTypeEnum, limit?: number): CategorySumData[] {
+  getCategorySum(bill_book_id: number, begin: number, end: number, bill_type: BillTypeEnum,
+    limit?: number): CategorySumData[] {
 
     let result: CategorySumData[] = [];
     try {
       let sql: string = `select sum(amount) as total ,category,COUNT(*) AS rows from bills
                  where bill_type=? and timestamp>=? and timestamp <?
+                 and bill_book_id= ?
                  group by category order by total asc`
 
       if (limit) {
         sql += ` limit ${limit}`
       }
 
-      let params: ValueType[] = [bill_type, begin, end];
+      let params: ValueType[] = [bill_type, begin, end, bill_book_id];
 
 
       const resultSet = this.rdbStore?.querySqlSync(sql, params); // 或使用 executeSql（需处理结果集）
@@ -390,15 +292,16 @@ export class DatabaseHelper {
   }
 
 
-  getDaySum(begin: number, end: number, bill_type: BillTypeEnum): SumData[] {
+  getDaySum(bill_book_id: number, begin: number, end: number, bill_type: BillTypeEnum): SumData[] {
 
     let result: SumData[] = [];
     try {
       const sql = `SELECT SUM(amount) as total,  strftime('%Y-%m-%d', timestamp/1000, 'unixepoch','localtime') AS date
                  FROM bills
                  where bill_type=? and timestamp>=? and timestamp <?
+                 and bill_book_id= ?
                  group by date order  by date asc`
-      let params: ValueType[] = [bill_type, begin, end];
+      let params: ValueType[] = [bill_type, begin, end, bill_book_id];
 
 
       const resultSet = this.rdbStore?.querySqlSync(sql, params); // 或使用 executeSql（需处理结果集）
@@ -430,15 +333,16 @@ export class DatabaseHelper {
     return result
   }
 
-  getMonthSum(begin: number, end: number, bill_type: BillTypeEnum): SumData[] {
+  getMonthSum(bill_book_id: number, begin: number, end: number, bill_type: BillTypeEnum): SumData[] {
 
     let result: SumData[] = [];
     try {
       const sql = `SELECT SUM(amount) as total,  strftime('%Y-%m', timestamp/1000, 'unixepoch','localtime') AS date
                  FROM bills
                  where bill_type=? and timestamp>=? and timestamp <?
+                 and bill_book_id= ?
                  group by date order  by date asc`
-      let params: ValueType[] = [bill_type, begin, end];
+      let params: ValueType[] = [bill_type, begin, end, bill_book_id];
 
 
       const resultSet = this.rdbStore?.querySqlSync(sql, params); // 或使用 executeSql（需处理结果集）
@@ -487,6 +391,7 @@ export class DatabaseHelper {
       while (resultSet?.goToNextRow()) {
         // 获取列索引
         const idIndex = resultSet.getColumnIndex('id');
+        const bill_book_id_index = resultSet.getColumnIndex('bill_book_id');
         const amountIndex = resultSet.getColumnIndex('amount');
         const categoryIndex = resultSet.getColumnIndex('category');
         const bill_type_Index = resultSet.getColumnIndex('bill_type');
@@ -496,6 +401,8 @@ export class DatabaseHelper {
 
         // 获取列值
         const idValue = resultSet.getLong(idIndex);
+        const bill_book_id = resultSet.getLong(bill_book_id_index);
+
         const amount = resultSet.getLong(amountIndex);
         const category = resultSet.getString(categoryIndex);
         const bill_type = resultSet.getLong(bill_type_Index);
@@ -503,11 +410,13 @@ export class DatabaseHelper {
         const notes = resultSet.getString(notesIndex);
         const extraFields = resultSet.getString(extraFieldsIndex);
 
-        console.log(`ID: ${idValue}, Amount: ${amount}, Category: ${category}, bill_type:${bill_type}}, Timestamp: ${timestamp}, Notes: ${notes}, Extra Fields: ${extraFields}`);
+        console.log(`ID: ${idValue}, Amount: ${amount}, Category: ${category}, bill_type:${bill_type}},
+         Timestamp: ${timestamp}, Notes: ${notes}, Extra Fields: ${extraFields}`);
 
         let item: BillDbRecord =
           {
             id: idValue,
+            bill_book_id: bill_book_id,
             category: category,
             bill_type: bill_type,
             amount: amount,
@@ -530,18 +439,21 @@ export class DatabaseHelper {
     return result;
   }
 
-  getBillRecordMonth(begin: number, end: number) {
+  getBillRecordMonth(bill_book_id: number, begin: number, end: number) {
     let result: RecordItemInfo[] = []
     try {
       // 1. 执行 SQL 查询
-      const sql = 'SELECT * FROM bills where timestamp>=? and timestamp<? order by timestamp desc';
+      const sql = 'SELECT * FROM bills where timestamp>=? and timestamp<? '
+        + ' and bill_book_id=? '
+        + 'order by timestamp desc';
 
-      let params: ValueType[] = [begin, end];
+      let params: ValueType[] = [begin, end, bill_book_id];
       const resultSet = this.rdbStore?.querySqlSync(sql, params); // 或使用 executeSql（需处理结果集）
 
       while (resultSet?.goToNextRow()) {
         // 获取列索引
         const idIndex = resultSet.getColumnIndex('id');
+        const bill_book_id_index = resultSet.getColumnIndex('bill_book_id');
         const amountIndex = resultSet.getColumnIndex('amount');
         const categoryIndex = resultSet.getColumnIndex('category');
         const bill_type_Index = resultSet.getColumnIndex('bill_type');
@@ -551,6 +463,7 @@ export class DatabaseHelper {
 
         // 获取列值
         const idValue = resultSet.getLong(idIndex);
+        const bill_book_id = resultSet.getLong(bill_book_id_index);
         const amount = resultSet.getLong(amountIndex);
         const category = resultSet.getString(categoryIndex);
         const bill_type = resultSet.getLong(bill_type_Index);
@@ -558,11 +471,13 @@ export class DatabaseHelper {
         const notes = resultSet.getString(notesIndex);
         const extraFields = resultSet.getString(extraFieldsIndex);
 
-        console.log(`ID: ${idValue}, Amount: ${amount}, Category: ${category}, bill_type:${bill_type}}, Timestamp: ${timestamp}, Notes: ${notes}, Extra Fields: ${extraFields}`);
+        console.log(`ID: ${idValue}, Amount: ${amount}, Category: ${category}, bill_type:${bill_type}},
+         Timestamp: ${timestamp}, Notes: ${notes}, Extra Fields: ${extraFields} ,bill_book_id:${bill_book_id}`);
 
         let item: RecordItemInfo =
           {
             id: idValue,
+            bill_book_id: bill_book_id,
             category_image: '',
             category_name: category,
             bill_type: bill_type,
@@ -585,28 +500,6 @@ export class DatabaseHelper {
     return result;
   }
 
-
-  selectTest() {
-    try {
-      // 1. 执行 SQL 查询
-      const sql = 'SELECT * FROM bills';
-      const resultSet = this.rdbStore?.querySqlSync(sql); // 或使用 executeSql（需处理结果集）
-
-      // 2. 读取结果
-      let count = 0;
-      if (resultSet?.goToFirstRow()) {
-        count = resultSet.getLong(resultSet.getColumnIndex('total'));
-      }
-
-      // 3. 关闭结果集
-      resultSet?.close();
-
-
-    } catch (error) {
-      console.error(`Failed to execute SQL: ${error.message}`);
-
-    }
-  }
 
   // 初始化方法必须完整覆盖赋值逻辑
 
@@ -631,21 +524,30 @@ export class DatabaseHelper {
       if (store.version === 0) {
         // 初始版本，创建表结构
 
-        let lines = init_category_data_sql.split(";");
 
-        lines = lines.filter(line => line.trim() != ""
-        )
         store.executeSync(SQL_CREATE_TABLE);
         //store.executeSync(SQL2);
         store.executeSync(SQL_index1);
         //初始化数据
         store.executeSync(init_category_table_sql);
 
+        let categoryDataLines = init_category_data_sql.split(";");
+        categoryDataLines = categoryDataLines.filter(line => line.trim() != "")
 
-        lines.forEach((line) => {
-
+        categoryDataLines.forEach((line) => {
           console.log(line);
           store.executeSync(line);
+        })
+
+        //初始化帐本
+        store.executeSync(init_bill_book_table_sql);
+
+        let billBookDataLines = init_bill_book_data_sql.split(";");
+        billBookDataLines = billBookDataLines.filter(line => line.trim() != "")
+
+        billBookDataLines.forEach((lineData) => {
+          console.log(lineData);
+          store.executeSync(lineData);
         })
 
 

@@ -106,7 +106,7 @@ struct BillReport {
 
     let biz_type = this.isOutput ? BillTypeEnum.Outcome : BillTypeEnum.Income
     let categorySum = DatabaseHelper.getInstance()
-      .getCategorySum(this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), biz_type
+      .getCategorySum(BizConstants.Default_bill_book_id, this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), biz_type
       );
 
     this.pieData = categorySum.map(item => ({
@@ -306,7 +306,7 @@ struct BillReport {
 
       interval = 0
       sumData = DatabaseHelper.getInstance()
-        .getDaySum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type);
+        .getDaySum(BizConstants.Default_bill_book_id, dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type);
       sumData.map(u => {
         map.set(u.timeBase, u.amount);
       });
@@ -331,7 +331,7 @@ struct BillReport {
       interval = 5
 
       sumData = DatabaseHelper.getInstance()
-        .getDaySum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type);
+        .getDaySum(BizConstants.Default_bill_book_id, dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type);
       sumData.map(u => {
         map.set(u.timeBase, u.amount);
       });
@@ -362,7 +362,7 @@ struct BillReport {
 
       sumData =
         DatabaseHelper.getInstance()
-          .getMonthSum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type);
+          .getMonthSum(BizConstants.Default_bill_book_id, dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type);
       sumData.map(u => {
         map.set(u.timeBase, u.amount);
       });
@@ -462,7 +462,7 @@ async function getReportDataTaskPool(dayBoundary: DayPair,
   const startTime = systemDateTime.getTime(false);
   await DatabaseHelper.getInstance().initDatabase(context)
   let categorySum = DatabaseHelper.getInstance()
-    .getCategorySum(dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type
+    .getCategorySum(BizConstants.Default_bill_book_id, dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type
     );
 
   let accountantData: AccountantData = getAccountantData(dayBoundary, context)
