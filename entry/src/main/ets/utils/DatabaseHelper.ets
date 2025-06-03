@@ -82,17 +82,18 @@ const SQL_CREATE_TABLE =
     '    extra_fields TEXT\n' +
     '  )';
 
-const SQL2 = "CREATE TABLE IF NOT EXISTS aggregations (\n" +
-  "      type TEXT,\n" +
-  "      date_key TEXT,\n" +
-  "      total_amount INTEGER,\n" +
-  "      category TEXT,\n" +
-  "      PRIMARY KEY (type, date_key)\n" +
-  "      )"
+// const SQL2 = "CREATE TABLE IF NOT EXISTS aggregations (\n" +
+//   "      type TEXT,\n" +
+//   "      date_key TEXT,\n" +
+//   "      total_amount INTEGER,\n" +
+//   "      category TEXT,\n" +
+//   "      PRIMARY KEY (type, date_key)\n" +
+//   "      )"
 
 const SQL_index1 = "CREATE INDEX idx_bills_timestamp ON bills(timestamp); " +
-  "CREATE INDEX idx_bills_category ON bills(category);  " +
-  "CREATE INDEX idx_aggregations_date ON aggregations(date_key);"
+  "CREATE INDEX idx_bills_category ON bills(category);  "
+
+//+ "CREATE INDEX idx_aggregations_date ON aggregations(date_key);"
 
 export class DatabaseHelper {
   private static instance: DatabaseHelper = new DatabaseHelper();
@@ -635,7 +636,7 @@ export class DatabaseHelper {
         lines = lines.filter(line => line.trim() != ""
         )
         store.executeSync(SQL_CREATE_TABLE);
-        store.executeSync(SQL2);
+        //store.executeSync(SQL2);
         store.executeSync(SQL_index1);
         //初始化数据
         store.executeSync(init_category_table_sql);

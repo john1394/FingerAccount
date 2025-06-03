@@ -102,7 +102,24 @@ struct BackupRestorePage {
 
   }
 
+  // async requestMediaPermission() {
+  //   let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
+  //   let context: Context = getContext(this) as common.UIAbilityContext;
+  //   atManager.requestPermissionsFromUser(context, ['ohos.permission.WRITE_MEDIA'],
+  //     (err: BusinessError, data: PermissionRequestResult) => {
+  //       if (err) {
+  //         console.error(`requestPermissionsFromUser fail, err->${JSON.stringify(err)}`);
+  //       } else {
+  //         console.info('data:' + JSON.stringify(data));
+  //         console.info('data permissions:' + data.permissions);
+  //         console.info('data authResults:' + data.authResults);
+  //         console.info('data dialogShownResults:' + data.dialogShownResults);
+  //       }
+  //     });
+  // }
+
   backupData() {
+
 
     try {
       let documentSaveOptions = new picker.DocumentSaveOptions();
