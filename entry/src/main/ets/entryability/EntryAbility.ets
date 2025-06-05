@@ -1,9 +1,10 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { KeyboardAvoidMode, window } from '@kit.ArkUI';
-import { BudgetStore } from '../utils/BudgetStore';
+import { PreferenceStore } from '../utils/PreferenceStore';
 import { DatabaseHelper } from '../utils/DatabaseHelper';
 import CategoryMapSingleton from '../models/CategoryMapSingleton';
+import { AutoBackupManager } from '../utils/AutoBackupManager';
 
 const DOMAIN = 0x0000;
 
@@ -26,14 +27,12 @@ export default class EntryAbility extends UIAbility {
     // ])
 
 
-    // // 申请录音(麦克风)权限 --- 进入应用的时候
-    // let pro = await manager.requestPermissionsFromUser(this.context, [
-    //   "ohos.permission.READ_WRITE_DOCUMENTS_DIRECTORY"
-    // ])
-
-    // const appContext = this.context.getApplicationContext();
     await DatabaseHelper.getInstance().initDatabase(this.context)
     CategoryMapSingleton.getInstance().initializeMap()
+
+    let manager = new AutoBackupManager(this.context)
+    let backupDir = await manager.createDownloadPackageDir(this.context)
+    await manager.backup(backupDir)
 
   }
 
@@ -45,7 +44,7 @@ export default class EntryAbility extends UIAbility {
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
 
-    BudgetStore.init(this.context)
+    PreferenceStore.init(this.context)
 
     //console.log("mylog", "begin call createKVStore")
     //await CategoryResourceStore.getInstance().createKVStore(this.context)

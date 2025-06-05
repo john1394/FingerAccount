@@ -125,6 +125,33 @@ export class DatabaseHelper {
     return DatabaseHelper.instance;
   }
 
+  backupDb(toFileFullPath: string): Promise<void> {
+
+    let pro: Promise<void> = new Promise((resolve, reject) => {
+      if (this.rdbStore) {
+
+        this.rdbStore.backup(toFileFullPath, () => {
+          console.log("mylog", "backup finished")
+          resolve()
+        })
+      } else {
+        resolve()
+      }
+    })
+
+    return pro
+
+
+  }
+
+  resoreDb(fromFileName: string) {
+    if (this.rdbStore) {
+      this.rdbStore.restore(fromFileName, () => {
+        console.log("mylog", "restore finished")
+      })
+    }
+  }
+
 
   insertBill(params: ValueType[]) {
     try {

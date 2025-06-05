@@ -255,6 +255,15 @@ struct BackupRestorePage {
         .width("100%")
         .padding(10)
 
+        Button("备份db")
+          .onClick(() => {
+            const startTime = systemDateTime.getTime(false);
+
+            //DatabaseHelper.getInstance().backupDb("bak1.mybak")
+            console.log(`mylog taskpool    cost：${systemDateTime.getTime(false) - startTime} ms `);
+          })
+          .visibility(Visibility.Visible)
+
       }
       .height('100%')
       .width('100%')

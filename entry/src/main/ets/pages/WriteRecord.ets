@@ -11,7 +11,7 @@ import { DatabaseHelper } from '../utils/DatabaseHelper'
 import { BillTypeEnum, RecordItemInfo } from '../models/RecordList'
 import CategoryMapSingleton from '../models/CategoryMapSingleton'
 import { RoundImage } from './RoundImage'
-import { BudgetStore } from '../utils/BudgetStore'
+import { PreferenceStore } from '../utils/PreferenceStore'
 import { emitter } from '@kit.BasicServicesKit'
 import { MonthPicker } from '../components/MonthPicker'
 import { BizConstants } from '../utils/BizConstants'
@@ -155,7 +155,7 @@ struct WriteRecord {
   aboutToAppear(): void {
 
     // 订阅
-    emitter.on(BudgetStore.budget_key, () => {
+    emitter.on(PreferenceStore.emit_budget, () => {
       this.getBudgetFromStore()
     })
 
@@ -219,7 +219,7 @@ struct WriteRecord {
             this.monthBudget = isNaN(tempNum) ? 0 : tempNum * 100
             //emit 接收
 
-            BudgetStore.addMonthBudget(this.monthBudget)
+            PreferenceStore.addMonthBudget(this.monthBudget)
 
             this.isShowBudgetSheet = false
           })
@@ -631,7 +631,7 @@ struct WriteRecord {
   }
 
   private getBudgetFromStore() {
-    this.monthBudget = BudgetStore.getMonthBudget()
+    this.monthBudget = PreferenceStore.getMonthBudget()
     this.monthBudgetInputText = (this.monthBudget / 100).toString();
     this.monthBudgetRemain = this.monthBudget + this.currentMonthSaved
   }
