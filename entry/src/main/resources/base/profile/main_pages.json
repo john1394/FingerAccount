@@ -13,6 +13,7 @@
     "pages/PrivacyPage",
     "pages/UserAgreementPage",
     "pages/AboutPage",
-    "pages/BackupRestorePage"
+    "pages/BackupRestorePage",
+    "pages/WelcomePage"
   ]
 }

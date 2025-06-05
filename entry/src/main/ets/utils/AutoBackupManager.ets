@@ -1,4 +1,4 @@
-import { PreferenceKeys, PreferenceStores } from './PreferenceKeys';
+import { PreferenceKeys, PreferenceStoreNames } from './PreferenceKeys';
 import { preferences } from '@kit.ArkData';
 import { DatabaseHelper } from './DatabaseHelper';
 import dayjs from 'dayjs';
@@ -6,6 +6,7 @@ import { fileUri, fileIo as fs, picker } from '@kit.CoreFileKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { BizConstants } from './BizConstants';
 import { backupInfoRecord as BackupInfoRecord } from '../models/BackupModel';
+import { PreferenceStore } from './PreferenceStore';
 
 export class AutoBackupManager {
   context: Context
@@ -44,16 +45,24 @@ export class AutoBackupManager {
   }
 
   getCurrentDate() {
-    //return dayjs("2025-06-09 00:12:12").toDate()
+    //return dayjs("2025-06-06 00:12:12").toDate()
     return new Date()
   }
 
+
   async backup(backupDir: string) {
 
+    //todo 有新数据才backup,has 新数据
 
     try {
 
-      let pref_store_name = PreferenceStores[PreferenceStores.default_pref_store]
+      if (!PreferenceStore.getHasNewData()) {
+
+        console.log("mylog", "no new data")
+        return
+      }
+
+      let pref_store_name = PreferenceStoreNames[PreferenceStoreNames.default_pref_store]
       let store = preferences.getPreferencesSync(this.context, {
         // 仓库的名称
         name: pref_store_name
@@ -116,9 +125,11 @@ export class AutoBackupManager {
         let toFilePath = backupDir + "/" + backupFileName
         fs.copyFileSync(srcFilePath, toFilePath)
 
+        PreferenceStore.setHasNewData(false)
+
         let newItem: BackupInfoRecord =
           {
-            //timestamp: new Date().getTime()
+
             timeStr: dayjs(this.getCurrentDate()).format("YYYY-MM-DD HH:mm:ss"),
             backupFilePath: toFilePath
           }
@@ -165,7 +176,7 @@ export class AutoBackupManager {
 
   }
 
-  restore() {
+  async restore(backupDir: string) {
 
   }
 }

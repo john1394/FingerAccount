@@ -32,6 +32,7 @@ export default class EntryAbility extends UIAbility {
 
     let manager = new AutoBackupManager(this.context)
     let backupDir = await manager.createDownloadPackageDir(this.context)
+    await manager.restore(backupDir)
     await manager.backup(backupDir)
 
   }
@@ -52,6 +53,7 @@ export default class EntryAbility extends UIAbility {
 
     windowStage.loadContent(
       'pages/Index',
+      //"pages/WelcomePage",
       //"pages/test/TestDatePickerPage"
       //"pages/test/SearchTestPage"
       (err) => {

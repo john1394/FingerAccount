@@ -1,11 +1,10 @@
 import { preferences } from '@kit.ArkData'
 import { emitter } from '@kit.BasicServicesKit'
-import { PreferenceKeys, PreferenceStores } from './PreferenceKeys'
+import { PreferenceKeys, PreferenceStoreNames } from './PreferenceKeys'
 
 export class PreferenceStore {
   static context: Context
-
-   static emit_budget: string = "emit_budget"
+  static emit_budget: string = "emit_budget"
 
   //  static month_key: string = "month_key"
 
@@ -18,7 +17,7 @@ export class PreferenceStore {
     // 获取仓库, 获取不到就会创建
     return preferences.getPreferencesSync(PreferenceStore.context, {
       // 仓库的名称
-      name: PreferenceStores[PreferenceStores.default_pref_store]
+      name: PreferenceStoreNames[PreferenceStoreNames.default_pref_store]
     })
   }
 
@@ -33,6 +32,20 @@ export class PreferenceStore {
 
     // 发布消息
     emitter.emit(PreferenceStore.emit_budget)
+  }
+
+  static async setHasNewData(hasNewData: boolean) {
+    const store = PreferenceStore.getStore()
+    store.putSync(PreferenceKeys[PreferenceKeys.has_new_data_key], hasNewData ? "1" : "0")
+    await store.flush()
+
+  }
+
+  static getHasNewData(): boolean {
+    const store = PreferenceStore.getStore();
+    const value = store.getSync(PreferenceKeys[PreferenceKeys.has_new_data_key], "")
+    let result = value === "1"
+    return result
   }
 
   static getMonthBudget(): number {

@@ -4,6 +4,7 @@ import { CategorySumData, SumData } from '../models/BillReportModel';
 import { CategoryItem } from '../models/CategoryList';
 import { BillDbRecord, BillTypeEnum, RecordItemInfo } from '../models/RecordList';
 import { BizConstants } from './BizConstants';
+import { PreferenceStore } from './PreferenceStore';
 
 
 const db_file_name = "bill.db"
@@ -161,6 +162,8 @@ export class DatabaseHelper {
       // 执行插入操作
       const insertId = this.rdbStore?.executeSync(sql, params)
       console.log(`Inserted row ID: ${insertId}`);
+
+      PreferenceStore.setHasNewData(true)
       return insertId;
     } catch (err) {
       const error = err as BusinessError;
@@ -204,6 +207,7 @@ export class DatabaseHelper {
       // 执行插入操作
       const updateId = this.rdbStore?.executeSync(sql, params)
       console.log(`affected row ID: ${updateId}`);
+      PreferenceStore.setHasNewData(true)
       return updateId;
     } catch (err) {
       const error = err as BusinessError;
