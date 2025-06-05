@@ -127,7 +127,7 @@ export class DatabaseHelper {
 
   backupDb(toFileFullPath: string): Promise<void> {
 
-    let pro: Promise<void> = new Promise((resolve, reject) => {
+    let pro: Promise<void> = new Promise((resolve) => {
       if (this.rdbStore) {
 
         this.rdbStore.backup(toFileFullPath, () => {

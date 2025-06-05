@@ -2,12 +2,12 @@ import { PreferenceKeys, PreferenceStores } from './PreferenceKeys';
 import { preferences } from '@kit.ArkData';
 import { DatabaseHelper } from './DatabaseHelper';
 import dayjs from 'dayjs';
-import { fileUri, fileIo as fs, ListFileOptions, picker } from '@kit.CoreFileKit';
+import { fileUri, fileIo as fs, picker } from '@kit.CoreFileKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { BizConstants } from './BizConstants';
+import { backupInfoRecord as BackupInfoRecord } from '../models/BackupModel';
 
 export class AutoBackupManager {
-  //static store_name: string = "pref_store_name"
   context: Context
 
   constructor(context: Context) {
@@ -43,6 +43,10 @@ export class AutoBackupManager {
 
   }
 
+  getCurrentDate() {
+    //return dayjs("2025-06-09 00:12:12").toDate()
+    return new Date()
+  }
 
   async backup(backupDir: string) {
 
@@ -56,79 +60,130 @@ export class AutoBackupManager {
       })
 
       let backup_key = PreferenceKeys[PreferenceKeys.backup_key]
-      // let val = store.getSync(backup_key, "")
-      let val = "" //debug only
 
+      let backup_info: BackupInfoRecord[] = []
+
+      let val: string = store.getSync(backup_key, "") as string
       if (val !== "") {
         console.log("mylog", backup_key + " exist");
-      } else {
-        let backupFileName = this.getBackupDbFileName()
-
-        //1. download/包名 目录下建立bak目录
-        let applicationContext = this.context.getApplicationContext();
-        // 获取应用文件路径
-        let filesDir = applicationContext.databaseDir;
-
-        let bakSrcDirPath = new fileUri.FileUri(filesDir + "/rdbbak").path
-
-        if (!fs.accessSync(bakSrcDirPath, fs.AccessModeType.EXIST)) {
-          fs.mkdirSync(bakSrcDirPath)
-        }
+        backup_info = JSON.parse(val)
+      }
 
 
-        let srcFilePath = bakSrcDirPath + "/" + backupFileName
-        await DatabaseHelper.getInstance().backupDb(srcFilePath)
+      let currentYmd = dayjs(this.getCurrentDate()).format("YYYY-MM-DD")
 
-        let srcExist = fs.accessSync(bakSrcDirPath, fs.AccessModeType.EXIST)
+      let sameYmdArray = backup_info.filter((item) => {
+        let hisYmd = dayjs(item.timeStr).format("YYYY-MM-DD")
+        return currentYmd === hisYmd
+      })
 
-        let listFileOption: ListFileOptions = {
-          recursion: false,
-          filter: {
-            suffix: [BizConstants.Rdb_backup_file_suffix],
-            // displayName: ["*.backup"],
-            fileSizeOver: 0,
+      if (sameYmdArray.length >= BizConstants.Rdb_backup_max_day_count) {
+        console.log("mylog", "has backed up at :", currentYmd)
+        return
+      }
+
+
+      let backupFileName = this.getBackupDbFileName()
+
+      //1. download/包名 目录下建立bak目录
+      let applicationContext = this.context.getApplicationContext();
+      // 获取应用文件路径
+      let filesDir = applicationContext.databaseDir;
+
+      let bakSrcDirPath = new fileUri.FileUri(filesDir + "/rdbbak").path
+
+      if (!fs.accessSync(bakSrcDirPath, fs.AccessModeType.EXIST)) {
+        fs.mkdirSync(bakSrcDirPath)
+      }
+
+      let srcFilePath = bakSrcDirPath + "/" + backupFileName
+      await DatabaseHelper.getInstance().backupDb(srcFilePath)
+
+      let srcExist = fs.accessSync(bakSrcDirPath, fs.AccessModeType.EXIST)
+
+      // let listFileOption: ListFileOptions = {
+      //   recursion: false,
+      //   filter: {
+      //     suffix: [BizConstants.Rdb_backup_file_suffix],
+      //     // displayName: ["*.backup"],
+      //     fileSizeOver: 0,
+      //   }
+      // };
+
+
+      if (srcExist) {
+        console.log("mylog", "src file exist", srcFilePath)
+        let toFilePath = backupDir + "/" + backupFileName
+        fs.copyFileSync(srcFilePath, toFilePath)
+
+        let newItem: BackupInfoRecord =
+          {
+            //timestamp: new Date().getTime()
+            timeStr: dayjs(this.getCurrentDate()).format("YYYY-MM-DD HH:mm:ss"),
+            backupFilePath: toFilePath
           }
-        };
 
+        backup_info.push(newItem)
 
-        //  let fileoperation1 = fs.listFileSync(bakSrcDirPath, listFileOption)
+        console.log("mylog", "copyFileSync", srcFilePath, "->", toFilePath)
+        fs.unlink(srcFilePath)
 
-        // .filter(
-        //   (item) => {
-        //     let path = bakSrcDirPath + "/" + item
-        //     let stat = fs.statSync(path)
-        //     return stat.isFile()
-        //   }
-        // );
-
-
-        if (srcExist) {
-          console.log("mylog", "src file exist", srcFilePath)
-          let toFilePath = backupDir + "/" + backupFileName
-          fs.copyFileSync(srcFilePath, toFilePath)
-
-          console.log("mylog", "copyFileSync", srcFilePath, "->", toFilePath)
-          fs.unlink(srcFilePath)
-        } else {
-          console.log("mylog", "src file not exist", srcFilePath)
-        }
 
         //完成之后写标记
-        //保留最新的5个备份
+        //保留最新的N 个备份
+        if (backup_info.length > 0 && backup_info.length > BizConstants.Rdb_backup_file_max_total_count) {
+          backup_info.sort((a, b) => {
+            let aDate = dayjs(a.timeStr)
+            let bDate = dayjs(b.timeStr)
+            return aDate.unix() - bDate.unix()
 
-        store.putSync(backup_key, "1")
+          })
+
+          let shiftItem = backup_info[0]
+          let shiftFileExist = fs.accessSync(shiftItem.backupFilePath, fs.AccessModeType.EXIST)
+          if (shiftFileExist) {
+            fs.unlinkSync(shiftItem.backupFilePath)
+          }
+
+          backup_info.shift()
+        }
+
+        let objectStr = JSON.stringify(backup_info)
+
+
+        store.putSync(backup_key, objectStr)
         store.flush()
+      } else {
+        console.log("mylog", "src file not exist", srcFilePath)
       }
-    } catch (err) {
 
+
+    } catch (err) {
       const error = err as BusinessError;
       console.error("mylog", `backup failed, code: ${error.code}, message: ${error.message}`);
     }
-    //console.log("mylog", PreferenceKeys.backup_key + ""); // 输出: "backup_key"
-    //console.log("mylog", "begin check backup ", PreferenceKeys.backup_key, PreferenceKeys[PreferenceKeys.backup_key])
+
   }
 
   restore() {
 
   }
 }
+
+
+//test only
+// backup_info = [
+//   {
+//     yyyyMMDDHHMMSS: "2025-06-04 01:12:13"
+//   },
+//   {
+//     yyyyMMDDHHMMSS: "2025-06-04 01:12:14"
+//   },
+//   {
+//     yyyyMMDDHHMMSS: "2025-06-04 01:12:15"
+//   },
+//   {
+//     yyyyMMDDHHMMSS: "2025-06-04 01:12:16"
+//   },
+//
+// ]
