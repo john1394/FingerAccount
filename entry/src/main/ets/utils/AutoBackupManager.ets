@@ -16,7 +16,8 @@ export class AutoBackupManager {
   }
 
   getBackupDbFileName() {
-    let fileName = "bak_" + dayjs(new Date()).format("YYYYMMDDHHmmss") + BizConstants.Rdb_backup_file_suffix
+    let fileName = BizConstants.Rdb_backup_name_suffix + dayjs(this.getCurrentDate()).format("YYYYMMDDHHmmss") +
+    BizConstants.Rdb_backup_file_suffix
     return fileName
   }
 
@@ -45,8 +46,10 @@ export class AutoBackupManager {
   }
 
   getCurrentDate() {
-    //return dayjs("2025-06-06 00:12:12").toDate()
+    //let str = "2025-06-07 00:" + Math.floor(Math.random() * 60) + ":" + Math.floor(Math.random() * 60)
+    //return dayjs(str).toDate()
     return new Date()
+    //return mockRandomCurrentDay("2025-06-08")
   }
 
 
@@ -92,7 +95,149 @@ export class AutoBackupManager {
 
   }
 
+  isDayBackupFileOverLimits(backupDir: string): boolean {
+
+    try {
+      let currentYmd = dayjs(this.getCurrentDate()).format("YYYY-MM-DD")
+
+      let listFileOption: ListFileOptions = {
+        recursion: false,
+        filter: {
+          suffix: [BizConstants.Rdb_backup_file_suffix],
+          fileSizeOver: 0,
+        }
+      };
+
+      let fileArray = fs.listFileSync(backupDir, listFileOption)
+
+      let findArray = fileArray.filter((item) => {
+
+        try {
+          let timePart = item.split(".")[0].split("_")[1]
+          if (timePart !== undefined) {
+            let date = dayjs(timePart, "YYYYMMDDHHmmss")
+            let ymd = date.format("YYYY-MM-DD")
+            if (ymd === currentYmd) {
+              return true
+            }
+          }
+
+        } catch (err1) {
+          const error = err1 as BusinessError;
+          console.error("mylog",
+            `isDayBackupFileOverLimits parse timePart failed, code: ${error.code}, message: ${error.message}`);
+        }
+
+        return false
+      }
+      )
+
+      if (findArray && findArray.length >= BizConstants.Rdb_backup_max_day_count) {
+        return true
+      }
+
+      return false
+    } catch (err) {
+      const error = err as BusinessError;
+      console.error("mylog", `isDayBackupFileOverLimits failed, code: ${error.code}, message: ${error.message}`);
+      return false
+    }
+
+
+  }
+
+  reserveLatestBackupFiles(backupDir: string) {
+    let listFileOption: ListFileOptions = {
+      recursion: false,
+      filter: {
+        suffix: [BizConstants.Rdb_backup_file_suffix],
+        fileSizeOver: 0,
+      }
+    };
+
+    let fileArray = fs.listFileSync(backupDir, listFileOption)
+
+    if (fileArray.length > 0) {
+      fileArray.sort((a, b) => {
+
+        let path1 = new fileUri.FileUri(backupDir + "/" + a).path
+        let path2 = new fileUri.FileUri(backupDir + "/" + b).path
+
+        let stat1 = fs.statSync(path1)
+        let stat2 = fs.statSync(path2)
+        let minus = stat1.mtime - stat2.mtime
+
+        return minus
+      }
+      )
+    }
+
+    let removeCount = fileArray.length - BizConstants.Rdb_backup_file_max_total_count
+
+    for (let i = 0; i < removeCount; i++) {
+      let removeFilePath = new fileUri.FileUri(backupDir + "/" + fileArray[i]).path
+      fs.unlink(removeFilePath)
+    }
+
+  }
+
   async backup(backupDir: string) {
+    try {
+
+
+      if (!PreferenceStore.getHasNewData()) {
+        console.log("mylog", "no new data")
+        return
+      }
+
+      let currentYmd = dayjs(this.getCurrentDate()).format("YYYY-MM-DD")
+
+      if (this.isDayBackupFileOverLimits(backupDir)) {
+        console.log("mylog", "has backed up at :", currentYmd)
+        return
+      }
+
+      let backupFileName = this.getBackupDbFileName()
+      //1. download/包名 目录下建立bak目录
+      let applicationContext = this.context.getApplicationContext();
+      let filesDir = applicationContext.databaseDir;
+      let bakSrcDirPath = new fileUri.FileUri(filesDir + "/rdbbak").path
+
+      if (!fs.accessSync(bakSrcDirPath, fs.AccessModeType.EXIST)) {
+        fs.mkdirSync(bakSrcDirPath)
+      }
+
+      let srcFilePath = bakSrcDirPath + "/" + backupFileName
+      await DatabaseHelper.getInstance().backupDb(srcFilePath)
+
+      let srcExist = fs.accessSync(bakSrcDirPath, fs.AccessModeType.EXIST)
+
+      //清理沙箱数据库备份文件
+      if (srcExist) {
+        console.log("mylog", "src file exist", srcFilePath)
+        let toFilePath = backupDir + "/" + backupFileName
+        fs.copyFileSync(srcFilePath, toFilePath)
+
+        PreferenceStore.setHasNewData(false)
+
+        console.log("mylog", "copyFileSync", srcFilePath, "->", toFilePath)
+        fs.unlink(srcFilePath)
+
+      } else {
+        console.log("mylog", "src file not exist", srcFilePath)
+      }
+
+      this.reserveLatestBackupFiles(backupDir)
+
+
+    } catch (err) {
+      const error = err as BusinessError;
+      console.error("mylog", `backup failed, code: ${error.code}, message: ${error.message}`);
+    }
+
+  }
+
+  async backupxx(backupDir: string) {
 
 
     try {
@@ -216,7 +361,5 @@ export class AutoBackupManager {
     }
 
   }
-
-
 }
 

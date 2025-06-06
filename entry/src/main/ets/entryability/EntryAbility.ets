@@ -18,7 +18,7 @@ export default class EntryAbility extends UIAbility {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
     //  console.log("mylog", "onCreate1")
 
-    console.log("mylog", "onCreate2")
+    console.log("mylog", "onCreate")
     await DatabaseHelper.getInstance().initDatabase(this.context)
     CategoryMapSingleton.getInstance().initializeMap()
 
@@ -44,8 +44,16 @@ export default class EntryAbility extends UIAbility {
 
   }
 
-  onDestroy(): void {
+  async onDestroy(): Promise<void> {
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onDestroy');
+    // if (PreferenceStore.getIsDoneRestoreOldData()) {
+    //   let manager = new AutoBackupManager(this.context)
+    //   let backupDir = await manager.createDownloadPackageDir()
+    //   await manager.backup(backupDir)
+    //
+    //   console.log("mylog", "onDestroy backup")
+    // }
+
   }
 
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {

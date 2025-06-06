@@ -128,6 +128,15 @@ export async function mockLongTime(ms: number): Promise<string> {
   return pro
 }
 
+//2025-06-07
+export function mockRandomCurrentDay(dayStr: string): Date {
+  let str = dayStr + " " + Math.floor(Math.random() * 24).toString().padStart(2, "0") + ":" +
+  Math.floor(Math.random() * 60).toString().padStart(2, "0") + ":" +
+  Math.floor(Math.random() * 60).toString().padStart(2, "0")
+
+  return dayjs(str, "yyyy-MM-DD HH:MM:SS").toDate()
+}
+
 export class DayPairImp implements DayPair {
   begin: Date;
   end: Date;
