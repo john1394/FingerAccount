@@ -58,4 +58,20 @@ export class PreferenceStore {
 
     return isNaN(tempNumber) ? 0 : tempNumber
   }
+
+  static getIsDoneRestoreOldData(): boolean {
+    //return false
+    //debug only
+    const store = PreferenceStore.getStore();
+    const value = store.getSync(PreferenceKeys[PreferenceKeys.has_restore_old_data_key], "")
+    let result = value === "1"
+    return result
+  }
+
+  static async setIsDoneRestoreOldData(flag: boolean) {
+    const store = PreferenceStore.getStore()
+    store.putSync(PreferenceKeys[PreferenceKeys.has_restore_old_data_key], flag ? "1" : "0")
+    await store.flush()
+
+  }
 }

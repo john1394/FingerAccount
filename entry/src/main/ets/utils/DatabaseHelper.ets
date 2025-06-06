@@ -145,12 +145,23 @@ export class DatabaseHelper {
 
   }
 
-  resoreDb(fromFileName: string) {
-    if (this.rdbStore) {
-      this.rdbStore.restore(fromFileName, () => {
-        console.log("mylog", "restore finished")
-      })
-    }
+  restoreDb(fromFileFullPath: string):Promise<void> {
+
+    let pro: Promise<void> = new Promise((resolve) => {
+      if (this.rdbStore) {
+
+        this.rdbStore.restore(fromFileFullPath, () => {
+          console.log("mylog", "restore db finished")
+          resolve()
+        })
+      } else {
+        resolve()
+      }
+    })
+
+    return pro
+
+
   }
 
 

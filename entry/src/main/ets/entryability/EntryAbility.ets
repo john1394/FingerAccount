@@ -8,12 +8,27 @@ import { AutoBackupManager } from '../utils/AutoBackupManager';
 
 const DOMAIN = 0x0000;
 
+
 export default class EntryAbility extends UIAbility {
   async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
-    this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
 
-    //test1();
+
+    this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
+    PreferenceStore.init(this.context)
+    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
+    //  console.log("mylog", "onCreate1")
+
+    console.log("mylog", "onCreate2")
+    await DatabaseHelper.getInstance().initDatabase(this.context)
+    CategoryMapSingleton.getInstance().initializeMap()
+
+
+    if (PreferenceStore.getIsDoneRestoreOldData()) {
+      let manager = new AutoBackupManager(this.context)
+      let backupDir = await manager.createDownloadPackageDir()
+      await manager.backup(backupDir)
+    }
+
 
     //DatabaseHelper.getInstance().restore(this.context)
     // 获取创建程序控制管理器
@@ -27,14 +42,6 @@ export default class EntryAbility extends UIAbility {
     // ])
 
 
-    await DatabaseHelper.getInstance().initDatabase(this.context)
-    CategoryMapSingleton.getInstance().initializeMap()
-
-    let manager = new AutoBackupManager(this.context)
-    let backupDir = await manager.createDownloadPackageDir(this.context)
-    await manager.restore(backupDir)
-    await manager.backup(backupDir)
-
   }
 
   onDestroy(): void {
@@ -44,27 +51,39 @@ export default class EntryAbility extends UIAbility {
   async onWindowStageCreate(windowStage: window.WindowStage): Promise<void> {
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
+    //await mockLongTime(3 * 1000)
+    console.log("mylog", "onWindowStageCreate")
 
-    PreferenceStore.init(this.context)
 
-    //console.log("mylog", "begin call createKVStore")
-    //await CategoryResourceStore.getInstance().createKVStore(this.context)
-    //console.log("mylog", "end call createKVStore")
+    if (!PreferenceStore.getIsDoneRestoreOldData()) {
+      windowStage.loadContent(
+        "pages/WelcomePage",
 
-    windowStage.loadContent(
-      'pages/Index',
-      //"pages/WelcomePage",
-      //"pages/test/TestDatePickerPage"
-      //"pages/test/SearchTestPage"
-      (err) => {
-        if (err.code) {
-          hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
-          return;
-        }
+        (err) => {
+          if (err.code) {
+            hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
+            return;
+          }
 
-        windowStage.getMainWindowSync().getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.RESIZE)
-        hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
-      });
+          windowStage.getMainWindowSync().getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.RESIZE)
+          hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
+        });
+    } else {
+      windowStage.loadContent(
+        'pages/Index',
+        // "pages/WelcomePage",
+
+        (err) => {
+          if (err.code) {
+            hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
+            return;
+          }
+
+          windowStage.getMainWindowSync().getUIContext().setKeyboardAvoidMode(KeyboardAvoidMode.RESIZE)
+          hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
+        });
+    }
+
   }
 
   onWindowStageDestroy(): void {

@@ -2,7 +2,7 @@ import { PreferenceKeys, PreferenceStoreNames } from './PreferenceKeys';
 import { preferences } from '@kit.ArkData';
 import { DatabaseHelper } from './DatabaseHelper';
 import dayjs from 'dayjs';
-import { fileUri, fileIo as fs, picker } from '@kit.CoreFileKit';
+import { fileUri, fileIo as fs, ListFileOptions, picker } from '@kit.CoreFileKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { BizConstants } from './BizConstants';
 import { backupInfoRecord as BackupInfoRecord } from '../models/BackupModel';
@@ -20,9 +20,9 @@ export class AutoBackupManager {
     return fileName
   }
 
-  async createDownloadPackageDir(context: Context): Promise<string> {
+  async createDownloadPackageDir(): Promise<string> {
 
-    const documentViewPicker = new picker.DocumentViewPicker(context);
+    const documentViewPicker = new picker.DocumentViewPicker(this.context);
     const documentSaveOptions = new picker.DocumentSaveOptions();
     documentSaveOptions.pickerMode = picker.DocumentPickerMode.DOWNLOAD;
 
@@ -50,9 +50,50 @@ export class AutoBackupManager {
   }
 
 
+  async getLatestBackup(): Promise<string> {
+    let backupDir: string = await this.createDownloadPackageDir()
+    let dirExist = fs.accessSync(backupDir, fs.AccessModeType.EXIST)
+
+    let result = ""
+    if (dirExist) {
+
+      let listFileOption: ListFileOptions = {
+        recursion: false,
+        filter: {
+          suffix: [BizConstants.Rdb_backup_file_suffix],
+          // displayName: ["*.backup"],
+          fileSizeOver: 0,
+        }
+      };
+
+      let fileArray = fs.listFileSync(backupDir, listFileOption)
+
+      if (fileArray.length > 0) {
+        fileArray.sort((a, b) => {
+
+          let path1 = new fileUri.FileUri(backupDir + "/" + a).path
+          let path2 = new fileUri.FileUri(backupDir + "/" + b).path
+
+          let stat1 = fs.statSync(path1)
+          let stat2 = fs.statSync(path2)
+          let minus = stat1.mtime - stat2.mtime
+
+          return minus
+        }
+        )
+
+        let latestFileName = fileArray[fileArray.length-1]
+        result = new fileUri.FileUri(backupDir + "/" + latestFileName).path
+      }
+
+    }
+
+    return result
+
+  }
+
   async backup(backupDir: string) {
 
-    //todo 有新数据才backup,has 新数据
 
     try {
 
@@ -176,25 +217,6 @@ export class AutoBackupManager {
 
   }
 
-  async restore(backupDir: string) {
 
-  }
 }
 
-
-//test only
-// backup_info = [
-//   {
-//     yyyyMMDDHHMMSS: "2025-06-04 01:12:13"
-//   },
-//   {
-//     yyyyMMDDHHMMSS: "2025-06-04 01:12:14"
-//   },
-//   {
-//     yyyyMMDDHHMMSS: "2025-06-04 01:12:15"
-//   },
-//   {
-//     yyyyMMDDHHMMSS: "2025-06-04 01:12:16"
-//   },
-//
-// ]

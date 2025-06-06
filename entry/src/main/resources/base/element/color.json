@@ -83,16 +83,22 @@
     {
       "name": "pay_back",
       "value": "#57ab70"
-    }
-    ,
+    },
     {
       "name": "image_gray",
-      "value":"#F3F3F3"
+      "value": "#F3F3F3"
     },
     {
       "name": "image_green",
-      "value":"#75FB4C"
+      "value": "#75FB4C"
+    },
+    {
+      "name": "background_divider",
+      "value": "#EEEEEE"
+    },
+    {
+      "name": "text_secondary",
+      "value": "#818181"
     }
-
   ]
 }
