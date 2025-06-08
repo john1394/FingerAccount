@@ -26,7 +26,10 @@ export default class EntryAbility extends UIAbility {
     if (PreferenceStore.getIsDoneRestoreOldData()) {
       let manager = new AutoBackupManager(this.context)
       let backupDir = await manager.createDownloadPackageDir()
-      await manager.backup(backupDir)
+
+      if (backupDir) {
+        await manager.backup(backupDir)
+      }
     }
 
 

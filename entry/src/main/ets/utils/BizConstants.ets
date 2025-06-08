@@ -14,8 +14,8 @@ export class BizConstants {
   static Default_bill_book_id: number = 1
   static Rdb_backup_file_suffix = ".backup"
   //总共最多备份数
-  static Rdb_backup_file_max_total_count: number = 3
+  static Rdb_backup_file_max_total_count: number = 5
   //每天最多备份数
-  static Rdb_backup_max_day_count: number = 2
+  static Rdb_backup_max_day_count: number = 3
   static Rdb_backup_name_suffix = "bak_"
 }

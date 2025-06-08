@@ -3,35 +3,16 @@ import { router } from '@kit.ArkUI';
 import { fileIo as fs, picker } from '@kit.CoreFileKit';
 import { BusinessError, emitter, systemDateTime } from '@kit.BasicServicesKit';
 import { DatabaseHelper } from '../utils/DatabaseHelper';
-import { taskpool, util } from '@kit.ArkTS';
+import { util } from '@kit.ArkTS';
 import { BillDbRecord } from '../models/RecordList';
 import { BizConstants } from '../utils/BizConstants';
-import { mockBillRecords } from '../utils/Util';
-import CategoryMapSingleton from '../models/CategoryMapSingleton';
 import dayjs from 'dayjs';
+import { mockLongTime } from '../utils/Util';
 
-// function stringToArray(str: string): Uint8Array {
-//   let textEncoder = new util.TextEncoder();
-//   return textEncoder.encodeInto(str);
-// }
-
-@Concurrent
-async function mockInsertBills(context: Context): Promise<number> {
-  await DatabaseHelper.getInstance().initDatabase(context)
-  CategoryMapSingleton.getInstance().initializeMap()
-  let billRecords: BillDbRecord[] = mockBillRecords(2025, 10, 12, 3, 5000, 1)
-
-  for (let billRecord of billRecords) {
-    DatabaseHelper.getInstance().insertOneBill(billRecord)
-  }
-
-  return billRecords.length
-
-}
 
 @Entry
 @Component
-struct BackupRestorePage {
+struct Export2FilePage {
   @State
   isProcessing: boolean = false
 
@@ -52,6 +33,8 @@ struct BackupRestorePage {
           let startTime = systemDateTime.getTime(false)
 
           if (documentSelectResult.length > 0) {
+
+            //await mockLongTime(10 * 1000)
             let path = documentSelectResult[0]
             let file = fs.openSync(path, fs.OpenMode.READ_ONLY);
             let stat = fs.statSync(file.fd)
@@ -73,8 +56,6 @@ struct BackupRestorePage {
               DatabaseHelper.getInstance().insertAllBillRecord(parsedObj)
             }
 
-            //await mockLongTime(10 * 1000)
-
             emitter.emit(BizConstants.Month_reload_data_key)
             emitter.emit(BizConstants.Report_reload_data_key)
 
@@ -87,36 +68,23 @@ struct BackupRestorePage {
           this.isProcessing = false
         } catch (error1) {
           console.error(`mylogfailed   , Error code: ${error1.code}, message: ${error1.message}`);
+          this.isProcessing = false
         }
 
 
       }).catch((err: BusinessError) => {
         console.error('DocumentViewPicker.select failed with err: ' + JSON.stringify(err));
+        this.isProcessing = false
       });
 
     } catch (error) {
       let err: BusinessError = error as BusinessError;
       console.error('DocumentViewPicker failed with err: ' + JSON.stringify(err));
+      this.isProcessing = false
     }
 
 
   }
-
-  // async requestMediaPermission() {
-  //   let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
-  //   let context: Context = getContext(this) as common.UIAbilityContext;
-  //   atManager.requestPermissionsFromUser(context, ['ohos.permission.WRITE_MEDIA'],
-  //     (err: BusinessError, data: PermissionRequestResult) => {
-  //       if (err) {
-  //         console.error(`requestPermissionsFromUser fail, err->${JSON.stringify(err)}`);
-  //       } else {
-  //         console.info('data:' + JSON.stringify(data));
-  //         console.info('data permissions:' + data.permissions);
-  //         console.info('data authResults:' + data.authResults);
-  //         console.info('data dialogShownResults:' + data.dialogShownResults);
-  //       }
-  //     });
-  // }
 
   backupData() {
 
@@ -127,7 +95,7 @@ struct BackupRestorePage {
       let fileName = "备份" + dayjs(new Date()).format("YYYYMMDDHHmmss") + ".json"
       documentSaveOptions.newFileNames = [fileName];
       let documentPicker = new picker.DocumentViewPicker(getContext(this));
-      documentPicker.save(documentSaveOptions).then((documentSaveResult: Array<string>) => {
+      documentPicker.save(documentSaveOptions).then(async (documentSaveResult: Array<string>) => {
         console.info('DocumentViewPicker.save successfully, documentSaveResult uri: ' +
         JSON.stringify(documentSaveResult));
 
@@ -136,6 +104,7 @@ struct BackupRestorePage {
         if (path !== undefined) {
 
           this.isProcessing = true
+          await mockLongTime(300)
           let startTime = systemDateTime.getTime(false)
           let allRecord = DatabaseHelper.getInstance().getAllBillRecord()
 
@@ -147,6 +116,12 @@ struct BackupRestorePage {
           let duration = systemDateTime.getTime(false) - startTime
           //mylog save export file cost：7 ms ,fileContent length:43283
           console.log(`mylog save export file cost：${duration} ms ,fileContent length:${fileContent.length} `);
+
+          AlertDialog.show(
+            {
+              message: "导出完成！",
+            }
+          )
 
         }
         this.isProcessing = false
@@ -175,7 +150,7 @@ struct BackupRestorePage {
       Column() {
         Column({ space: 10 }) {
           Column() {
-            Button("备份", { type: ButtonType.Normal })
+            Button("导出为 json 文件", { type: ButtonType.Normal })
               .width("100%")
               .height(36)
               .border({ width: 1, color: Color.Black })// 蓝色细边框
@@ -193,24 +168,6 @@ struct BackupRestorePage {
           .backgroundColor($r("app.color.white"))
           .borderRadius(8)
 
-          Column() {
-            Button("恢复", { type: ButtonType.Normal })
-              .width("100%")
-              .height(36)
-              .border({ width: 1, color: Color.Black })// 蓝色细边框
-              .fontColor($r("app.color.text_primary"))
-              .fontWeight(FontWeight.Medium)
-              .fontSize(20)
-              .backgroundColor(Color.Transparent)
-              .borderRadius(8)
-              .onClick(() => {
-                this.restore()
-              })
-              .enabled(!this.isProcessing)
-
-          }
-          .backgroundColor($r("app.color.white"))
-          .borderRadius(8)
 
           if (this.isProcessing) {
             Row({ space: 10 }) {
@@ -222,47 +179,20 @@ struct BackupRestorePage {
           }
 
 
-          Column({ space: 10 }) {
-
-            Text("1.升级或者重装之前备份为文件").fontSize(18)
-              .width("100%")
-            Text("2.升级或者重装之后从备份文件中恢复").fontSize(18)
-              .width("100%")
-
-          }.backgroundColor($r("app.color.white"))
-          .borderRadius(8)
-          .padding(10)
-
-
-          Button("模拟生成帐单数据")
-            .onClick(async () => {
-
-              this.isProcessing = true
-              const startTime = systemDateTime.getTime(false);
-
-              let count = await taskpool.execute(new taskpool.Task(mockInsertBills,
-                getContext(this)))
-
-              let duration = systemDateTime.getTime(false) - startTime
-              console.log(`mylog taskpool    cost：${duration} ms ,count:${count} `);
-
-              this.isProcessing = false
-            })
-            .visibility(Visibility.Visible)
-
+          // Column({ space: 10 }) {
+          //
+          //   Text("1.升级或者重装之前备份为文件").fontSize(18)
+          //     .width("100%")
+          //   Text("2.升级或者重装之后从备份文件中恢复").fontSize(18)
+          //     .width("100%")
+          //
+          // }.backgroundColor($r("app.color.white"))
+          // .borderRadius(8)
+          // .padding(10)
 
         }
         .width("100%")
         .padding(10)
-
-        Button("备份db")
-          .onClick(() => {
-            const startTime = systemDateTime.getTime(false);
-
-            //DatabaseHelper.getInstance().backupDb("bak1.mybak")
-            console.log(`mylog taskpool    cost：${systemDateTime.getTime(false) - startTime} ms `);
-          })
-          .visibility(Visibility.Visible)
 
       }
       .height('100%')

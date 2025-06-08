@@ -104,21 +104,46 @@ struct My {
         .color($r("app.color.text_second"))
 
 
-      this.getRenderItem("备份/恢复",
+      this.getRenderItem("导出",
         () => {
           router.pushUrl({
-            url: "pages/BackupRestorePage",
+            url: "pages/Export2FilePage",
             params: {}
           })
         }
 
       )
 
-      // Divider().strokeWidth(0.5)
-      //   .width("90%")
-      //   .color($r("app.color.text_second"))
-      //Row().height(10)
-      // this.getRenderItem("设置")
+      Divider().strokeWidth(0.5)
+        .width("90%")
+        .color($r("app.color.text_second"))
+
+
+      this.getRenderItem("备份/恢复",
+        () => {
+          router.pushUrl({
+            url: "pages/BackupAndRestorePage",
+            params: {}
+          })
+        }
+
+      )
+
+      //test
+      Divider().strokeWidth(0.5)
+        .width("90%")
+        .color($r("app.color.text_second"))
+
+
+      this.getRenderItem("测试",
+        () => {
+          router.pushUrl({
+            url: "pages/DebugPage",
+            params: {}
+          })
+        }
+      )
+
     }
     .width('100%')
     .height('100%')

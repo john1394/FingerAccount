@@ -13,7 +13,9 @@
     "pages/PrivacyPage",
     "pages/UserAgreementPage",
     "pages/AboutPage",
-    "pages/BackupRestorePage",
-    "pages/WelcomePage"
+    "pages/Export2FilePage",
+    "pages/WelcomePage",
+    "pages/DebugPage",
+    "pages/BackupAndRestorePage"
   ]
 }
