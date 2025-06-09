@@ -301,6 +301,22 @@ export class AutoBackupManager {
     return true
   }
 
+  async deleteBackupItemInner(filePath: string) {
+    try {
+
+      await this.createDownloadPackageDir()
+      if (fs.accessSync(filePath, fs.AccessModeType.READ_WRITE)) {
+        fs.unlink(filePath)
+      }
+
+    } catch (err) {
+      const error = err as BusinessError;
+      console.error("mylog", `deleteItem failed, code: ${error.code}, message: ${error.message}`);
+    }
+
+  }
+
+
   async backupInner(backupDir: string) {
     try {
 

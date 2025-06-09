@@ -8,3 +8,9 @@ export interface BackupInfoRecord {
   backupFilePath: string
 
 }
+
+export interface PopupItem {
+  title: string
+  icon: ResourceStr,
+  itemClick?: () => void
+}
