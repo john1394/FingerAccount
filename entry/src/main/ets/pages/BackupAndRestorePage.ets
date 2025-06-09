@@ -3,6 +3,8 @@ import { router } from '@kit.ArkUI';
 import { AutoBackupManager } from '../utils/AutoBackupManager';
 import { BackupInfoRecord, PopupItem } from '../models/BackupModel';
 import { BackupItem } from '../components/BackupItem';
+import { BizConstants } from '../utils/BizConstants';
+import { emitter } from '@kit.BasicServicesKit';
 
 @Entry
 @Component
@@ -48,17 +50,19 @@ struct BackupAndRestorePage {
 
   }
 
-  //
-  // async deleteBackupItemReal(path: string) {
-  //
-  //   //await mockLongTime(5 * 1000)
-  //   let context = getContext(this)
-  //   let manager = new AutoBackupManager(context)
-  //   await manager.createDownloadPackageDir()
-  //   await manager.deleteBackupItemInner(path)
-  //   await this.reloadBackupList()
-  //   this.isLoading = false
-  // }
+  async restoreBackupItem(restoreFilePath: string) {
+
+    this.isLoading = true
+    let context = getContext(this)
+    let manager = new AutoBackupManager(context)
+    let bakDir = await manager.createDownloadPackageDir()
+    if (bakDir) {
+      await manager.restoreInner(restoreFilePath)
+      emitter.emit(BizConstants.Month_reload_data_key)
+      emitter.emit(BizConstants.Report_reload_data_key)
+    }
+    this.isLoading = false
+  }
 
   @Builder
   getContent() {
@@ -188,34 +192,14 @@ struct BackupAndRestorePage {
 
                         deleteBackupItem: (path: string) => {
                           this.deleteBackupItem(path)
-                        }
+                        },
 
+                        restoreBackupItem: (path: string) => {
+                          this.restoreBackupItem(path)
+                        },
 
                       }
                     )
-                    // Column({ space: 0 }) {
-                    //   Text("备份 " + item.timeStr)
-                    //     .height(40)
-                    //     .onClick(() => {
-                    //       this.showPopup = true
-                    //     })
-                    //     .bindPopup(this.showPopup, {
-                    //       builder: this.getContent,
-                    //       popupColor: $r("app.color.popup_back"),
-                    //       backgroundBlurStyle: BlurStyle.NONE,
-                    //       onStateChange: (event) => {
-                    //         this.showPopup = event.isVisible
-                    //       }
-                    //     })
-                    //   // .gesture(LongPressGesture().onAction(() => {
-                    //   //   // 绑定长按的手势
-                    //   //   this.showPopup = true
-                    //   // }))
-                    //
-                    //
-                    // }.width("100%")
-                    // .justifyContent(FlexAlign.Center)
-
 
                   }
                   .borderRadius(5)

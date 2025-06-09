@@ -18,4 +18,6 @@ export class BizConstants {
   //每天最多备份数
   static Rdb_backup_max_day_count: number = 5
   static Rdb_backup_name_suffix = "bak_"
+  static Rdb_backup_dir_path = "/rdbbak"
+
 }

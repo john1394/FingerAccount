@@ -316,6 +316,35 @@ export class AutoBackupManager {
 
   }
 
+  async restoreInner(restoreFilePath: string) {
+
+    //1. 沙箱
+
+    try {
+      let fileName = new fileUri.FileUri(restoreFilePath).name
+      let applicationContext = this.context.getApplicationContext();
+      let filesDir = applicationContext.databaseDir;
+      let bakSrcDirPath = new fileUri.FileUri(filesDir + BizConstants.Rdb_backup_dir_path).path
+      let toFilePath = bakSrcDirPath + "/" + fileName
+      if (!fs.accessSync(restoreFilePath, fs.AccessModeType.EXIST)) {
+        console.warn("mylog", "src file not exists:" + bakSrcDirPath)
+        return
+      }
+
+      if (fs.accessSync(toFilePath, fs.AccessModeType.EXIST)) {
+        console.warn("mylog", " to file exists:" + toFilePath)
+        return
+      }
+
+      fs.copyFileSync(restoreFilePath, toFilePath)
+      await DatabaseHelper.getInstance().restoreDb(toFilePath)
+      fs.unlink(toFilePath)
+      console.log("mylog", "restore finished")
+    } catch (err) {
+      const error = err as BusinessError;
+      console.error("mylog", `restoreInner failed, code: ${error.code}, message: ${error.message}`);
+    }
+  }
 
   async backupInner(backupDir: string) {
     try {
@@ -330,7 +359,7 @@ export class AutoBackupManager {
       //1. download/包名 目录下建立bak目录
       let applicationContext = this.context.getApplicationContext();
       let filesDir = applicationContext.databaseDir;
-      let bakSrcDirPath = new fileUri.FileUri(filesDir + "/rdbbak").path
+      let bakSrcDirPath = new fileUri.FileUri(filesDir + BizConstants.Rdb_backup_dir_path).path
 
       if (!fs.accessSync(bakSrcDirPath, fs.AccessModeType.EXIST)) {
         fs.mkdirSync(bakSrcDirPath)

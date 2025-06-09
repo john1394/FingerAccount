@@ -13,6 +13,11 @@ export struct BackupItem {
     {
       title: '恢复',
       icon: $r("app.media.restore"),
+      itemClick: () => {
+
+        this.showPopup = false
+        this.restoreBackupItem(this.backupRecord.backupFilePath)
+      }
 
     },
     {
@@ -26,6 +31,9 @@ export struct BackupItem {
     }
   ]
   deleteBackupItem: (path: string) => void = () => {
+  }
+
+  restoreBackupItem: (path: string) => void = () => {
   }
 
   //
