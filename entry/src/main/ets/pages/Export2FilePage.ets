@@ -1,14 +1,15 @@
 import { BackHeader } from '../components/RenderItem';
 import { router } from '@kit.ArkUI';
-import { fileIo as fs, picker } from '@kit.CoreFileKit';
+import { fileUri, fileIo as fs, picker } from '@kit.CoreFileKit';
 import { BusinessError, emitter, systemDateTime } from '@kit.BasicServicesKit';
 import { DatabaseHelper } from '../utils/DatabaseHelper';
-import { util } from '@kit.ArkTS';
-import { BillDbRecord } from '../models/RecordList';
+import { taskpool, util } from '@kit.ArkTS';
+import { BillDbRecord, BillTypeEnum } from '../models/RecordList';
 import { BizConstants } from '../utils/BizConstants';
 import dayjs from 'dayjs';
-import { mockLongTime } from '../utils/Util';
-
+import { formatSimpleDate } from '../utils/Util';
+import ExcelJS from '@archermind/exceljs';
+import { CSVWriter } from '@ohos/opencsv';
 
 @Entry
 @Component
@@ -86,55 +87,89 @@ struct Export2FilePage {
 
   }
 
-  backupData() {
+  async export2Json() {
 
 
     try {
       let documentSaveOptions = new picker.DocumentSaveOptions();
 
-      let fileName = "备份" + dayjs(new Date()).format("YYYYMMDDHHmmss") + ".json"
+      let fileName = "导出_" + dayjs(new Date()).format("YYYYMMDDHHmmss") + ".json"
       documentSaveOptions.newFileNames = [fileName];
       let documentPicker = new picker.DocumentViewPicker(getContext(this));
-      documentPicker.save(documentSaveOptions).then(async (documentSaveResult: Array<string>) => {
-        console.info('DocumentViewPicker.save successfully, documentSaveResult uri: ' +
-        JSON.stringify(documentSaveResult));
+      let documentSaveResult = await documentPicker.save(documentSaveOptions)
+      let path = documentSaveResult[0]
 
-        let path = documentSaveResult[0]
+      if (path !== undefined) {
+        this.isProcessing = true
+        let startTime = systemDateTime.getTime(false)
+        let allRecord = DatabaseHelper.getInstance().getAllBillRecord()
 
-        if (path !== undefined) {
+        let fileContent = JSON.stringify(allRecord)
 
-          this.isProcessing = true
-          await mockLongTime(300)
-          let startTime = systemDateTime.getTime(false)
-          let allRecord = DatabaseHelper.getInstance().getAllBillRecord()
+        let file = fs.openSync(path, fs.OpenMode.READ_WRITE);
+        fs.writeSync(file.fd, fileContent)
 
-          let fileContent = JSON.stringify(allRecord)
+        let duration = systemDateTime.getTime(false) - startTime
+        //mylog save export file cost：7 ms ,fileContent length:43283
+        console.log(`mylog save export file cost：${duration} ms ,fileContent length:${fileContent.length} `);
+        AlertDialog.show(
+          {
+            message: "导出完成！",
+          }
+        )
 
-          let file = fs.openSync(path, fs.OpenMode.READ_WRITE);
-          fs.writeSync(file.fd, fileContent)
+      }
 
-          let duration = systemDateTime.getTime(false) - startTime
-          //mylog save export file cost：7 ms ,fileContent length:43283
-          console.log(`mylog save export file cost：${duration} ms ,fileContent length:${fileContent.length} `);
-
-          AlertDialog.show(
-            {
-              message: "导出完成！",
-            }
-          )
-
-        }
-        this.isProcessing = false
-
-      }).catch((err: BusinessError) => {
-        console.error('DocumentViewPicker.save failed with err: ' + JSON.stringify(err));
-      });
     } catch (error) {
       let err: BusinessError = error as BusinessError;
       console.error('DocumentViewPicker failed with err: ' + JSON.stringify(err));
     }
-    return
 
+
+  }
+
+  async export2Excel() {
+
+    try {
+      let documentSaveOptions = new picker.DocumentSaveOptions();
+
+      let fileName = "export_" + dayjs(new Date()).format("YYYYMMDDHHmmss") + ".csv"
+      documentSaveOptions.newFileNames = [fileName];
+      let documentPicker = new picker.DocumentViewPicker(getContext(this));
+      let documentSaveResult = await documentPicker.save(documentSaveOptions)
+
+      let path = documentSaveResult[0]
+
+      if (path !== undefined) {
+
+        //await mockLongTime(300)
+        let startTime = systemDateTime.getTime(false)
+        let allRecord = DatabaseHelper.getInstance().getAllBillRecord()
+
+        //改为异步
+
+        let savePath = new fileUri.FileUri(path).path
+        await taskpool.execute(new taskpool.Task(record2Csv, allRecord, savePath))
+
+        let duration = systemDateTime.getTime(false) - startTime
+        //mylog save export file cost：7 ms ,fileContent length:43283
+        console.log(`mylog save export file cost：${duration} ms ,allRecord count:${allRecord.length} `);
+
+        AlertDialog.show(
+          {
+            message: "导出完成！",
+          }
+        )
+
+      }
+
+      this.isProcessing = false
+
+    } catch (error) {
+      let err: BusinessError = error as BusinessError;
+      console.error('DocumentViewPicker failed with err: ' + JSON.stringify(err));
+      this.isProcessing = false
+    }
   }
 
   build() {
@@ -149,7 +184,7 @@ struct Export2FilePage {
 
       Column() {
         Column({ space: 10 }) {
-          Column() {
+          Column({ space: 10 }) {
             Button("导出为 json 文件", { type: ButtonType.Normal })
               .width("100%")
               .height(36)
@@ -159,8 +194,28 @@ struct Export2FilePage {
               .fontSize(20)
               .backgroundColor(Color.Transparent)
               .borderRadius(8)
-              .onClick(() => {
-                this.backupData()
+              .onClick(async () => {
+                this.isProcessing = true
+                await this.export2Json()
+                this.isProcessing = false
+              })
+              .enabled(!this.isProcessing)
+              .visibility(Visibility.None)
+
+            Button("导出为 csv 文件", { type: ButtonType.Normal })
+              .width("100%")
+              .height(36)
+              .border({ width: 1, color: Color.Black })// 蓝色细边框
+              .fontColor($r("app.color.text_primary"))
+              .fontWeight(FontWeight.Medium)
+              .fontSize(20)
+              .backgroundColor(Color.Transparent)
+              .borderRadius(8)
+              .onClick(async () => {
+                this.isProcessing = true
+                await this.export2Excel()
+
+                console.log('mylog:', "after async call export2Excel");
               })
               .enabled(!this.isProcessing)
 
@@ -200,4 +255,96 @@ struct Export2FilePage {
       .backgroundColor($r('app.color.back_color'))
     }
   }
+}
+
+
+@Concurrent
+async function record2Xlsx(billDbRecords: BillDbRecord[], filePath: string) {
+
+  const workbook = new ExcelJS.Workbook();
+  // 2. 添加工作表
+  const worksheet = workbook.addWorksheet('用户数据');
+  // 3. 设置表头
+  worksheet.columns = [
+    { header: 'ID', key: 'id', width: 10 },
+    { header: '帐本名称', key: 'account_name', width: 20 },
+    { header: '类别', key: 'category', width: 10 },
+    { header: '收支类型', key: 'bill_type', width: 25 },
+    { header: '金额', key: 'amount', width: 25 },
+    { header: '记帐时间', key: 'timestamp', width: 25 },
+    { header: '备注', key: 'notes', width: 25 }
+
+  ];
+
+  let countIndex = 0
+  for (let billItem of billDbRecords) {
+
+    if (countIndex >= 1000) {
+      break
+    }
+
+    worksheet.addRow({
+      id: billItem.id,
+      account_name: billItem.bill_book_id === 1 ? "基本帐本" : "其它帐本",
+      category: billItem.category,
+      bill_type: billItem.bill_type === BillTypeEnum.Outcome ? "支出" : "收入",
+      amount: (billItem.amount / 100).toFixed(2),
+      timestamp: new Date(billItem.timestamp),
+      notes: billItem.notes
+    });
+
+    countIndex++
+
+
+  }
+  console.log(`mylog: ${countIndex}`);
+
+  //await workbook.xlsx.writeFile(filePath)
+  console.log("mylog", `Excel文件将存至: ${filePath}`);
+  try {
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    // 写入文件系统
+    const file = fs.openSync(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE);
+    fs.writeSync(file.fd, buffer);
+    fs.closeSync(file);
+    console.log("mylog", `Excel文件已保存至: ${filePath}`);
+  } catch (error) {
+    console.error("mylog", '文件保存失败:', error);
+  }
+}
+
+
+@Concurrent
+async function record2Csv(billDbRecords: BillDbRecord[], filePath: string) {
+  try {
+
+    const file = fs.openSync(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE);
+
+    let writer = new CSVWriter(file.fd);
+
+    writer.writeNext(["ID", '帐本名称', '类别', '收支类型', '金额', '时间', '备注'], true)
+
+    for (let billItem of billDbRecords) {
+
+      writer.writeNext([
+        billItem.id + "",
+        billItem.bill_book_id === 1 ? "基本帐本" : "其它帐本",
+        billItem.category,
+        (billItem.bill_type === BillTypeEnum.Outcome) ? "支出" : "收入",
+        (billItem.amount / 100).toFixed(2),
+
+        formatSimpleDate(billItem.timestamp),
+
+        billItem.notes
+      ],
+        true);
+
+    }
+    writer.close(); // 写入关闭
+
+  } catch (error) {
+    console.error("mylog", '文件保存失败:', error);
+  }
+
 }

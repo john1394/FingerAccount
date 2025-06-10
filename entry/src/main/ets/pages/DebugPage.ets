@@ -1,9 +1,10 @@
-import { systemDateTime } from '@kit.BasicServicesKit'
+import { emitter, systemDateTime } from '@kit.BasicServicesKit'
 import { taskpool } from '@kit.ArkTS'
 import { DatabaseHelper } from '../utils/DatabaseHelper'
 import CategoryMapSingleton from '../models/CategoryMapSingleton'
 import { mockBillRecords } from '../utils/Util'
 import { BillDbRecord } from '../models/RecordList'
+import { BizConstants } from '../utils/BizConstants'
 
 @Entry
 @Component
@@ -29,6 +30,8 @@ struct DebugPage {
             let duration = systemDateTime.getTime(false) - startTime
             console.log(`mylog taskpool    cost：${duration} ms ,count:${count} `);
 
+            emitter.emit(BizConstants.Month_reload_data_key)
+            emitter.emit(BizConstants.Report_reload_data_key)
             this.isProcessing = false
           })
           .visibility(Visibility.Visible)

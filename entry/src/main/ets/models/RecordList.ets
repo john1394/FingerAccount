@@ -1,5 +1,5 @@
 export interface BillDbRecord {
-  // 用户id
+  // id
   id: number
   //帐本id
   bill_book_id: number,
@@ -19,6 +19,25 @@ export interface BillDbRecord {
 
   //扩展列
   extra_fields: string
+}
+
+export interface BillDbRecordExport {
+  // id
+  id: number
+  //帐本id
+  bill_book_name: string,
+
+  // 类型名称
+  category: string
+  //收支类型 0 为支出 ,1 为收入
+  bill_type_name: string,
+  //金额
+  amountStr: string
+  //记帐时间
+  timeStr: string,
+  //备注
+  notes: string,
+
 }
 
 

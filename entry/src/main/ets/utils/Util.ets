@@ -134,7 +134,14 @@ export function mockRandomCurrentDay(dayStr: string): Date {
   Math.floor(Math.random() * 60).toString().padStart(2, "0") + ":" +
   Math.floor(Math.random() * 60).toString().padStart(2, "0")
 
-  return dayjs(str, "yyyy-MM-DD HH:MM:SS").toDate()
+  //YYYY-MM-DD HH:mm:ss
+  return dayjs(str, "YYYY-MM-DD HH:mm:ss").toDate()
+}
+
+export function formatSimpleDate(time: number): string {
+
+  let str = dayjs(time).format("YYYY-MM-DD HH:mm:ss")
+  return str
 }
 
 export class DayPairImp implements DayPair {
