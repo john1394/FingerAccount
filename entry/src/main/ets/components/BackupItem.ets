@@ -32,13 +32,8 @@ export struct BackupItem {
   ]
   deleteBackupItem: (path: string) => void = () => {
   }
-
   restoreBackupItem: (path: string) => void = () => {
   }
-
-  //
-  // @Prop
-  // context:Context;
 
   @Builder
   getContent() {
@@ -73,9 +68,7 @@ export struct BackupItem {
   build() {
     Column({ space: 0 }) {
       Text("备份 " + this.backupRecord.timeStr)
-        .height(40)// .onClick(() => {
-          //   this.showPopup = true
-          // })
+        .height(40)
         .bindPopup(this.showPopup, {
           builder: this.getContent,
           popupColor: $r("app.color.popup_back"),
@@ -91,6 +84,12 @@ export struct BackupItem {
 
 
     }.width("100%")
+    .border(
+      {
+        width: this.showPopup ? 1 : 0,
+        color: this.showPopup ? Color.Green : Color.Transparent
+      }
+    )
     .justifyContent(FlexAlign.Center)
   }
 }
