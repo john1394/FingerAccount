@@ -145,7 +145,7 @@ export class DatabaseHelper {
 
   }
 
-  restoreDb(fromFileFullPath: string):Promise<void> {
+  restoreDb(fromFileFullPath: string): Promise<void> {
 
     let pro: Promise<void> = new Promise((resolve) => {
       if (this.rdbStore) {
@@ -282,6 +282,28 @@ export class DatabaseHelper {
       console.error(`Failed to execute SQL: ${error.message}`);
 
     }
+    return result
+  }
+
+  getAllRecordCount(): number {
+
+    let result = 0
+    try {
+      let sql: string = `select count(1) as total from bills`
+      let params: ValueType[] = [];
+      const resultSet = this.rdbStore?.querySqlSync(sql, params);
+      if (resultSet?.goToNextRow()) {
+        // 获取列值
+        const total = resultSet.getLong(resultSet.getColumnIndex('total'));
+        result = total
+      }
+
+      resultSet?.close();
+
+    } catch (error) {
+      console.error(`getAllRecordCount failed to execute SQL: ${error.message}`);
+    }
+
     return result
   }
 

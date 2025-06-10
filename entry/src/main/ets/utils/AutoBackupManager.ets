@@ -365,6 +365,8 @@ export class AutoBackupManager {
         fs.mkdirSync(bakSrcDirPath)
       }
 
+      let count = DatabaseHelper.getInstance().getAllRecordCount()
+
       let srcFilePath = bakSrcDirPath + "/" + backupFileName
       await DatabaseHelper.getInstance().backupDb(srcFilePath)
 
@@ -376,6 +378,9 @@ export class AutoBackupManager {
         let toFilePath = backupDir + "/" + backupFileName
         fs.copyFileSync(srcFilePath, toFilePath)
 
+        //todo 写元数据
+
+
         PreferenceStore.setHasNewData(false)
 
         console.log("mylog", "copyFileSync", srcFilePath, "->", toFilePath)
@@ -384,8 +389,6 @@ export class AutoBackupManager {
       } else {
         console.log("mylog", "src file not exist", srcFilePath)
       }
-
-      //this.reserveLatestBackupFiles(backupDir)
 
 
     } catch (err) {
