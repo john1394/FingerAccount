@@ -6,12 +6,12 @@
         "type": "HarmonyOS",
         "material": {
           "certpath": "C:\\Users\\john\\.ohos\\config\\default_FingerAccount_dt19cNpdJa1vNku08JFh5oH60ZVn51wptPIwZ6-czvw=.cer",
-          "storePassword": "0000001B34B74E7420822C01B544387AA805F4D1E3F5D6A58DF096E7EA01799CA8CC3C023D655998F63524",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001B75B9B6BA73ECC30D8340771508EF633F60EE450A791F90C02F84D505227CBC0D56E061085C993E",
+          "keyPassword": "0000001B76B863EA9FAD96B5CD24D053D84246C95249656A3C99C936973CD29B59F0E95BA513EBB3E29983",
           "profile": "C:\\Users\\john\\.ohos\\config\\default_FingerAccount_dt19cNpdJa1vNku08JFh5oH60ZVn51wptPIwZ6-czvw=.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\john\\.ohos\\config\\default_FingerAccount_dt19cNpdJa1vNku08JFh5oH60ZVn51wptPIwZ6-czvw=.p12"
+          "storeFile": "C:\\Users\\john\\.ohos\\config\\default_FingerAccount_dt19cNpdJa1vNku08JFh5oH60ZVn51wptPIwZ6-czvw=.p12",
+          "storePassword": "0000001BE5C5153C1B2DDBE0A4BCF26056010F94735EB47BC84A096E5BBB840313AFA9858C21EFDE05173E"
         }
       }
     ],
