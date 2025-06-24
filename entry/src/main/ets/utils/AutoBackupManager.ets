@@ -325,7 +325,15 @@ export class AutoBackupManager {
       let applicationContext = this.context.getApplicationContext();
       let filesDir = applicationContext.databaseDir;
       let bakSrcDirPath = new fileUri.FileUri(filesDir + BizConstants.Rdb_backup_dir_path).path
+
+      //确保沙箱目录存在
+      if (!fs.accessSync(bakSrcDirPath, fs.AccessModeType.EXIST)) {
+        fs.mkdirSync((bakSrcDirPath))
+      }
+
       let toFilePath = bakSrcDirPath + "/" + fileName
+
+
       if (!fs.accessSync(restoreFilePath, fs.AccessModeType.EXIST)) {
         console.warn("mylog", "src file not exists:" + bakSrcDirPath)
         return
@@ -333,12 +341,13 @@ export class AutoBackupManager {
 
       if (fs.accessSync(toFilePath, fs.AccessModeType.EXIST)) {
         console.warn("mylog", " to file exists:" + toFilePath)
-        return
+        fs.unlinkSync(toFilePath)
       }
+
 
       fs.copyFileSync(restoreFilePath, toFilePath)
       await DatabaseHelper.getInstance().restoreDb(toFilePath)
-      fs.unlink(toFilePath)
+      fs.unlinkSync(toFilePath)
       console.log("mylog", "restore finished")
     } catch (err) {
       const error = err as BusinessError;
