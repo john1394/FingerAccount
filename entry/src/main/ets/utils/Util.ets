@@ -261,8 +261,10 @@ export function formatDayBoundary(boundary: DayPair) {
   //周,月 ，年
   // let endDate = new Date(boundary.end.getTime() - 1)
   let endDate = new Date(boundary.end.getTime())
-  return formatDateYMDHan(boundary.begin) + "-" + formatDateYMDHan(endDate);
+  return formatDateYMDHan(boundary.begin) + "-" + formatDateMDHan(endDate)
+  //formatDateYMDHan(endDate);
 }
+
 
 export function shiftYear(dayPair: DayPair, left: boolean): DayPair {
   let deltaNumber = left ? -1 : 1;
@@ -399,6 +401,7 @@ export function formatDateYMDHan(date: Date): string {
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}年${month}月${day}日`;
 }
+
 
 export function getDayOfWeek(date: Date): string {
   const daysOfWeek = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
