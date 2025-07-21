@@ -3,6 +3,8 @@ import { router } from '@kit.ArkUI'
 @Preview
 @Component
 struct My {
+  isDebug: boolean = false
+
   @Builder
   getRenderItem(left: string, rightClick?: () => void) {
     Row() {
@@ -75,33 +77,53 @@ struct My {
       Divider().strokeWidth(0.5)
         .width("90%")
         .color($r("app.color.text_second"))
-      //Row().height(10)
-      this.getRenderItem("用户协议",
-        () => {
-          router.pushUrl({
-            url: "pages/UserAgreementPage",
-            params: {}
-          })
-        }
-      )
 
-      Divider().strokeWidth(0.5)
-        .width("90%")
-        .color($r("app.color.text_second"))
-
-      this.getRenderItem("隐私项",
-        () => {
-          router.pushUrl({
-            url: "pages/PrivacyPage",
-            params: {}
-          })
-        }
-      )
+      if (this.isDebug) {
 
 
-      Divider().strokeWidth(0.5)
-        .width("90%")
-        .color($r("app.color.text_second"))
+        this.getRenderItem("用户协议",
+          () => {
+            router.pushUrl({
+              url: "pages/UserAgreementPage",
+              params: {}
+            })
+          }
+        )
+
+        Divider().strokeWidth(0.5)
+          .width("90%")
+          .color($r("app.color.text_second"))
+
+        this.getRenderItem("隐私项",
+          () => {
+            router.pushUrl({
+              url: "pages/PrivacyPage",
+              params: {}
+            })
+          }
+        )
+
+
+        Divider().strokeWidth(0.5)
+          .width("90%")
+          .color($r("app.color.text_second"))
+
+        //测试
+        Divider().strokeWidth(0.5)
+          .width("90%")
+          .color($r("app.color.text_second"))
+
+
+        this.getRenderItem("测试",
+          () => {
+            router.pushUrl({
+              url: "pages/DebugPage",
+              params: {}
+            })
+          }
+        )
+
+      }
 
 
       this.getRenderItem("导出",
@@ -129,20 +151,6 @@ struct My {
 
       )
 
-      //test
-      Divider().strokeWidth(0.5)
-        .width("90%")
-        .color($r("app.color.text_second"))
-
-
-      this.getRenderItem("测试",
-        () => {
-          router.pushUrl({
-            url: "pages/DebugPage",
-            params: {}
-          })
-        }
-      )
 
     }
     .width('100%')
