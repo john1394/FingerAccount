@@ -13,7 +13,7 @@ export default class EntryAbility extends UIAbility {
   async onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
 
 
-    this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
+    this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT);
     PreferenceStore.init(this.context)
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
     //  console.log("mylog", "onCreate1")

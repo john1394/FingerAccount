@@ -1,13 +1,13 @@
 {
-  "modelVersion": "5.0.5",
+  "modelVersion": "5.0.2",
   "description": "Please describe the basic information.",
   "dependencies": {
     "@ohos/axios": "^2.2.4",
     "@mcui/mccharts": "^2.8.7",
-    "@wuyan/hm_chart": "^2.0.4",
-    "@ohos/mpchart": "^3.0.22",
+    //    "@wuyan/hm_chart": "^2.0.4",
+    //    "@ohos/mpchart": "^3.0.22",
     "dayjs": "^1.11.13",
-    "@archermind/exceljs": "^1.0.0",
+    //    "@archermind/exceljs": "^1.0.0",
     "@ohos/opencsv": "^2.0.0"
   },
   "devDependencies": {

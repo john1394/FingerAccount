@@ -8,7 +8,7 @@ import { BillDbRecord, BillTypeEnum } from '../models/RecordList';
 import { BizConstants } from '../utils/BizConstants';
 import dayjs from 'dayjs';
 import { formatSimpleDate } from '../utils/Util';
-import ExcelJS from '@archermind/exceljs';
+// import ExcelJS from '@archermind/exceljs';
 import { CSVWriter } from '@ohos/opencsv';
 
 @Entry
@@ -258,62 +258,62 @@ struct Export2FilePage {
 }
 
 
-@Concurrent
-async function record2Xlsx(billDbRecords: BillDbRecord[], filePath: string) {
-
-  const workbook = new ExcelJS.Workbook();
-  // 2. 添加工作表
-  const worksheet = workbook.addWorksheet('用户数据');
-  // 3. 设置表头
-  worksheet.columns = [
-    { header: 'ID', key: 'id', width: 10 },
-    { header: '帐本名称', key: 'account_name', width: 20 },
-    { header: '类别', key: 'category', width: 10 },
-    { header: '收支类型', key: 'bill_type', width: 25 },
-    { header: '金额', key: 'amount', width: 25 },
-    { header: '记帐时间', key: 'timestamp', width: 25 },
-    { header: '备注', key: 'notes', width: 25 }
-
-  ];
-
-  let countIndex = 0
-  for (let billItem of billDbRecords) {
-
-    if (countIndex >= 1000) {
-      break
-    }
-
-    worksheet.addRow({
-      id: billItem.id,
-      account_name: billItem.bill_book_id === 1 ? "基本帐本" : "其它帐本",
-      category: billItem.category,
-      bill_type: billItem.bill_type === BillTypeEnum.Outcome ? "支出" : "收入",
-      amount: (billItem.amount / 100).toFixed(2),
-      timestamp: new Date(billItem.timestamp),
-      notes: billItem.notes
-    });
-
-    countIndex++
-
-
-  }
-  console.log(`mylog: ${countIndex}`);
-
-  //await workbook.xlsx.writeFile(filePath)
-  console.log("mylog", `Excel文件将存至: ${filePath}`);
-  try {
-    const buffer = await workbook.xlsx.writeBuffer();
-
-    // 写入文件系统
-    const file = fs.openSync(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE);
-    fs.writeSync(file.fd, buffer);
-    fs.closeSync(file);
-    console.log("mylog", `Excel文件已保存至: ${filePath}`);
-  } catch (error) {
-    console.error("mylog", '文件保存失败:', error);
-  }
-}
-
+// @Concurrent
+// async function record2Xlsx(billDbRecords: BillDbRecord[], filePath: string) {
+//
+//   const workbook = new ExcelJS.Workbook();
+//   // 2. 添加工作表
+//   const worksheet = workbook.addWorksheet('用户数据');
+//   // 3. 设置表头
+//   worksheet.columns = [
+//     { header: 'ID', key: 'id', width: 10 },
+//     { header: '帐本名称', key: 'account_name', width: 20 },
+//     { header: '类别', key: 'category', width: 10 },
+//     { header: '收支类型', key: 'bill_type', width: 25 },
+//     { header: '金额', key: 'amount', width: 25 },
+//     { header: '记帐时间', key: 'timestamp', width: 25 },
+//     { header: '备注', key: 'notes', width: 25 }
+//
+//   ];
+//
+//   let countIndex = 0
+//   for (let billItem of billDbRecords) {
+//
+//     if (countIndex >= 1000) {
+//       break
+//     }
+//
+//     worksheet.addRow({
+//       id: billItem.id,
+//       account_name: billItem.bill_book_id === 1 ? "基本帐本" : "其它帐本",
+//       category: billItem.category,
+//       bill_type: billItem.bill_type === BillTypeEnum.Outcome ? "支出" : "收入",
+//       amount: (billItem.amount / 100).toFixed(2),
+//       timestamp: new Date(billItem.timestamp),
+//       notes: billItem.notes
+//     });
+//
+//     countIndex++
+//
+//
+//   }
+//   console.log(`mylog: ${countIndex}`);
+//
+//   //await workbook.xlsx.writeFile(filePath)
+//   console.log("mylog", `Excel文件将存至: ${filePath}`);
+//   try {
+//     const buffer = await workbook.xlsx.writeBuffer();
+//
+//     // 写入文件系统
+//     const file = fs.openSync(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE);
+//     fs.writeSync(file.fd, buffer);
+//     fs.closeSync(file);
+//     console.log("mylog", `Excel文件已保存至: ${filePath}`);
+//   } catch (error) {
+//     console.error("mylog", '文件保存失败:', error);
+//   }
+// }
+//
 
 @Concurrent
 async function record2Csv(billDbRecords: BillDbRecord[], filePath: string) {
