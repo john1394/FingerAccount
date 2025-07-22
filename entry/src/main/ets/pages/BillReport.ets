@@ -106,7 +106,8 @@ struct BillReport {
 
     let biz_type = this.isOutput ? BillTypeEnum.Outcome : BillTypeEnum.Income
     let categorySum = DatabaseHelper.getInstance()
-      .getCategorySum(BizConstants.Default_bill_book_id, this.dayBoundary.begin.getTime(), this.dayBoundary.end.getTime(), biz_type
+      .getCategorySum(BizConstants.Default_bill_book_id, this.dayBoundary.begin.getTime(),
+        this.dayBoundary.end.getTime(), biz_type
       );
 
     this.pieData = categorySum.map(item => ({
@@ -118,7 +119,7 @@ struct BillReport {
       .slice(0, BizConstants.Category_TOP5_Limit);
 
     emitter.on(BizConstants.Report_reload_data_key, () => {
-      this.updateTimeRange(this.dayBoundary,this.isOutput)
+      this.updateTimeRange(this.dayBoundary, this.isOutput)
     }
     )
 
@@ -286,6 +287,10 @@ struct BillReport {
       //.backgroundColor(Color.Pink)
       .align(Alignment.Top)
 
+      .edgeEffect(
+        EdgeEffect.Spring
+      )
+
     }
     .width("100%")
     .backgroundColor($r("app.color.back_color"))
@@ -306,7 +311,8 @@ struct BillReport {
 
       interval = 0
       sumData = DatabaseHelper.getInstance()
-        .getDaySum(BizConstants.Default_bill_book_id, dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type);
+        .getDaySum(BizConstants.Default_bill_book_id, dayBoundary.begin.getTime(), dayBoundary.end.getTime(),
+          bill_type);
       sumData.map(u => {
         map.set(u.timeBase, u.amount);
       });
@@ -331,7 +337,8 @@ struct BillReport {
       interval = 5
 
       sumData = DatabaseHelper.getInstance()
-        .getDaySum(BizConstants.Default_bill_book_id, dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type);
+        .getDaySum(BizConstants.Default_bill_book_id, dayBoundary.begin.getTime(), dayBoundary.end.getTime(),
+          bill_type);
       sumData.map(u => {
         map.set(u.timeBase, u.amount);
       });
@@ -362,7 +369,8 @@ struct BillReport {
 
       sumData =
         DatabaseHelper.getInstance()
-          .getMonthSum(BizConstants.Default_bill_book_id, dayBoundary.begin.getTime(), dayBoundary.end.getTime(), bill_type);
+          .getMonthSum(BizConstants.Default_bill_book_id, dayBoundary.begin.getTime(), dayBoundary.end.getTime(),
+            bill_type);
       sumData.map(u => {
         map.set(u.timeBase, u.amount);
       });
