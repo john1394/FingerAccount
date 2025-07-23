@@ -231,8 +231,8 @@ export struct ReportTimeSelector {
             Column() {
               Text(item.txt)
                 .fontColor(item.getFontColor())
-                .fontSize(18)
-                .fontWeight(FontWeight.Normal)
+                .fontSize(17)
+                .fontWeight(FontWeight.Bold)
             }
             .backgroundColor(item.getBackColor(this.isLoading))
 
@@ -306,6 +306,7 @@ export struct ReportTimeSelector {
           Column() {
             Text(this.fromBeginDateStr)
               .fontSize(15)
+              .fontWeight(FontWeight.Bold)
 
           }.layoutWeight(5)
 
@@ -337,6 +338,8 @@ export struct ReportTimeSelector {
           Row({ space: 3 }) {
             Text(formatDateYMDHan(this.dayBoundary.begin))
               .fontColor(this.isLoading ? $r("app.color.text_second") : $r("app.color.text_primary"))
+              .fontSize(15)
+              .fontWeight(FontWeight.Bold)
             Image(this.isLoading ? $r("app.media.arrowtriangle_down_fill_disable") :
             $r("app.media.arrowtriangle_down_fill"))
               .width(16)
@@ -371,6 +374,7 @@ export struct ReportTimeSelector {
           Row({ space: 3 }) {
             Text(formatDateYMDHan(this.dayBoundary.end))
               .fontColor(this.isLoading ? $r("app.color.text_second") : $r("app.color.text_primary"))
+              .fontWeight(FontWeight.Bold)
             //Image($r("sys.media.ohos_ic_public_arrow_down"))
             Image(this.isLoading ? $r("app.media.arrowtriangle_down_fill_disable") :
             $r("app.media.arrowtriangle_down_fill"))
