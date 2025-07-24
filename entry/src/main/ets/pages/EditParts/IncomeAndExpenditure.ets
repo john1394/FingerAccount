@@ -102,6 +102,7 @@ export struct IncomeAndExpenditure {
         //.backgroundColor(Color.Yellow)
 
       }
+      .edgeEffect(EdgeEffect.Spring)
       .align(Alignment.Top)
       .height("100%")
       .width('100%')
