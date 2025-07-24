@@ -157,21 +157,14 @@ struct Export2FilePage {
         console.log(`mylog save export file cost：${duration} ms ,allRecord count:${allRecord.length} `);
 
 
-        let timerId = setTimeout(() => {
-          clearTimeout(timerId);
-          // promptAction.showToast({
-          //   message: '导出完成',
-          //   duration: 400,
-          //   textColor: Color.Green,
-          //   alignment: Alignment.Center
-          // });
+        animateTo({ duration: 300 }, () => {
+          AlertDialog.show(
+            {
+              message: "导出操作完成!"
+            }
+          )
 
-          AlertDialog.show({
-            message: "导出完成！"
-          })
-
-        }, 300)
-
+        })
       }
 
       this.isProcessing = false
@@ -254,6 +247,21 @@ struct Export2FilePage {
       .width('100%')
       .backgroundColor($r('app.color.back_color'))
     }
+  }
+
+  pageTransition() {
+    // 定义页面进入时的效果，从右侧滑入，时长为1000ms，页面栈发生push操作时该效果才生效
+    PageTransitionEnter({ type: RouteType.Push, duration: 300 })
+      .slide(SlideEffect.Right)
+    // 定义页面进入时的效果，从左侧滑入，时长为1000ms，页面栈发生pop操作时该效果才生效
+    PageTransitionEnter({ type: RouteType.Pop, duration: 300 })
+      .slide(SlideEffect.Left)
+    // 定义页面退出时的效果，向左侧滑出，时长为1000ms，页面栈发生push操作时该效果才生效
+    PageTransitionExit({ type: RouteType.Push, duration: 300 })
+      .slide(SlideEffect.Left)
+    // 定义页面退出时的效果，向右侧滑出，时长为1000ms，页面栈发生pop操作时该效果才生效
+    PageTransitionExit({ type: RouteType.Pop, duration: 300 })
+      .slide(SlideEffect.Right)
   }
 }
 

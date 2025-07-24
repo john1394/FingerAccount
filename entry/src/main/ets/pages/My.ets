@@ -130,7 +130,8 @@ struct My {
         () => {
           router.pushUrl({
             url: "pages/Export2FilePage",
-            params: {}
+            params: {},
+
           })
         }
 
@@ -157,6 +158,8 @@ struct My {
     .height('100%')
     .backgroundColor($r('app.color.back_color'))
   }
+
+
 }
 
 export default My
