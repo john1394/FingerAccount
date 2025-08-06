@@ -494,11 +494,13 @@ struct WriteRecord {
                                 overflow: TextOverflow.Ellipsis
                               }
                             )
-                            .width(150)//  .backgroundColor(Color.Pink)
+                            .width(120)//  .backgroundColor(Color.Pink)
                             .maxLines(1)
                             .fontSize(14)
                             .fontColor($r("app.color.text_second"))
                         }.alignItems(HorizontalAlign.Start)
+
+                        // .backgroundColor(Color.Orange)
 
                       }.justifyContent(FlexAlign.Start)
                       .padding(
@@ -525,9 +527,10 @@ struct WriteRecord {
                           .fontSize(14)
 
 
-                      }.layoutWeight(1)
-                      //.backgroundColor(Color.Yellow)
-                      //.width(120)
+                      }
+                      .layoutWeight(1)
+                      // .backgroundColor(Color.Pink)
+
                       .alignItems(HorizontalAlign.End)
 
                       .padding(
