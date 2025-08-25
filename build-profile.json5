@@ -1,38 +1,38 @@
 {
   "app": {
     "signingConfigs": [
+      //      {
+      //        "name": "default",
+      //        "type": "HarmonyOS",
+      //        "material": {
+      //          "certpath": "C:\\Users\\john\\.ohos\\config\\default_FingerAccount_dt19cNpdJa1vNku08JFh5oH60ZVn51wptPIwZ6-czvw=.cer",
+      //          "keyAlias": "debugKey",
+      //          "keyPassword": "0000001B76B863EA9FAD96B5CD24D053D84246C95249656A3C99C936973CD29B59F0E95BA513EBB3E29983",
+      //          "profile": "C:\\Users\\john\\.ohos\\config\\default_FingerAccount_dt19cNpdJa1vNku08JFh5oH60ZVn51wptPIwZ6-czvw=.p7b",
+      //          "signAlg": "SHA256withECDSA",
+      //          "storeFile": "C:\\Users\\john\\.ohos\\config\\default_FingerAccount_dt19cNpdJa1vNku08JFh5oH60ZVn51wptPIwZ6-czvw=.p12",
+      //          "storePassword": "0000001BE5C5153C1B2DDBE0A4BCF26056010F94735EB47BC84A096E5BBB840313AFA9858C21EFDE05173E"
+      //        }
+      //      },
       {
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\john\\.ohos\\config\\default_FingerAccount_dt19cNpdJa1vNku08JFh5oH60ZVn51wptPIwZ6-czvw=.cer",
-          "keyAlias": "debugKey",
-          "keyPassword": "0000001B76B863EA9FAD96B5CD24D053D84246C95249656A3C99C936973CD29B59F0E95BA513EBB3E29983",
-          "profile": "C:\\Users\\john\\.ohos\\config\\default_FingerAccount_dt19cNpdJa1vNku08JFh5oH60ZVn51wptPIwZ6-czvw=.p7b",
+          "storeFile": "D:/workspace/2025/hos/keys/fingeraccount.p12",
+          "storePassword": "00000018690A8223AC3291E5F1D75A2B73E1D8F6D6695788685233A4B14F8FB1C86531E8E785D4EA",
+          "keyAlias": "fingerprint_pub",
+          "keyPassword": "0000001822EDD1497273A874C8992FC3E94E5492036C954B548662AEEC0F7B6CEBE783962C0B502C",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\john\\.ohos\\config\\default_FingerAccount_dt19cNpdJa1vNku08JFh5oH60ZVn51wptPIwZ6-czvw=.p12",
-          "storePassword": "0000001BE5C5153C1B2DDBE0A4BCF26056010F94735EB47BC84A096E5BBB840313AFA9858C21EFDE05173E"
+          "profile": "D:/workspace/2025/hos/keys/fingeraccountRelease.p7b",
+          "certpath": "D:/workspace/2025/hos/keys/fingeraccount.cer"
         }
-      },
-      //      {
-      //        "name": "pub",
-      //        "type": "HarmonyOS",
-      //        "material": {
-      //          "storeFile": "D:/workspace/2025/hos/keys/fingeraccount.p12",
-      //          "storePassword": "00000018690A8223AC3291E5F1D75A2B73E1D8F6D6695788685233A4B14F8FB1C86531E8E785D4EA",
-      //          "keyAlias": "fingerprint_pub",
-      //          "keyPassword": "0000001822EDD1497273A874C8992FC3E94E5492036C954B548662AEEC0F7B6CEBE783962C0B502C",
-      //          "signAlg": "SHA256withECDSA",
-      //          "profile": "D:/workspace/2025/hos/keys/fingeraccountRelease.p7b",
-      //          "certpath": "D:/workspace/2025/hos/keys/fingeraccount.cer"
-      //        }
-      //      }
+      }
     ],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.5(17)",
+        "compatibleSdkVersion": "5.0.2(14)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "strictMode": {
